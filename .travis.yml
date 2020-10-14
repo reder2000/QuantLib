@@ -16,7 +16,7 @@ stages:
 before_install:
   - docker pull ${DOCKER_IMAGE}
   - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ./autogen.sh
-  - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ./configure --disable-static ${CONFIGURE_FLAGS} CC="${CACHEDCC}" CXX="${CACHEDCXX}" CXXFLAGS="${CXXFLAGS}"
+  - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ./configure --disable-static --enable-error-lines --enable-error-functions --enable-tracing --enable-indexed-coupons --enable-extra-safety-checks --enable-sessions --enable-thread-safe-observer-pattern --enable-intraday ${CONFIGURE_FLAGS} CC="${CACHEDCC}" CXX="${CACHEDCXX}" CXXFLAGS="${CXXFLAGS}"
   - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ccache --max-size=2.5G
 
 jobs:
@@ -25,22 +25,15 @@ jobs:
     - &build-lib
       stage: Build library
       env:
-        - INFO="gcc 4.8 (Boost 1.48)"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:trusty
+        - INFO="gcc 5.4 (Boost 1.66)"
+          DOCKER_IMAGE=lballabio/quantlib-devenv:xenial
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Werror"
+          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
       script:
         - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make -j 2 -C ql
     - <<: *build-lib
       env:
-        - INFO="gcc 5.4 (Boost 1.66)"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:xenial
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *build-lib
-      env:
         - INFO="gcc 6.3 (Boost 1.66)"
           DOCKER_IMAGE=lballabio/quantlib-devenv:zesty
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
@@ -147,46 +140,23 @@ jobs:
           CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
     - <<: *build-lib
       env:
-        - INFO="Intraday calculations enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-intraday"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *build-lib
-      env:
-        - INFO="Indexed coupons enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-indexed-coupons"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *build-lib
-      env:
         - INFO="C++11 classes enabled"
           DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
           CONFIGURE_FLAGS="--enable-std-classes"
-          CXXFLAGS="-O2 -g0 -std=c++11 -Wall -Wno-unknown-pragmas -Werror"
+          CXXFLAGS="-O2 -g0 -std=c++17 -Wall -Wno-unknown-pragmas -Werror"
     # Build the rest
     - &build-tests
       stage: Build tests
       env:
-        - INFO="gcc 4.8 (Boost 1.48)"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:trusty
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Werror"
-      script:
-        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make -j 2
-    - <<: *build-tests
-      env:
         - INFO="gcc 5.4 (Boost 1.66)"
           DOCKER_IMAGE=lballabio/quantlib-devenv:xenial
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
           CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
+      script:
+        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make -j 2
     - <<: *build-tests
       env:
         - INFO="gcc 6.3 (Boost 1.66)"
@@ -295,52 +265,26 @@ jobs:
           CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
     - <<: *build-tests
       env:
-        - INFO="Intraday calculations enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-intraday"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *build-tests
-      env:
-        - INFO="Indexed coupons enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-indexed-coupons"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *build-tests
-      env:
         - INFO="C++11 classes enabled"
           DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
           CONFIGURE_FLAGS="--enable-std-classes"
-          CXXFLAGS="-O2 -g0 -std=c++11 -Wall -Wno-unknown-pragmas -Werror"
+          CXXFLAGS="-O2 -g0 -std=c++17 -Wall -Wno-unknown-pragmas -Werror"
 
     # Run all checks
     - &run-checks
       stage: Run all checks
       env:
-        - INFO="gcc 4.8 (Boost 1.48)"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:trusty
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Werror"
-      script:
-        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make -j 2
-        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ./test-suite/quantlib-test-suite --log_level=message
-        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make check-examples
-        - echo "#include <ql/quantlib.hpp>" > test1.cpp && echo "int main() { return 0; }" >> test1.cpp
-        - echo "#include <ql/quantlib.hpp>" > test2.cpp
-        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} bash -c "make install && ${CACHEDCXX} ${CXXFLAGS} test1.cpp test2.cpp -lQuantLib"
-    - <<: *run-checks
-      env:
         - INFO="gcc 5.4 (Boost 1.66)"
           DOCKER_IMAGE=lballabio/quantlib-devenv:xenial
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
           CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
+      script:
+        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make -j 2
+        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} ./test-suite/quantlib-test-suite --log_level=message
+        - docker run ${DOCKER_OPTS} ${DOCKER_IMAGE} make check-examples
     - <<: *run-checks
       env:
         - INFO="gcc 6.3 (Boost 1.66)"
@@ -449,25 +393,9 @@ jobs:
           CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
     - <<: *run-checks
       env:
-        - INFO="Intraday calculations enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-intraday"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *run-checks
-      env:
-        - INFO="Indexed coupons enabled"
-          DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
-          DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
-          CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
-          CONFIGURE_FLAGS="--enable-indexed-coupons"
-          CXXFLAGS="-O2 -g0 -Wall -Wno-unknown-pragmas -Wno-deprecated-declarations -Werror"
-    - <<: *run-checks
-      env:
         - INFO="C++11 classes enabled"
           DOCKER_IMAGE=lballabio/quantlib-devenv:rolling
           DOCKER_OPTS="--rm -ti -v ${HOME}/.ccache:/root/.ccache -v ${TRAVIS_BUILD_DIR}:/build -w /build"
           CACHEDCC="ccache gcc" CACHEDCXX="ccache g++"
           CONFIGURE_FLAGS="--enable-std-classes"
-          CXXFLAGS="-O2 -g0 -std=c++11 -Wall -Wno-unknown-pragmas -Werror"
+          CXXFLAGS="-O2 -g0 -std=c++17 -Wall -Wno-unknown-pragmas -Werror"

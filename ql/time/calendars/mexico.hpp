@@ -24,7 +24,7 @@
 #ifndef quantlib_mexico_calendar_hpp
 #define quantlib_mexico_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -52,9 +52,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Mexico : public Calendar {
+    template <class Date>
+    class Mexico : public Calendar<Date> {
       private:
-        class BmvImpl : public Calendar::WesternImpl {
+        class BmvImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Mexican stock exchange"; }
             bool isBusinessDay(const Date&) const;

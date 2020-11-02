@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -25,9 +26,9 @@ namespace QuantLib {
 
     Israel::Israel(Israel::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> SettlementImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> SettlementImpl(
                                         new Israel::TelAvivImpl);
-        static ext::shared_ptr<Calendar::Impl> TelAvivImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> TelAvivImpl(
                                         new Israel::TelAvivImpl);
         switch (market) {
         case Settlement:
@@ -355,3 +356,4 @@ namespace QuantLib {
     }
 
 }
+#endif

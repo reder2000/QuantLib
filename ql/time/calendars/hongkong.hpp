@@ -25,7 +25,7 @@
 #ifndef quantlib_hongkong_calendar_hpp
 #define quantlib_hongkong_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -60,9 +60,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class HongKong : public Calendar {
+    template <class Date>
+    class HongKong : public Calendar<Date> {
       private:
-        class HkexImpl : public Calendar::WesternImpl {
+        class HkexImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Hong Kong stock exchange"; }
             bool isBusinessDay(const Date&) const;

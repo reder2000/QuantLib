@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -25,15 +26,15 @@ namespace QuantLib {
     Germany::Germany(Germany::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(
             new Germany::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> frankfurtStockExchangeImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> frankfurtStockExchangeImpl(
             new Germany::FrankfurtStockExchangeImpl);
-        static ext::shared_ptr<Calendar::Impl> xetraImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> xetraImpl(
             new Germany::XetraImpl);
-        static ext::shared_ptr<Calendar::Impl> eurexImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> eurexImpl(
             new Germany::EurexImpl);
-        static ext::shared_ptr<Calendar::Impl> euwaxImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> euwaxImpl(
             new Germany::EuwaxImpl);
 
         switch (market) {
@@ -197,3 +198,4 @@ namespace QuantLib {
     }
 }
 
+#endif

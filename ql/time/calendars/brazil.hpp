@@ -25,7 +25,7 @@
 #ifndef quantlib_brazilian_calendar_hpp
 #define quantlib_brazilian_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -74,14 +74,15 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class Brazil : public Calendar {
+    template <class Date>
+    class Brazil : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Brazil"; }
             bool isBusinessDay(const Date&) const;
         };
-        class ExchangeImpl : public Calendar::WesternImpl {
+        class ExchangeImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "BOVESPA"; }
             bool isBusinessDay(const Date&) const;
@@ -91,8 +92,107 @@ namespace QuantLib {
         enum Market { Settlement,            //!< generic settlement calendar
                       Exchange               //!< BOVESPA calendar
         };
-        Brazil(Market market = Settlement);
+        Brazil(Market market = Settlement) {
+            // all calendar instances on the same market share the same
+            // implementation instance
+            static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(new Brazil::SettlementImpl);
+            static ext::shared_ptr<Calendar<Date>::Impl> exchangeImpl(new Brazil::ExchangeImpl);
+            switch (market) {
+                case Settlement:
+                    impl_ = settlementImpl;
+                    break;
+                case Exchange:
+                    impl_ = exchangeImpl;
+                    break;
+                default:
+                    QL_FAIL("unknown market");
+            }
+        }
     };
+
+  template <class Date>
+    inline bool Brazil<Date>::SettlementImpl::isBusinessDay(const Date& date) const {
+        Weekday w = type_traits<Date>::weekday(date);
+        Day d = type_traits<Date>::dayOfMonth(date);
+        Day dd = type_traits<Date>::dayOfYear(date);
+        Month m = type_traits<Date>::month(date);
+        Year y = date.year();
+        Day em = easterMonday(y);
+
+        if (isWeekend(w)
+            // New Year's Day
+            || (d == 1 && m == January)
+            // Tiradentes Day
+            || (d == 21 && m == April)
+            // Labor Day
+            || (d == 1 && m == May)
+            // Independence Day
+            || (d == 7 && m == September)
+            // Nossa Sra. Aparecida Day
+            || (d == 12 && m == October)
+            // All Souls Day
+            || (d == 2 && m == November)
+            // Republic Day
+            || (d == 15 && m == November)
+            // Christmas
+            || (d == 25 && m == December)
+            // Passion of Christ
+            || (dd == em - 3)
+            // Carnival
+            || (dd == em - 49 || dd == em - 48)
+            // Corpus Christi
+            || (dd == em + 59))
+            return false; // NOLINT(readability-simplify-boolean-expr)
+        return true;
+    }
+
+template <class Date>
+    inline bool Brazil<Date>::ExchangeImpl::isBusinessDay(const Date& date) const {
+        Weekday w = type_traits<Date>::weekday(date);
+        Day d = type_traits<Date>::dayOfMonth(date);
+        Day dd = type_traits<Date>::dayOfYear(date);
+        Month m = type_traits<Date>::month(date);
+        Year y = date.year();
+        Day em = easterMonday(y);
+
+        if (isWeekend(w)
+            // New Year's Day
+            || (d == 1 && m == January)
+            // Sao Paulo City Day
+            || (d == 25 && m == January)
+            // Tiradentes Day
+            || (d == 21 && m == April)
+            // Labor Day
+            || (d == 1 && m == May)
+            // Revolution Day
+            || (d == 9 && m == July)
+            // Independence Day
+            || (d == 7 && m == September)
+            // Nossa Sra. Aparecida Day
+            || (d == 12 && m == October)
+            // All Souls Day
+            || (d == 2 && m == November)
+            // Republic Day
+            || (d == 15 && m == November)
+            // Black Consciousness Day
+            || (d == 20 && m == November && y >= 2007)
+            // Christmas Eve
+            || (d == 24 && m == December)
+            // Christmas
+            || (d == 25 && m == December)
+            // Passion of Christ
+            || (dd == em - 3)
+            // Carnival
+            || (dd == em - 49 || dd == em - 48)
+            // Corpus Christi
+            || (dd == em + 59)
+            // last business day of the year
+            || (m == December && (d == 31 || (d >= 29 && w == Friday))))
+            return false; // NOLINT(readability-simplify-boolean-expr)
+        return true;
+    }
+
+
 
 }
 

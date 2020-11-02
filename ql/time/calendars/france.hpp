@@ -25,7 +25,7 @@
 #ifndef quantlib_france_calendar_hpp
 #define quantlib_france_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -63,14 +63,15 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class France : public Calendar {
+    template <class Date>
+    class France : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "French settlement"; }
             bool isBusinessDay(const Date&) const;
         };
-        class ExchangeImpl : public Calendar::WesternImpl {
+        class ExchangeImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Paris stock exchange"; }
             bool isBusinessDay(const Date&) const;

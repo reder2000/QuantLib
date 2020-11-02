@@ -25,7 +25,7 @@
 #ifndef quantlib_austria_calendar_hpp
 #define quantlib_austria_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -69,14 +69,15 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Austria : public Calendar {
+    template <class Date>
+    class Austria : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Austrian settlement"; }
             bool isBusinessDay(const Date&) const;
         };
-        class ExchangeImpl : public Calendar::WesternImpl {
+        class ExchangeImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Vienna stock exchange"; }
             bool isBusinessDay(const Date&) const;
@@ -88,6 +89,103 @@ namespace QuantLib {
         };
         explicit Austria(Market market = Settlement);
     };
+
+
+        template <class Date>
+    inline Austria<Date>::Austria(Austria<Date>::Market market) {
+        // all calendar instances on the same market share the same
+        // implementation instance
+        static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(new Austria<Date>::SettlementImpl);
+        static ext::shared_ptr<Calendar<Date>::Impl> exchangeImpl(new Austria<Date>::ExchangeImpl);
+        switch (market) {
+            case Settlement:
+                impl_ = settlementImpl;
+                break;
+            case Exchange:
+                impl_ = exchangeImpl;
+                break;
+            default:
+                QL_FAIL("unknown market");
+        }
+    }
+
+
+        template <class Date>
+    inline bool Austria<Date>::SettlementImpl::isBusinessDay(const Date& date) const {
+        Weekday w = type_traits<Date>::weekday(date);
+        Day d = type_traits<Date>::dayOfMonth(date);
+        Day dd = type_traits<Date>::dayOfYear(date);
+        Month m = type_traits<Date>::month(date);
+        Year y = date.year();
+        Day em = easterMonday(y);
+        if (isWeekend(w)
+            // New Year's Day
+            || (d == 1 && m == January)
+            // Epiphany
+            || (d == 6 && m == January)
+            // Easter Monday
+            || (dd == em)
+            // Ascension Thurday
+            || (dd == em + 38)
+            // Whit Monday
+            || (dd == em + 49)
+            // Corpus Christi
+            || (dd == em + 59)
+            // Labour Day
+            || (d == 1 && m == May)
+            // Assumption
+            || (d == 15 && m == August)
+            // National Holiday since 1967
+            || (d == 26 && m == October && y >= 1967)
+            // National Holiday 1919-1934
+            || (d == 12 && m == November && y >= 1919 && y <= 1934)
+            // All Saints' Day
+            || (d == 1 && m == November)
+            // Immaculate Conception
+            || (d == 8 && m == December)
+            // Christmas
+            || (d == 25 && m == December)
+            // St. Stephen
+            || (d == 26 && m == December))
+            return false; // NOLINT(readability-simplify-boolean-expr)
+        return true;
+    }
+
+
+            template <class Date>
+    inline bool Austria<Date>::ExchangeImpl::isBusinessDay(const Date& date) const {
+        Weekday w = type_traits<Date>::weekday(date);
+        Day d = type_traits<Date>::dayOfMonth(date);
+        Day dd = type_traits<Date>::dayOfYear(date);
+        Month m = type_traits<Date>::month(date);
+        Year y = date.year();
+        Day em = easterMonday(y);
+        if (isWeekend(w)
+            // New Year's Day
+            || (d == 1 && m == January)
+            // Good Friday
+            || (dd == em - 3)
+            // Easter Monday
+            || (dd == em)
+            // Whit Monay
+            || (dd == em + 49)
+            // Labour Day
+            || (d == 1 && m == May)
+            // National Holiday since 1967
+            || (d == 26 && m == October && y >= 1967)
+            // National Holiday 1919-1934
+            || (d == 12 && m == November && y >= 1919 && y <= 1934)
+            // Christmas' Eve
+            || (d == 24 && m == December)
+            // Christmas
+            || (d == 25 && m == December)
+            // St. Stephen
+            || (d == 26 && m == December)
+            // Exchange Holiday
+            || (d == 31 && m == December))
+            return false; // NOLINT(readability-simplify-boolean-expr)
+        return true;
+    }
 
 }
 

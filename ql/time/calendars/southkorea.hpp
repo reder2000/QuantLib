@@ -27,7 +27,7 @@
 #ifndef quantlib_south_korean_calendar_hpp
 #define quantlib_south_korean_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -73,9 +73,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class SouthKorea : public Calendar {
+    template <class Date>
+    class SouthKorea : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::Impl {
+        class SettlementImpl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "South-Korean settlement"; }
             bool isWeekend(Weekday) const;

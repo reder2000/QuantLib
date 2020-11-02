@@ -26,7 +26,7 @@
 #ifndef quantlib_romania_calendar_hpp
 #define quantlib_romania_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -56,9 +56,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Romania : public Calendar {
+    template <class Date>
+    class Romania : public Calendar<Date> {
       private:
-        class PublicImpl : public Calendar::OrthodoxImpl {
+        class PublicImpl : public Calendar<Date>::OrthodoxImpl {
           public:
             std::string name() const { return "Romania"; }
             bool isBusinessDay(const Date&) const;

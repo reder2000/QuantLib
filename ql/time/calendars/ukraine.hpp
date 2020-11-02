@@ -24,7 +24,7 @@
 #ifndef quantlib_ukrainian_calendar_hpp
 #define quantlib_ukrainian_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -50,9 +50,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Ukraine : public Calendar {
+    template <class Date>
+    class Ukraine : public Calendar<Date> {
       private:
-        class UseImpl : public Calendar::OrthodoxImpl {
+        class UseImpl : public Calendar<Date>::OrthodoxImpl {
           public:
             std::string name() const { return "Ukrainian stock exchange"; }
             bool isBusinessDay(const Date&) const;

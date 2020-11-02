@@ -24,7 +24,7 @@
 #ifndef quantlib_russia_calendar_hpp
 #define quantlib_russia_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -55,14 +55,15 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Russia : public Calendar {
+    template <class Date>
+    class Russia : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::OrthodoxImpl {
+        class SettlementImpl : public Calendar<Date>::OrthodoxImpl {
           public:
             std::string name() const { return "Russian settlement"; }
             bool isBusinessDay(const Date&) const;
         };
-        class ExchangeImpl : public Calendar::OrthodoxImpl {
+        class ExchangeImpl : public Calendar<Date>::OrthodoxImpl {
           public:
             std::string name() const { return "Moscow exchange"; }
             bool isBusinessDay(const Date&) const;

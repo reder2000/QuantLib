@@ -25,7 +25,7 @@
 #ifndef quantlib_taiwanese_calendar_hpp
 #define quantlib_taiwanese_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -52,9 +52,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Taiwan : public Calendar {
+    template <class Date>
+    class Taiwan : public Calendar<Date> {
       private:
-        class TsecImpl : public Calendar::Impl {
+        class TsecImpl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "Taiwan stock exchange"; }
             bool isWeekend(Weekday) const;

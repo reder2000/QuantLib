@@ -25,7 +25,7 @@
 #ifndef quantlib_israel_calendar_hpp
 #define quantlib_israel_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -58,9 +58,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Israel : public Calendar {
+    template <class Date>
+    class Israel : public Calendar<Date> {
       private:
-        class TelAvivImpl : public Calendar::Impl {
+        class TelAvivImpl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "Tel Aviv stock exchange"; }
             bool isWeekend(Weekday) const;

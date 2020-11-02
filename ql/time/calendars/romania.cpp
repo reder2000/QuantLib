@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -27,9 +28,9 @@ namespace QuantLib {
 
     Romania::Romania(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> publicImpl =
+        static ext::shared_ptr<Calendar<Date>::Impl> publicImpl =
             ext::make_shared<Romania::PublicImpl>();
-        static ext::shared_ptr<Calendar::Impl> bvbImpl =
+        static ext::shared_ptr<Calendar<Date>::Impl> bvbImpl =
             ext::make_shared<Romania::BVBImpl>();
         switch (market) {
           case Public:
@@ -94,3 +95,4 @@ namespace QuantLib {
             
 }
 
+#endif

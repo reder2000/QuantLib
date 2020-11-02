@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -25,7 +26,7 @@ namespace QuantLib {
 
     Turkey::Turkey() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Turkey::Impl);
+        static ext::shared_ptr<Calendar<Date>::Impl> impl(new Turkey::Impl);
         impl_ = impl;
     }
 
@@ -259,3 +260,4 @@ namespace QuantLib {
 
 }
 
+#endif

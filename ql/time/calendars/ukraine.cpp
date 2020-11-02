@@ -1,4 +1,6 @@
-/* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+#if defined(FIXME_WHEN_YOU_HAVE_TIME) 
+/* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; \
+                                         c-basic-offset: 4 -*- */
 
 /*
  Copyright (C) 2005 StatPro Italia srl
@@ -23,7 +25,7 @@ namespace QuantLib {
 
     Ukraine::Ukraine(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Ukraine::UseImpl);
+        static ext::shared_ptr<Calendar<Date>::Impl> impl(new Ukraine::UseImpl);
         impl_ = impl;
     }
 
@@ -63,3 +65,4 @@ namespace QuantLib {
 
 }
 
+#endif

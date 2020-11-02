@@ -24,7 +24,7 @@
 #ifndef quantlib_target_calendar_h
 #define quantlib_target_calendar_h
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -47,16 +47,48 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class TARGET : public Calendar {
+    template <class Date>
+    class TARGET : public Calendar<Date> {
       private:
-        class Impl : public Calendar::WesternImpl {
+        class Impl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "TARGET"; }
             bool isBusinessDay(const Date&) const;
         };
       public:
-        TARGET();
+        TARGET() {
+            // all calendar instances share the same implementation instance
+            static ext::shared_ptr<Calendar<Date>::Impl> impl(new TARGET::Impl);
+            impl_ = impl;
+        }
     };
+
+    template <class Date> inline
+        bool TARGET<Date>::Impl::isBusinessDay(const Date& date) const {
+        Weekday w = type_traits<Date>::weekday(date);
+        Day d = type_traits<Date>::dayOfMonth(date);
+        Day dd = type_traits<Date>::dayOfYear(date);
+        Month m = type_traits<Date>::month(date);
+        Year y = date.year();
+        Day em = easterMonday(y);
+        if (isWeekend(w)
+            // New Year's Day
+            || (d == 1 && m == January)
+            // Good Friday
+            || (dd == em - 3 && y >= 2000)
+            // Easter Monday
+            || (dd == em && y >= 2000)
+            // Labour Day
+            || (d == 1 && m == May && y >= 2000)
+            // Christmas
+            || (d == 25 && m == December)
+            // Day of Goodwill
+            || (d == 26 && m == December && y >= 2000)
+            // December 31st, 1998, 1999, and 2001 only
+            || (d == 31 && m == December && (y == 1998 || y == 1999 || y == 2001)))
+            return false; // NOLINT(readability-simplify-boolean-expr)
+        return true;
+    }
 
 }
 

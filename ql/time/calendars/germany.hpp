@@ -24,7 +24,7 @@
 #ifndef quantlib_germany_calendar_hpp
 #define quantlib_germany_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -109,29 +109,30 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class Germany : public Calendar {
+    template <class Date>
+    class Germany : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "German settlement"; }
             bool isBusinessDay(const Date&) const;
         };
-        class FrankfurtStockExchangeImpl : public Calendar::WesternImpl {
+        class FrankfurtStockExchangeImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Frankfurt stock exchange"; }
             bool isBusinessDay(const Date&) const;
         };
-        class XetraImpl : public Calendar::WesternImpl {
+        class XetraImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Xetra"; }
             bool isBusinessDay(const Date&) const;
         };
-        class EurexImpl : public Calendar::WesternImpl {
+        class EurexImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Eurex"; }
             bool isBusinessDay(const Date&) const;
         };
-        class EuwaxImpl : public Calendar::WesternImpl {
+        class EuwaxImpl : public Calendar<Date>::WesternImpl {
         public:
             std::string name() const { return "Euwax"; }
             bool isBusinessDay(const Date&) const;

@@ -24,7 +24,7 @@
 #ifndef quantlib_iceland_calendar_hpp
 #define quantlib_iceland_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -50,9 +50,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Iceland : public Calendar {
+    template <class Date>
+    class Iceland : public Calendar<Date> {
       private:
-        class IcexImpl : public Calendar::WesternImpl {
+        class IcexImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Iceland stock exchange"; }
             bool isBusinessDay(const Date&) const;

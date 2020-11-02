@@ -24,7 +24,7 @@
 #ifndef quantlib_swiss_calendar_hpp
 #define quantlib_swiss_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -47,9 +47,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Switzerland : public Calendar {
+    template <class Date>
+    class Switzerland : public Calendar<Date> {
       private:
-        class Impl : public Calendar::WesternImpl {
+        class Impl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Switzerland"; }
             bool isBusinessDay(const Date&) const;

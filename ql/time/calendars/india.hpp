@@ -24,7 +24,7 @@
 #ifndef quantlib_indian_calendar_hpp
 #define quantlib_indian_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -65,9 +65,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class India : public Calendar {
+    template <class Date>
+    class India : public Calendar<Date> {
       private:
-        class NseImpl : public Calendar::WesternImpl {
+        class NseImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const {
                 return "National Stock Exchange of India";

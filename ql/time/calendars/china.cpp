@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -26,8 +27,8 @@ namespace QuantLib {
 
     China::China(Market m) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> sseImpl(new China::SseImpl);
-        static ext::shared_ptr<Calendar::Impl> IBImpl(new China::IbImpl);
+        static ext::shared_ptr<Calendar<Date>::Impl> sseImpl(new China::SseImpl);
+        static ext::shared_ptr<Calendar<Date>::Impl> IBImpl(new China::IbImpl);
         switch (m) {
           case SSE:
             impl_ = sseImpl;
@@ -307,3 +308,4 @@ namespace QuantLib {
 
 }
 
+#endif

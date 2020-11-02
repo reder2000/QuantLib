@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -136,7 +137,7 @@ namespace QuantLib {
 
     SaudiArabia::SaudiArabia(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> tadawulImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> tadawulImpl(
                                                 new SaudiArabia::TadawulImpl);
         switch (market) {
           case Tadawul:
@@ -171,3 +172,4 @@ namespace QuantLib {
 
 }
 
+#endif

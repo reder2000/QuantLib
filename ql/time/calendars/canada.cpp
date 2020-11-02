@@ -1,3 +1,4 @@
+#if defined(FIXME_WHEN_YOU_HAVE_TIME)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -25,9 +26,9 @@ namespace QuantLib {
 
     Canada::Canada(Canada::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(
                                                   new Canada::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> tsxImpl(new Canada::TsxImpl);
+        static ext::shared_ptr<Calendar<Date>::Impl> tsxImpl(new Canada::TsxImpl);
         switch (market) {
           case Settlement:
             impl_ = settlementImpl;
@@ -114,3 +115,4 @@ namespace QuantLib {
     }
 
 }
+#endif

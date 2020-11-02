@@ -24,7 +24,7 @@
 #ifndef quantlib_target_weekends_only_hpp
 #define quantlib_target_weekends_only_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -35,15 +35,22 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class WeekendsOnly : public Calendar {
+    template <class Date>
+    class WeekendsOnly : public Calendar<Date> {
       private:
-        class Impl : public Calendar::WesternImpl {
+        class Impl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "weekends only"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const Date&date) const {
+                return !isWeekend(type_traits<Date>::weekday(date));
+            }
         };
       public:
-        WeekendsOnly();
+        WeekendsOnly() {
+            // all calendar instances share the same implementation instance
+            static ext::shared_ptr<Calendar<Date>::Impl> impl(new WeekendsOnly::Impl);
+            impl_ = impl;
+        }
     };
 
 }

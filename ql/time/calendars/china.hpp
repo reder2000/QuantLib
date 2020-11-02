@@ -25,7 +25,7 @@
 #ifndef quantlib_chinese_calendar_hpp
 #define quantlib_chinese_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -55,16 +55,17 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class China : public Calendar {
+    template <class Date>
+    class China : public Calendar<Date> {
       private:
-        class SseImpl : public Calendar::Impl {
+        class SseImpl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "Shanghai stock exchange"; }
             bool isWeekend(Weekday) const;
             bool isBusinessDay(const Date&) const;
         };
 
-        class IbImpl : public Calendar::Impl {
+        class IbImpl : public Calendar<Date>::Impl {
           public:
             IbImpl()
             : sseImpl(ext::make_shared<China::SseImpl>()) {}
@@ -72,7 +73,7 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             bool isBusinessDay(const Date&) const;
           private:
-            ext::shared_ptr<Calendar::Impl> sseImpl;
+            ext::shared_ptr<Calendar<Date>::Impl> sseImpl;
         };
       public:
         enum Market { SSE,    //!< Shanghai stock exchange

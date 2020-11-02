@@ -25,7 +25,7 @@
 #ifndef quantlib_canadian_calendar_hpp
 #define quantlib_canadian_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -69,14 +69,15 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Canada : public Calendar {
+    template <class Date>
+    class Canada : public Calendar<Date> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "Canada"; }
             bool isBusinessDay(const Date&) const;
         };
-        class TsxImpl : public Calendar::WesternImpl {
+        class TsxImpl : public Calendar<Date>::WesternImpl {
           public:
             std::string name() const { return "TSX"; }
             bool isBusinessDay(const Date&) const;

@@ -19,25 +19,26 @@
 */
 
 /*! \file nullcalendar.hpp
-    \brief Calendar for reproducing theoretical calculations
+    \brief Calendar<Date> for reproducing theoretical calculations
 */
 
 #ifndef quantlib_null_calendar_hpp
 #define quantlib_null_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
-    //! %Calendar for reproducing theoretical calculations.
+    //! %Calendar<Date> for reproducing theoretical calculations.
     /*! This calendar has no holidays. It ensures that dates at
         whole-month distances have the same day of month.
 
         \ingroup calendars
     */
-    class NullCalendar : public Calendar {
+    template <class Date>
+    class NullCalendar : public Calendar<Date> {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "Null"; }
             bool isWeekend(Weekday) const { return false; }
@@ -45,7 +46,7 @@ namespace QuantLib {
         };
       public:
         NullCalendar() {
-            impl_ = ext::shared_ptr<Calendar::Impl>(new NullCalendar::Impl);
+            impl_ = ext::shared_ptr<Calendar<Date>::Impl>(new NullCalendar::Impl);
         }
     };
 

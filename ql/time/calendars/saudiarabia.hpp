@@ -25,7 +25,7 @@
 #ifndef quantlib_saudi_arabian_calendar_hpp
 #define quantlib_saudi_arabian_calendar_hpp
 
-#include <ql/time/calendar.hpp>
+#include "calendar.hpp"
 
 namespace QuantLib {
 
@@ -47,9 +47,10 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class SaudiArabia : public Calendar {
+    template <class Date>
+    class SaudiArabia : public Calendar<Date> {
       private:
-        class TadawulImpl : public Calendar::Impl {
+        class TadawulImpl : public Calendar<Date>::Impl {
           public:
             std::string name() const { return "Tadawul"; }
             bool isWeekend(Weekday) const;

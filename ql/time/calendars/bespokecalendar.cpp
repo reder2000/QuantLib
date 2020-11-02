@@ -22,35 +22,7 @@
 
 namespace QuantLib {
 
-    BespokeCalendar::Impl::Impl(const std::string& name)
-    : name_(name) {}
 
-    std::string BespokeCalendar::Impl::name() const {
-        return name_;
-    }
-
-    bool BespokeCalendar::Impl::isWeekend(Weekday w) const {
-        return (weekend_.find(w) != weekend_.end());
-    }
-
-    bool BespokeCalendar::Impl::isBusinessDay(const Date& date) const {
-        return !isWeekend(date.weekday());
-    }
-
-    void BespokeCalendar::Impl::addWeekend(Weekday w) {
-        weekend_.insert(w);
-    }
-
-
-    BespokeCalendar::BespokeCalendar(const std::string& name) {
-        bespokeImpl_ = ext::make_shared<BespokeCalendar::Impl>(
-                                             name);
-        impl_ = bespokeImpl_;
-    }
-
-    void BespokeCalendar::addWeekend(Weekday w) {
-        bespokeImpl_->addWeekend(w);
-    }
 
 }
 

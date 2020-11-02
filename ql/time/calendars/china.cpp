@@ -18,7 +18,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/china.hpp>
+#include "china.hpp"
 #include <ql/errors.hpp>
 #include <set>
 

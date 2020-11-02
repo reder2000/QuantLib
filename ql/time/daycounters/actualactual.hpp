@@ -1,3 +1,5 @@
+#if defined(FIX_SCHEDULE_INCLUDE)
+
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -24,7 +26,7 @@
 #ifndef quantlib_actualactual_day_counter_h
 #define quantlib_actualactual_day_counter_h
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 #include <ql/time/schedule.hpp>
 
 namespace QuantLib {
@@ -98,7 +100,7 @@ namespace QuantLib {
                               const Date&,
                               const Date&) const;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(
+        static std::shared_ptr<DayCounter::Impl> implementation(
                                                                Convention c, 
                                                                const Schedule& schedule);
       public:
@@ -110,3 +112,5 @@ namespace QuantLib {
 }
 
 #endif
+
+#endif //defined(FIX_SCHEDULE_INCLUDE)

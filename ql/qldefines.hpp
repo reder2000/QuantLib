@@ -35,14 +35,14 @@
 #define _USE_MATH_DEFINES
 #endif
 
-#include <boost/config.hpp>
-#include <boost/version.hpp>
-#if BOOST_VERSION < 104800
-    #error using an old version of Boost, please update.
-#endif
-#if !defined(BOOST_ENABLE_ASSERT_HANDLER)
-    #define BOOST_ENABLE_ASSERT_HANDLER
-#endif
+//#include <boost/config.hpp>
+//#include <boost/version.hpp>
+//#if BOOST_VERSION < 104800
+//    #error using an old version of Boost, please update.
+//#endif
+//#if !defined(BOOST_ENABLE_ASSERT_HANDLER)
+//    #define BOOST_ENABLE_ASSERT_HANDLER
+//#endif
 
 /* This allows one to include a given file at this point by
    passing it as a compiler define (e.g., -DQL_INCLUDE_FIRST=foo.hpp).
@@ -168,7 +168,7 @@
 /*! \def QL_EPSILON
     Defines the machine precision for operations over doubles
 */
-#include <boost/limits.hpp>
+//#include <boost/limits.hpp>
 // limits used as such
 #define QL_MIN_INTEGER         ((std::numeric_limits<QL_INTEGER>::min)())
 #define QL_MAX_INTEGER         ((std::numeric_limits<QL_INTEGER>::max)())

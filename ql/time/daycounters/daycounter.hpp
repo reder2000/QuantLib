@@ -18,17 +18,63 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-/*! \file daycounter.hpp
+/*! \file DayCounter<Date>.hpp
     \brief day counter class
 */
 
 #ifndef quantlib_day_counter_hpp
 #define quantlib_day_counter_hpp
 
-#include <ql/time/date.hpp>
+
 #include <ql/errors.hpp>
 
+template <class T>
+struct type_traits {
+    using serial_type = int;
+    using Time = double;
+    /*! \relates Date
+    \brief Difference in days (including fraction of days) between dates
+*/
+    static Time daysBetween(const T&, const T&);
+    /*! \relates Date
+        \brief Difference in days between dates
+    */
+    static serial_type onlyDaysBetween(const T&, const T&);
+    //! whether a date is the last day of its month
+    static bool isEndOfMonth(const T&);
+
+    static bool isLeap(int y);
+};
+
 namespace QuantLib {
+
+        //! Month names
+    /*! \ingroup datetime */
+    enum Month {
+        January = 1,
+        February = 2,
+        March = 3,
+        April = 4,
+        May = 5,
+        June = 6,
+        July = 7,
+        August = 8,
+        September = 9,
+        October = 10,
+        November = 11,
+        December = 12,
+        Jan = 1,
+        Feb = 2,
+        Mar = 3,
+        Apr = 4,
+        Jun = 6,
+        Jul = 7,
+        Aug = 8,
+        Sep = 9,
+        Oct = 10,
+        Nov = 11,
+        Dec = 12
+    };
 
     //! day counter class
     /*! This class provides methods for determining the length of a time
@@ -40,6 +86,7 @@ namespace QuantLib {
 
         \ingroup datetime
     */
+    template <class Date>
     class DayCounter {
       protected:
         //! abstract base class for day counter implementations
@@ -48,28 +95,29 @@ namespace QuantLib {
             virtual ~Impl() {}
             virtual std::string name() const = 0;
             //! to be overloaded by more complex day counters
-            virtual Date::serial_type dayCount(const Date& d1,
+            virtual typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                                const Date& d2) const {
-                return (d2-d1);
+                return type_traits<Date>::onlyDaysBetween(d1, d2);
             }
-            virtual Time yearFraction(const Date& d1,
+            virtual typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                                       const Date& d2,
                                       const Date& refPeriodStart,
                                       const Date& refPeriodEnd) const = 0;
         };
-        ext::shared_ptr<Impl> impl_;
+        std::shared_ptr<Impl> impl_;
         /*! This constructor can be invoked by derived classes which
             define a given implementation.
         */
-        explicit DayCounter(const ext::shared_ptr<Impl>& impl)
+        explicit DayCounter<Date>(const std::shared_ptr<Impl>& impl)
         : impl_(impl) {}
       public:
         /*! The default constructor returns a day counter with a null
             implementation, which is therefore unusable except as a
             placeholder.
         */
-        DayCounter() {}
-        //! \name DayCounter interface
+        DayCounter<Date>() {}
+        //! \name DayCounter<Date> interface
         //@{
         //!  Returns whether or not the day counter is initialized
         bool empty() const;
@@ -80,10 +128,11 @@ namespace QuantLib {
         */
         std::string name() const;
         //! Returns the number of days between two dates.
-        Date::serial_type dayCount(const Date&,
+        typename type_traits<Date>::serial_type dayCount(const Date&,
                                    const Date&) const;
         //! Returns the period between two dates as a fraction of year.
-        Time yearFraction(const Date&, const Date&,
+        typename type_traits<Date>::Time yearFraction(const Date&,
+                                                      const Date&,
                           const Date& refPeriodStart = Date(),
                           const Date& refPeriodEnd = Date()) const;
         //@}
@@ -95,52 +144,64 @@ namespace QuantLib {
         derived class.
         \relates DayCounter
     */
-    bool operator==(const DayCounter&,
-                    const DayCounter&);
+    template <class Date>
+    bool operator==(const DayCounter<Date>&,
+                    const DayCounter<Date>&);
 
-    /*! \relates DayCounter */
-    bool operator!=(const DayCounter&,
-                    const DayCounter&);
+    /*! \relates DayCounter<Date> */
+    template <class Date>
+    bool operator!=(const DayCounter<Date>&,
+                    const DayCounter<Date>&);
 
-    /*! \relates DayCounter */
+    /*! \relates DayCounter<Date> */
+    template <class Date>
     std::ostream& operator<<(std::ostream&,
-                             const DayCounter&);
+                             const DayCounter<Date>&);
 
 
     // inline definitions
 
-    inline bool DayCounter::empty() const {
+        template <class Date>
+    inline bool DayCounter<Date>::empty() const {
         return !impl_;
     }
 
-    inline std::string DayCounter::name() const {
+        template <class Date>
+    inline std::string DayCounter<Date>::name() const {
         QL_REQUIRE(impl_, "no day counter implementation provided");
         return impl_->name();
     }
 
-    inline Date::serial_type DayCounter::dayCount(const Date& d1,
+        template <class Date>
+    inline typename type_traits<Date>::serial_type DayCounter<Date>::dayCount(const Date& d1,
                                                   const Date& d2) const {
         QL_REQUIRE(impl_, "no day counter implementation provided");
         return impl_->dayCount(d1,d2);
     }
 
-    inline Time DayCounter::yearFraction(const Date& d1, const Date& d2,
+        template <class Date>
+    inline typename type_traits<Date>::Time
+    DayCounter<Date>::yearFraction(const Date& d1,
+                                         const Date& d2,
         const Date& refPeriodStart, const Date& refPeriodEnd) const {
             QL_REQUIRE(impl_, "no day counter implementation provided");
             return impl_->yearFraction(d1,d2,refPeriodStart,refPeriodEnd);
     }
 
 
-    inline bool operator==(const DayCounter& d1, const DayCounter& d2) {
+        template <class Date>
+    inline bool operator==(const DayCounter<Date>& d1, const DayCounter<Date>& d2) {
         return (d1.empty() && d2.empty())
             || (!d1.empty() && !d2.empty() && d1.name() == d2.name());
     }
 
-    inline bool operator!=(const DayCounter& d1, const DayCounter& d2) {
+        template <class Date>
+    inline bool operator!=(const DayCounter<Date>& d1, const DayCounter<Date>& d2) {
         return !(d1 == d2);
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const DayCounter &d) {
+        template <class Date>
+    inline std::ostream& operator<<(std::ostream& out, const DayCounter<Date>& d) {
         return out << d.name();
     }
 

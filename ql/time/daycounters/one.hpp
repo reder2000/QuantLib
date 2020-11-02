@@ -24,31 +24,33 @@
 #ifndef quantlib_one_day_counter_h
 #define quantlib_one_day_counter_h
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
     //! 1/1 day count convention
     /*! \ingroup daycounters */
-    class OneDayCounter : public DayCounter {
+    template <class Date>
+    class OneDayCounter : public DayCounter<Date> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("1/1"); }
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const {
+            typename type_traits<Date>::serial_type dayCount(const Date& d1, const Date& d2) const {
                 // the sign is all we need
                 return (d2 >= d1 ? 1 : -1);
             };
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return Time(dayCount(d1, d2));
+                return typename type_traits<Date>::Time(dayCount(d1, d2));
             }
         };
       public:
         OneDayCounter()
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter<Date>(std::shared_ptr<typename DayCounter<Date>::Impl>(
                                         new OneDayCounter::Impl)) {}
     };
 

@@ -19,7 +19,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/jointcalendar.hpp>
+#include "jointcalendar.hpp"
 #include <ql/errors.hpp>
 #include <sstream>
 

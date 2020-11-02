@@ -1,3 +1,5 @@
+#if defined(FIX_CALENDAR_INCLUDE)
+
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -51,9 +53,11 @@ namespace QuantLib {
         };
       public:
         Business252(const Calendar& c = Brazil())
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(new Business252::Impl(c))) {}
+        : DayCounter(std::shared_ptr<DayCounter::Impl>(new Business252::Impl(c))) {}
     };
 
 }
 
 #endif
+
+#endif //defined(FIX_CALENDAR_INCLUDE)

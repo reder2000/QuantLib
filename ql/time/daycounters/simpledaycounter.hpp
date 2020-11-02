@@ -24,7 +24,8 @@
 #ifndef quantlib_simple_day_counter_hpp
 #define quantlib_simple_day_counter_hpp
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
+#include "thirty360.hpp"
 
 namespace QuantLib {
 
@@ -43,23 +44,57 @@ namespace QuantLib {
         \test the correctness of the results is checked against known
               good values.
     */
-    class SimpleDayCounter : public DayCounter {
+    template <class Date>
+    class SimpleDayCounter : public DayCounter<Date> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return "Simple"; }
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const;
         };
       public:
         SimpleDayCounter()
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter<Date>(std::shared_ptr<typename DayCounter<Date>::Impl>(
                                              new SimpleDayCounter::Impl())) {}
     };
+
+        namespace {
+        template <class Date>
+            static DayCounter<Date> fallback = Thirty360<Date>();
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    SimpleDayCounter<Date>::Impl::dayCount(const Date& d1, const Date& d2) const {
+        return fallback<Date>.dayCount(d1, d2);
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::Time SimpleDayCounter<Date>::Impl::yearFraction(
+        const Date& d1,
+                                              const Date& d2,
+                                              const Date&,
+                                              const Date&) const {
+        auto dm1 = dayOfMonth(d1), dm2 = dayOfMonth(d2);
+
+        if (dm1 == dm2 ||
+            // e.g., Aug 30 -> Feb 28 ?
+            (dm1 > dm2 && type_traits<Date>::isEndOfMonth(d2)) ||
+            // e.g., Feb 28 -> Aug 30 ?
+            (dm1 < dm2 && type_traits<Date>::isEndOfMonth(d1))) {
+
+            return (d2.year() - d1.year()) + (int(d2.month()) - int(d1.month())) / 12.0;
+
+        } else {
+            return fallback<Date>.yearFraction(d1, d2);
+        }
+    }
 
 }
 

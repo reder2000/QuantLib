@@ -24,7 +24,7 @@
 #ifndef quantlib_actual360_day_counter_h
 #define quantlib_actual360_day_counter_h
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
@@ -34,9 +34,10 @@ namespace QuantLib {
 
         \ingroup daycounters
     */
-    class Actual360 : public DayCounter {
+    template <class Date>
+    class Actual360 : public DayCounter<Date> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           private:
               bool includeLastDay_;
           public:
@@ -47,21 +48,22 @@ namespace QuantLib {
                     std::string("Actual/360 (inc)")
                     : std::string("Actual/360");
             }
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const {
-                return (d2-d1) + (includeLastDay_ ? 1 : 0);
+                return type_traits<Date>::onlyDaysBetween(d1, d2) + (includeLastDay_ ? 1 : 0);
             }
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return (daysBetween(d1,d2)
+                return (type_traits<Date>::daysBetween(d1, d2)
                         + (includeLastDay_ ? 1.0 : 0.0))/360.0;
             }
         };
       public:
         explicit Actual360(const bool includeLastDay = false)
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter<Date>(std::shared_ptr<typename DayCounter<Date>::Impl>(
             new Actual360::Impl(includeLastDay))) {}
     };
 

@@ -17,7 +17,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/poland.hpp>
+#include "poland.hpp"
 
 namespace QuantLib {
 

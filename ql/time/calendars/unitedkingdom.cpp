@@ -18,7 +18,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/unitedkingdom.hpp>
+#include "unitedkingdom.hpp"
 #include <ql/errors.hpp>
 
 namespace QuantLib {

@@ -18,7 +18,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/saudiarabia.hpp>
+#include "saudiarabia.hpp"
 #include <ql/errors.hpp>
 #include <boost/assign/list_of.hpp> // for 'list_of()'
 

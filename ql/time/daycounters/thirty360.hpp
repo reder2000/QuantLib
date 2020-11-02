@@ -25,7 +25,7 @@
 #ifndef quantlib_thirty360_day_counter_h
 #define quantlib_thirty360_day_counter_h
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
@@ -57,51 +57,56 @@ namespace QuantLib {
 
         \ingroup daycounters
     */
-    class Thirty360 : public DayCounter {
+    template <class Date>
+    class Thirty360 : public DayCounter<Date> {
       public:
         enum Convention { USA, BondBasis,
                           European, EurobondBasis,
                           Italian,
                           German };
       private:
-        class US_Impl : public DayCounter::Impl {
+        class US_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("30/360 (Bond Basis)");}
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class EU_Impl : public DayCounter::Impl {
+        class EU_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("30E/360 (Eurobond Basis)");}
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class IT_Impl : public DayCounter::Impl {
+        class IT_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("30/360 (Italian)");}
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1, const Date& d2) const;
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class GER_Impl : public DayCounter::Impl {
+        class GER_Impl : public DayCounter<Date>::Impl {
           public:
             explicit GER_Impl(bool isLastPeriod) : isLastPeriod_(isLastPeriod) {}
             std::string name() const { return std::string("30/360 (German)");}
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1, const Date& d2) const;
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
@@ -109,13 +114,90 @@ namespace QuantLib {
         private:
             bool isLastPeriod_;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(
+        static std::shared_ptr<typename DayCounter<Date>::Impl> implementation(
             Convention c, bool isLastPeriod);
       public:
         Thirty360(Convention c = Thirty360::BondBasis, bool isLastPeriod = false)
-        : DayCounter(implementation(c, isLastPeriod)) {}
+        : DayCounter<Date>(implementation(c, isLastPeriod)) {}
     };
 
+        template <class Date>
+    inline std::shared_ptr<typename DayCounter<Date>::Impl>
+    Thirty360<Date>::implementation(Thirty360::Convention c, bool isLastPeriod) {
+        switch (c) {
+            case USA:
+            case BondBasis:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new US_Impl);
+            case European:
+            case EurobondBasis:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new EU_Impl);
+            case Italian:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new IT_Impl);
+            case German:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new GER_Impl(isLastPeriod));
+            default:
+                QL_FAIL("unknown 30/360 convention");
+        }
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Thirty360<Date>::US_Impl::dayCount(const Date& d1, const Date& d2) const {
+        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        int mm1 = d1.month(), mm2 = d2.month();
+        auto yy1 = d1.year(), yy2 = d2.year();
+
+        if (dd2 == 31 && dd1 < 30) {
+            dd2 = 1;
+            mm2++;
+        }
+
+        return 360 * (yy2 - yy1) + 30 * (mm2 - mm1 - 1) + std::max(int(0), 30 - dd1) +
+               std::min(int(30), dd2);
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Thirty360<Date>::EU_Impl::dayCount(const Date& d1, const Date& d2) const {
+        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto mm1 = d1.month(), mm2 = d2.month();
+        auto yy1 = d1.year(), yy2 = d2.year();
+
+        return 360 * (yy2 - yy1) + 30 * (mm2 - mm1 - 1) + std::max(int(0), 30 - dd1) +
+               std::min(int(30), dd2);
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Thirty360<Date>::IT_Impl::dayCount(const Date& d1, const Date& d2) const {
+        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto mm1 = d1.month(), mm2 = d2.month();
+        auto yy1 = d1.year(), yy2 = d2.year();
+
+        if (mm1 == 2 && dd1 > 27)
+            dd1 = 30;
+        if (mm2 == 2 && dd2 > 27)
+            dd2 = 30;
+
+        return 360 * (yy2 - yy1) + 30 * (mm2 - mm1 - 1) + std::max(int(0), 30 - dd1) +
+               std::min(int(30), dd2);
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Thirty360<Date>::GER_Impl::dayCount(const Date& d1, const Date& d2) const {
+        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto mm1 = d1.month(), mm2 = d2.month();
+        auto yy1 = d1.year(), yy2 = d2.year();
+
+        if (mm1 == 2 && dd1 == 28 + (type_traits<Date>::isLeap(yy1) ? 1 : 0))
+            dd1 = 30;
+        if (!isLastPeriod_ && mm2 == 2 && dd2 == 28 + (type_traits<Date>::isLeap(yy2) ? 1 : 0))
+            dd2 = 30;
+
+        return 360 * (yy2 - yy1) + 30 * (mm2 - mm1 - 1) + std::max(int(0), 30 - dd1) +
+               std::min(int(30), dd2);
+    }
 }
 
 #endif

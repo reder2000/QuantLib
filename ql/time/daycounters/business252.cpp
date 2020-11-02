@@ -1,3 +1,5 @@
+#if defined(FIX_CALENDAR_INCLUDE)
+
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -18,7 +20,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/daycounters/business252.hpp>
+#include "business252.hpp"
 #include <map>
 
 namespace QuantLib {
@@ -58,7 +60,7 @@ namespace QuantLib {
             if (outerCache[year] == 0) {
                 // calculate and store.
                 Date::serial_type total = 0;
-                for (Integer i=1; i<=12; ++i) {
+                for (int i=1; i<=12; ++i) {
                     total += businessDays(cache,calendar,
                                           Month(i), year);
                 }
@@ -110,7 +112,7 @@ namespace QuantLib {
             d = Date(1,d1.month(),d1.year()) + 1*Months;
             total += calendar_.businessDaysBetween(d1, d);
             // ...then we add any remaining months, possibly cached
-            for (Integer m = Integer(d1.month())+1; m <= 12; ++m) {
+            for (int m = int(d1.month())+1; m <= 12; ++m) {
                 total += businessDays(cache, calendar_,
                                       Month(m), d.year());
             }
@@ -123,7 +125,7 @@ namespace QuantLib {
             }
             // finally, we get to the end of the period.
             // First, we add whole months...
-            for (Integer m = 1; m<Integer(d2.month()); ++m) {
+            for (int m = 1; m<int(d2.month()); ++m) {
                 total += businessDays(cache, calendar_,
                                       Month(m), d2.year());
             }
@@ -142,3 +144,5 @@ namespace QuantLib {
     }
 
 }
+
+#endif 

@@ -26,7 +26,7 @@
 #ifndef quantlib_actual365fixed_day_counter_h
 #define quantlib_actual365fixed_day_counter_h
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
@@ -42,47 +42,125 @@ namespace QuantLib {
 
         \ingroup daycounters
     */
-    class Actual365Fixed : public DayCounter {
+    template <class Date>
+    class Actual365Fixed : public DayCounter<Date> {
       public:
         enum Convention { Standard, Canadian, NoLeap };
         explicit Actual365Fixed(Convention c = Actual365Fixed::Standard)
-        : DayCounter(implementation(c)) {}
+        : DayCounter<Date> (implementation(c)) {}
 
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("Actual/365 (Fixed)"); }
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return daysBetween(d1,d2)/365.0;
+                return type_traits<Date>::daysBetween(d1, d2) / 365.0;
             }
         };
-        class CA_Impl : public DayCounter::Impl {
+        class CA_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/365 (Fixed) Canadian Bond");
             }
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        class NL_Impl : public DayCounter::Impl {
+        class NL_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/365 (No Leap)");
             }
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(Convention);
+        static std::shared_ptr<typename DayCounter<Date>::Impl> implementation(Convention);
     };
+
+    template <class Date>
+    inline std::shared_ptr<typename DayCounter<Date>::Impl>
+    Actual365Fixed<Date>::implementation(Actual365Fixed::Convention c) {
+        switch (c) {
+            case Standard:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new Impl);
+            case Canadian:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new CA_Impl);
+            case NoLeap:
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new NL_Impl);
+            default:
+                QL_FAIL("unknown Actual/365 (Fixed) convention");
+        }
+    }
+
+template <class Date>
+    inline typename type_traits<Date>::Time
+    Actual365Fixed<Date>::CA_Impl::yearFraction(const Date& d1,
+                                               const Date& d2,
+                                               const Date& refPeriodStart,
+                                               const Date& refPeriodEnd) const {
+        if (d1 == d2)
+            return 0.0;
+
+        // We need the period to calculate the frequency
+        QL_REQUIRE(refPeriodStart != Date(), "invalid refPeriodStart");
+        QL_REQUIRE(refPeriodEnd != Date(), "invalid refPeriodEnd");
+
+        typename type_traits<Date>::Time dcs =  type_traits<Date>::daysBetween(d1, d2);
+        typename type_traits<Date>::Time dcc =
+            type_traits<Date>::daysBetween(refPeriodStart, refPeriodEnd);
+        int months = int(0.5 + 12 * dcc / 365);
+        QL_REQUIRE(months != 0, "invalid reference period for Act/365 Canadian; "
+                                "must be longer than a month");
+        int frequency = int(12 / months);
+
+        if (dcs < int(365 / frequency))
+            return dcs / 365.0;
+
+        return 1. / frequency - (dcc - dcs) / 365.0;
+    }
+
+    template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Actual365Fixed<Date>::NL_Impl::dayCount(const Date& d1, const Date& d2) const {
+
+        static const int MonthOffset[] = {
+            0,   31,  59,  90,  120, 151, // Jan - Jun
+            181, 212, 243, 273, 304, 334  // Jun - Dec
+        };
+
+        typename type_traits<Date>::serial_type s1 = dayOfMonth(d1) + MonthOffset[d1.month() - 1] + (d1.year() * 365);
+        typename type_traits<Date>::serial_type s2 =
+            dayOfMonth(d2) + MonthOffset[d2.month() - 1] + (d2.year() * 365);
+
+        if (d1.month() == Feb && dayOfMonth(d1) == 29) {
+            --s1;
+        }
+
+        if (d2.month() == Feb && dayOfMonth(d2) == 29) {
+            --s2;
+        }
+
+        return s2 - s1;
+    }
+
+        template <class Date>
+        inline typename type_traits<Date>::Time Actual365Fixed<Date>::NL_Impl::yearFraction(
+        const Date& d1,
+                                               const Date& d2,
+                                               const Date& d3,
+                                               const Date& d4) const {
+        return dayCount(d1, d2) / 365.0;
+    }
+
 
 }
 

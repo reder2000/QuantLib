@@ -24,20 +24,22 @@
 #ifndef quantlib_thirty_365_day_counter_hpp
 #define quantlib_thirty_365_day_counter_hpp
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
     //! 30/365 day count convention
     /*! \ingroup daycounters */
-    class Thirty365 : public DayCounter {
+    template <class Date>
+    class Thirty365 : public DayCounter<Date> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("30/365"); }
-            Date::serial_type dayCount(const Date& d1,
+            typename type_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&, 
                               const Date&) const {
@@ -46,6 +48,20 @@ namespace QuantLib {
       public:
         Thirty365();
     };
+
+        template <class Date>
+    inline typename type_traits<Date>::serial_type
+    Thirty365<Date>::Impl::dayCount(const Date& d1, const Date& d2) const {
+        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        int mm1 = d1.month(), mm2 = d2.month();
+        auto yy1 = d1.year(), yy2 = d2.year();
+
+        return 360 * (yy2 - yy1) + 30 * (mm2 - mm1) + (dd2 - dd1);
+    }
+
+    template <class Date>
+    inline Thirty365<Date>::Thirty365()
+    : DayCounter<Date>(std::shared_ptr<typename DayCounter<Date>::Impl>(new Thirty365::Impl)) {}
 
 }
 

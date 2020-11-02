@@ -19,7 +19,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/romania.hpp>
+#include "romania.hpp"
 #include <ql/errors.hpp>
 #include <boost/make_shared.hpp>
 

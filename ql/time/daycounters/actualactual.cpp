@@ -1,3 +1,47 @@
+#include "all.hpp"
+#include <blpapi_datetime.h>
+
+
+using Datetime = BloombergLP::blpapi::Datetime;
+int dayOfMonth(const Datetime&);
+
+//template <class T>
+//struct type_traits ; 
+//    
+//template <>
+//struct type_traits<class DateTime> 
+//{
+//    using T = DateTime;
+//    using serial_type = int;
+//    using Time = double;
+//    /*! \relates Date
+//    \brief Difference in days (including fraction of days) between dates
+//*/
+//    static Time daysBetween(const T&, const T&);
+//    /*! \relates Date
+//        \brief Difference in days between dates
+//    */
+//     static serial_type onlyDaysBetween(const T&, const T&);
+//    //! whether a date is the last day of its month
+//     static bool isEndOfMonth(const T&);
+//
+//     static bool isLeap(int y);
+//};
+
+
+
+
+
+QuantLib::Actual360<Datetime> toto0; 
+QuantLib::Actual364<Datetime> toto1;
+QuantLib::Actual365Fixed<Datetime> toto2;
+QuantLib::OneDayCounter<Datetime> toto3;
+QuantLib::SimpleDayCounter<Datetime> toto4;
+QuantLib::Thirty360<Datetime> toto5;
+QuantLib::Thirty365<Datetime> toto6;
+
+#if defined(FIX_SCHEDULE_INCLUDE)
+
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -17,7 +61,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/daycounters/actualactual.hpp>
+#include "actualactual.hpp"
 #include <algorithm>
 
 namespace QuantLib {
@@ -27,11 +71,11 @@ namespace QuantLib {
         // the template argument works around passing a protected type
 
         template <class T>
-        Integer findCouponsPerYear(const T& impl,
+        int findCouponsPerYear(const T& impl,
                                    Date refStart, Date refEnd) {
             // This will only work for day counts longer than 15 days.
-            Integer months = Integer(0.5 + 12 * Real(impl.dayCount(refStart, refEnd))/365.0);
-            return (Integer)(0.5 + 12.0 / Real(months));
+            int months = int(0.5 + 12 * Real(impl.dayCount(refStart, refEnd))/365.0);
+            return (int)(0.5 + 12.0 / Real(months));
         }
 
         /* An ISMA day counter either needs a schedule or to have
@@ -82,7 +126,7 @@ namespace QuantLib {
 
             Real referenceDayCount = Real(impl.dayCount(d3, d4));
             //guess how many coupon periods per year:
-            Integer couponsPerYear;
+            int couponsPerYear;
             if (referenceDayCount < 16) {
                 couponsPerYear = 1;
                 referenceDayCount = impl.dayCount(d1, d1 + 1 * Years);
@@ -95,23 +139,23 @@ namespace QuantLib {
 
     }
 
-    ext::shared_ptr<DayCounter::Impl>
+    std::shared_ptr<DayCounter::Impl>
     ActualActual::implementation(ActualActual::Convention c,
                                  const Schedule& schedule) {
         switch (c) {
           case ISMA:
           case Bond:
             if (!schedule.empty())
-                return ext::shared_ptr<DayCounter::Impl>(new ISMA_Impl(schedule));
+                return std::shared_ptr<DayCounter::Impl>(new ISMA_Impl(schedule));
             else
-                return ext::shared_ptr<DayCounter::Impl>(new Old_ISMA_Impl);
+                return std::shared_ptr<DayCounter::Impl>(new Old_ISMA_Impl);
           case ISDA:
           case Historical:
           case Actual365:
-            return ext::shared_ptr<DayCounter::Impl>(new ISDA_Impl);
+            return std::shared_ptr<DayCounter::Impl>(new ISDA_Impl);
           case AFB:
           case Euro:
-            return ext::shared_ptr<DayCounter::Impl>(new AFB_Impl);
+            return std::shared_ptr<DayCounter::Impl>(new AFB_Impl);
           default:
             QL_FAIL("unknown act/act convention");
         }
@@ -171,8 +215,8 @@ namespace QuantLib {
                    << ", reference period end: " << refPeriodEnd);
 
         // estimate roughly the length in months of a period
-        Integer months =
-            Integer(0.5+12*Real(refPeriodEnd-refPeriodStart)/365);
+        int months =
+            int(0.5+12*Real(refPeriodEnd-refPeriodStart)/365);
 
         // for short periods...
         if (months == 0) {
@@ -229,7 +273,7 @@ namespace QuantLib {
             // the part from refPeriodEnd to d2
             // count how many regular periods are in [refPeriodEnd, d2],
             // then add the remaining time
-            Integer i=0;
+            int i=0;
             Date newRefStart, newRefEnd;
             for (;;) {
                 newRefStart = refPeriodEnd + (months*i)*Months;
@@ -257,7 +301,7 @@ namespace QuantLib {
         if (d1 > d2)
             return -yearFraction(d2,d1,Date(),Date());
 
-        Integer y1 = d1.year(), y2 = d2.year();
+        int y1 = d1.year(), y2 = d2.year();
         Real dib1 = (Date::isLeap(y1) ? 366.0 : 365.0),
              dib2 = (Date::isLeap(y2) ? 366.0 : 365.0);
 
@@ -309,3 +353,5 @@ namespace QuantLib {
     }
 
 }
+
+#endif

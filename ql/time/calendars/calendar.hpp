@@ -122,11 +122,11 @@ namespace QuantLib {
             \deprecated Use the non-static overload.
                         Deprecated in version 1.18.
         */
-        QL_DEPRECATED
-        static std::vector<Date> holidayList(const Calendar& calendar,
-                                             const Date& from,
-                                             const Date& to,
-                                             bool includeWeekEnds = false);
+        ////QL_DEPRECATED
+        //static std::vector<Date> holidayList(const Calendar& calendar,
+        //                                     const Date& from,
+        //                                     const Date& to,
+        //                                     bool includeWeekEnds = false);
 
         /*! Returns the holidays between two dates. */
         std::vector<Date> holidayList(const Date& from,

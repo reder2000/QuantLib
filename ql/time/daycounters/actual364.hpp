@@ -24,27 +24,29 @@
 #ifndef quantlib_actual364_day_counter_hpp
 #define quantlib_actual364_day_counter_hpp
 
-#include <ql/time/daycounter.hpp>
+#include "daycounter.hpp"
 
 namespace QuantLib {
 
     //! Actual/364 day count convention
     /*! \ingroup daycounters */
-    class Actual364 : public DayCounter {
+    template <class Date>
+    class Actual364 : public DayCounter<Date> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("Actual/364"); }
-            Time yearFraction(const Date& d1,
+            typename type_traits<Date>::Time
+            yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return dayCount(d1,d2)/364.0;
+                return this->dayCount(d1,d2)/364.0;
             }
         };
       public:
         Actual364()
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(new Actual364::Impl)) {}
+        : DayCounter<Date>(std::shared_ptr<typename DayCounter<Date>::Impl>(new Actual364::Impl)) {}
     };
 
 }

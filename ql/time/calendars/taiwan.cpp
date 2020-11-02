@@ -18,7 +18,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/taiwan.hpp>
+#include "taiwan.hpp"
 
 namespace QuantLib {
 

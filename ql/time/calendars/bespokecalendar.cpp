@@ -17,7 +17,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/calendars/bespokecalendar.hpp>
+#include "bespokecalendar.hpp"
 #include <sstream>
 
 namespace QuantLib {

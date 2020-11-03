@@ -265,12 +265,12 @@ namespace QuantLib {
 
     template <class Date>
     inline bool Calendar<Date>::isEndOfMonth(const Date& d) const {
-        return (d.month() != adjust(d+1).month());
+        return (d.month() != adjust((date_traits<Date>::add_1(d))).month());
     }
 
     template <class Date>
     inline Date Calendar<Date>::endOfMonth(const Date& d) const {
-        return adjust(Date::endOfMonth(d), Preceding);
+        return adjust(date_traits<Date>::endOfMonth(d), Preceding);
     }
 
     template <class Date>
@@ -346,28 +346,29 @@ namespace QuantLib {
         Date d1 = d;
         if (c == Following || c == ModifiedFollowing || c == HalfMonthModifiedFollowing) {
             while (isHoliday(d1))
-                ++d1;
+                date_traits<Date>::inc(d1);
             if (c == ModifiedFollowing || c == HalfMonthModifiedFollowing) {
                 if (d1.month() != d.month()) {
                     return adjust(d, Preceding);
                 }
                 if (c == HalfMonthModifiedFollowing) {
-                    if (d.dayOfMonth() <= 15 && d1.dayOfMonth() > 15) {
+                    if (date_traits<Date>::dayOfMonth(d) <= 15 &&
+                        date_traits<Date>::dayOfMonth(d1) > 15) {
                         return adjust(d, Preceding);
                     }
                 }
             }
         } else if (c == Preceding || c == ModifiedPreceding) {
             while (isHoliday(d1))
-                --d1;
+                date_traits<Date>::dec(d1);
             if (c == ModifiedPreceding && d1.month() != d.month()) {
                 return adjust(d, Following);
             }
         } else if (c == Nearest) {
             Date d2 = d;
             while (isHoliday(d1) && isHoliday(d2)) {
-                ++d1;
-                --d2;
+                date_traits<Date>::inc(d1);
+                date_traits<Date>::dec(d2);
             }
             if (isHoliday(d1))
                 return d2;
@@ -389,25 +390,25 @@ namespace QuantLib {
             Date d1 = d;
             if (n > 0) {
                 while (n > 0) {
-                    ++d1;
+                    date_traits<Date>::inc(d1);
                     while (isHoliday(d1))
-                        ++d1;
+                        date_traits<Date>::inc(d1);
                     --n;
                 }
             } else {
                 while (n < 0) {
-                    --d1;
+                    date_traits<Date>::dec(d1);
                     while (isHoliday(d1))
-                        --d1;
+                        date_traits<Date>::dec(d1);
                     ++n;
                 }
             }
             return d1;
         } else if (unit == Weeks) {
-            Date d1 = d + n * unit;
+            Date d1 = date_traits<Date>::plusPeriod(d , n * unit);
             return adjust(d1, c);
         } else {
-            Date d1 = d + n * unit;
+            Date d1 = date_traits<Date>::plusPeriod(d , n * unit);
 
             // we are sure the unit is Months or Years
             if (endOfMonth && isEndOfMonth(d))

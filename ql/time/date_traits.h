@@ -1,5 +1,7 @@
 #pragma once 
 
+#include "period.hpp"
+
 namespace QuantLib {
 
     //! Month names
@@ -57,6 +59,16 @@ struct date_traits {
     static Day dayOfYear(const T&);
 
     static QuantLib::Month month(const T&);
+
+    static T plusPeriod(const T&, const QuantLib::Period&);
+
+    static T& inc(T&);
+
+    static T& dec(T&);
+
+    static T add_1(const T&);
+
+    static T endOfMonth(const T&);
 };
 
 

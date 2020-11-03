@@ -24,7 +24,7 @@ namespace QuantLib {
 
     India::India(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<Date>::Impl> impl(new India::NseImpl);
+        static std::shared_ptr<Calendar<Date>::Impl> impl(new India::NseImpl);
         impl_ = impl;
     }
 

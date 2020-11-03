@@ -36,9 +36,9 @@ namespace QuantLib {
         class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("30/365"); }
-            typename type_traits<Date>::serial_type dayCount(const Date& d1,
+            typename date_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&, 
@@ -50,7 +50,7 @@ namespace QuantLib {
     };
 
         template <class Date>
-    inline typename type_traits<Date>::serial_type
+    inline typename date_traits<Date>::serial_type
     Thirty365<Date>::Impl::dayCount(const Date& d1, const Date& d2) const {
         auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
         int mm1 = d1.month(), mm2 = d2.month();

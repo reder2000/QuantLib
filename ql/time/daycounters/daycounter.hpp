@@ -26,7 +26,7 @@
 #define quantlib_day_counter_hpp
 
 
-#include <ql/errors.hpp>
+#include "../errors.hpp"
 
 namespace QuantLib {
 
@@ -49,11 +49,11 @@ namespace QuantLib {
             virtual ~Impl() {}
             virtual std::string name() const = 0;
             //! to be overloaded by more complex day counters
-            virtual typename type_traits<Date>::serial_type dayCount(const Date& d1,
+            virtual typename date_traits<Date>::serial_type dayCount(const Date& d1,
                                                const Date& d2) const {
-                return type_traits<Date>::onlyDaysBetween(d1, d2);
+                return date_traits<Date>::onlyDaysBetween(d1, d2);
             }
-            virtual typename type_traits<Date>::Time
+            virtual typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                                       const Date& d2,
                                       const Date& refPeriodStart,
@@ -82,10 +82,10 @@ namespace QuantLib {
         */
         std::string name() const;
         //! Returns the number of days between two dates.
-        typename type_traits<Date>::serial_type dayCount(const Date&,
+        typename date_traits<Date>::serial_type dayCount(const Date&,
                                    const Date&) const;
         //! Returns the period between two dates as a fraction of year.
-        typename type_traits<Date>::Time yearFraction(const Date&,
+        typename date_traits<Date>::Time yearFraction(const Date&,
                                                       const Date&,
                           const Date& refPeriodStart = Date(),
                           const Date& refPeriodEnd = Date()) const;
@@ -127,14 +127,14 @@ namespace QuantLib {
     }
 
         template <class Date>
-    inline typename type_traits<Date>::serial_type DayCounter<Date>::dayCount(const Date& d1,
+    inline typename date_traits<Date>::serial_type DayCounter<Date>::dayCount(const Date& d1,
                                                   const Date& d2) const {
         QL_REQUIRE(impl_, "no day counter implementation provided");
         return impl_->dayCount(d1,d2);
     }
 
         template <class Date>
-    inline typename type_traits<Date>::Time
+    inline typename date_traits<Date>::Time
     DayCounter<Date>::yearFraction(const Date& d1,
                                          const Date& d2,
         const Date& refPeriodStart, const Date& refPeriodEnd) const {

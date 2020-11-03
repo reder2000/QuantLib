@@ -59,17 +59,17 @@ namespace QuantLib {
       public:
         Australia() {
             // all calendar instances share the same implementation instance
-            static ext::shared_ptr<Calendar<Date>::Impl> impl(new Australia::Impl);
+            static std::shared_ptr<Calendar<Date>::Impl> impl(new Australia::Impl);
             impl_ = impl;
         }
     };
 
     template <class Date>
     inline bool Australia<Date>::Impl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)

@@ -51,7 +51,7 @@ namespace QuantLib {
             std::set<Weekday> weekend_;
             std::string name_;
         };
-        ext::shared_ptr<BespokeCalendar::Impl> bespokeImpl_;
+        std::shared_ptr<BespokeCalendar::Impl> bespokeImpl_;
       public:
         /*! \warning different bespoke calendars created with the same
                      name (or different bespoke calendars created with
@@ -75,7 +75,7 @@ template <class Date>  inline
     }
 template <class Date>  inline
     bool  BespokeCalendar<Date>::Impl::isBusinessDay(const Date& date) const {
-        return !isWeekend(type_traits<Date>::weekday(date));
+        return !isWeekend(date_traits<Date>::weekday(date));
     }
 template <class Date>  inline
     void  BespokeCalendar<Date>::Impl::addWeekend(Weekday w) {
@@ -84,7 +84,7 @@ template <class Date>  inline
 
 
     template <class Date>  inline BespokeCalendar<Date>::BespokeCalendar(const std::string& name) {
-        bespokeImpl_ = ext::make_shared<BespokeCalendar<Date>::Impl>(
+        bespokeImpl_ = std::make_shared<BespokeCalendar<Date>::Impl>(
                                              name);
         impl_ = bespokeImpl_;
     }

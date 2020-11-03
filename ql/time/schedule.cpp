@@ -21,7 +21,6 @@
 
 #include "schedule.hpp"
 #include "imm.hpp"
-#include <ql/settings.hpp>
 
 namespace QuantLib {
 

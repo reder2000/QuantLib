@@ -95,8 +95,8 @@ namespace QuantLib {
         Brazil(Market market = Settlement) {
             // all calendar instances on the same market share the same
             // implementation instance
-            static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(new Brazil::SettlementImpl);
-            static ext::shared_ptr<Calendar<Date>::Impl> exchangeImpl(new Brazil::ExchangeImpl);
+            static std::shared_ptr<Calendar<Date>::Impl> settlementImpl(new Brazil::SettlementImpl);
+            static std::shared_ptr<Calendar<Date>::Impl> exchangeImpl(new Brazil::ExchangeImpl);
             switch (market) {
                 case Settlement:
                     impl_ = settlementImpl;
@@ -112,10 +112,10 @@ namespace QuantLib {
 
   template <class Date>
     inline bool Brazil<Date>::SettlementImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         Day em = easterMonday(y);
 
@@ -148,10 +148,10 @@ namespace QuantLib {
 
 template <class Date>
     inline bool Brazil<Date>::ExchangeImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         Day em = easterMonday(y);
 

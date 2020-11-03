@@ -27,11 +27,13 @@
 #define quantlib_schedule_hpp
 
 #include "calendars/nullcalendar.hpp"
-#include <ql/utilities/null.hpp>
+//#include <ql/utilities/null.hpp>
 #include "period.hpp"
 #include "dategenerationrule.hpp"
-#include <ql/errors.hpp>
+#include "../errors.hpp"
 #include <boost/optional.hpp>
+
+using Size = size_t;
 
 namespace QuantLib {
 

@@ -236,15 +236,15 @@ namespace QuantLib {
     inline UnitedStates<Date>::UnitedStates(UnitedStates<Date>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar<Date>::Impl> settlementImpl(
+        static std::shared_ptr<Calendar<Date>::Impl> settlementImpl(
             new UnitedStates<Date>::SettlementImpl);
-        static ext::shared_ptr<Calendar<Date>::Impl> liborImpactImpl(
+        static std::shared_ptr<Calendar<Date>::Impl> liborImpactImpl(
             new UnitedStates<Date>::LiborImpactImpl);
-        static ext::shared_ptr<Calendar<Date>::Impl> nyseImpl(new UnitedStates<Date>::NyseImpl);
-        static ext::shared_ptr<Calendar<Date>::Impl> governmentImpl(
+        static std::shared_ptr<Calendar<Date>::Impl> nyseImpl(new UnitedStates<Date>::NyseImpl);
+        static std::shared_ptr<Calendar<Date>::Impl> governmentImpl(
             new UnitedStates<Date>::GovernmentBondImpl);
-        static ext::shared_ptr<Calendar<Date>::Impl> nercImpl(new UnitedStates<Date>::NercImpl);
-        static ext::shared_ptr<Calendar<Date>::Impl> federalReserveImpl(
+        static std::shared_ptr<Calendar<Date>::Impl> nercImpl(new UnitedStates<Date>::NercImpl);
+        static std::shared_ptr<Calendar<Date>::Impl> federalReserveImpl(
             new UnitedStates<Date>::FederalReserveImpl);
         switch (market) {
             case Settlement:
@@ -273,9 +273,9 @@ namespace QuantLib {
 
        template <class Date>
     inline bool UnitedStates<Date>::SettlementImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -308,9 +308,9 @@ namespace QuantLib {
     inline bool UnitedStates<Date>::LiborImpactImpl::isBusinessDay(const Date& date) const {
         // Since 2015 Independence Day only impacts Libor if it falls
         // on a weekday
-           Weekday w = type_traits<Date>::weekday(date);
-           Day d = type_traits<Date>::dayOfMonth(date);
-           Month m = type_traits<Date>::month(date);
+           Weekday w = date_traits<Date>::weekday(date);
+           Day d = date_traits<Date>::dayOfMonth(date);
+           Month m = date_traits<Date>::month(date);
            Year y = date.year();
            if (((d == 5 && w == Monday) || (d == 3 && w == Friday)) && m == July && y >= 2015)
             return true;
@@ -319,10 +319,10 @@ namespace QuantLib {
 
       template <class Date>
     inline bool UnitedStates<Date>::NyseImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)
@@ -402,10 +402,10 @@ namespace QuantLib {
 
       template <class Date>
     inline bool UnitedStates<Date>::GovernmentBondImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)
@@ -448,10 +448,10 @@ namespace QuantLib {
 
         template <class Date>
     inline bool UnitedStates<Date>::NercImpl::isBusinessDay(const Date& date) const {
-        Weekday w = type_traits<Date>::weekday(date);
-        Day d = type_traits<Date>::dayOfMonth(date);
-        Day dd = type_traits<Date>::dayOfYear(date);
-        Month m = type_traits<Date>::month(date);
+        Weekday w = date_traits<Date>::weekday(date);
+        Day d = date_traits<Date>::dayOfMonth(date);
+        Day dd = date_traits<Date>::dayOfYear(date);
+        Month m = date_traits<Date>::month(date);
         Year y = date.year();
         if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -474,10 +474,10 @@ namespace QuantLib {
        template <class Date>
     inline bool UnitedStates<Date>::FederalReserveImpl::isBusinessDay(const Date& date) const {
         // see https://www.frbservices.org/holidayschedules/ for details
-           Weekday w = type_traits<Date>::weekday(date);
-           Day d = type_traits<Date>::dayOfMonth(date);
-           Day dd = type_traits<Date>::dayOfYear(date);
-           Month m = type_traits<Date>::month(date);
+           Weekday w = date_traits<Date>::weekday(date);
+           Day d = date_traits<Date>::dayOfMonth(date);
+           Day dd = date_traits<Date>::dayOfYear(date);
+           Month m = date_traits<Date>::month(date);
            Year y = date.year();
            if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)

@@ -29,8 +29,11 @@
 
 #include "frequency.hpp"
 #include "timeunit.hpp"
-#include <ql/types.hpp>
+//#include <ql/types.hpp>
 #include <fmt/ostream.h>
+
+using Integer  = int;
+using Real = double;
 
 namespace QuantLib {
 

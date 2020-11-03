@@ -1,24 +1,5 @@
 #pragma once 
 
-
-template <class T>
-struct date_traits {
-    using serial_type = int;
-    using Time = double;
-    /*! \relates Date
-    \brief Difference in days (including fraction of days) between dates
-*/
-    static Time daysBetween(const T&, const T&);
-    /*! \relates Date
-        \brief Difference in days between dates
-    */
-    static serial_type onlyDaysBetween(const T&, const T&);
-    //! whether a date is the last day of its month
-    static bool isEndOfMonth(const T&);
-
-    static bool isLeap(int y);
-};
-
 namespace QuantLib {
 
     //! Month names
@@ -49,4 +30,33 @@ namespace QuantLib {
         Dec = 12
     };
 
-}  // namespace QuantLib 
+} // namespace QuantLib
+
+template <class T>
+struct date_traits {
+    using serial_type = int;
+    using Time = double;
+    using Day = int;
+    /*! \relates Date
+    \brief Difference in days (including fraction of days) between dates
+*/
+    static Time daysBetween(const T&, const T&);
+    /*! \relates Date
+        \brief Difference in days between dates
+    */
+    static serial_type onlyDaysBetween(const T&, const T&);
+    //! whether a date is the last day of its month
+    static bool isEndOfMonth(const T&);
+
+    static bool isLeap(int y);
+
+    static QuantLib::Weekday weekday(const T&);
+
+    static Day dayOfMonth(const T&);
+
+    static Day dayOfYear(const T&);
+
+    static QuantLib::Month month(const T&);
+};
+
+

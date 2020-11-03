@@ -42,13 +42,13 @@ namespace QuantLib {
           public:
             std::string name() const { return "weekends only"; }
             bool isBusinessDay(const Date&date) const {
-                return !isWeekend(type_traits<Date>::weekday(date));
+                return !isWeekend(date_traits<Date>::weekday(date));
             }
         };
       public:
         WeekendsOnly() {
             // all calendar instances share the same implementation instance
-            static ext::shared_ptr<Calendar<Date>::Impl> impl(new WeekendsOnly::Impl);
+            static std::shared_ptr<Calendar<Date>::Impl> impl(new WeekendsOnly::Impl);
             impl_ = impl;
         }
     };

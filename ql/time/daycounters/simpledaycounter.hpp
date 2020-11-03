@@ -50,9 +50,9 @@ namespace QuantLib {
         class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return "Simple"; }
-            typename type_traits<Date>::serial_type dayCount(const Date& d1,
+            typename date_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
@@ -70,13 +70,13 @@ namespace QuantLib {
     }
 
     template <class Date>
-    inline typename type_traits<Date>::serial_type
+    inline typename date_traits<Date>::serial_type
     SimpleDayCounter<Date>::Impl::dayCount(const Date& d1, const Date& d2) const {
         return fallback<Date>.dayCount(d1, d2);
     }
 
     template <class Date>
-    inline typename type_traits<Date>::Time SimpleDayCounter<Date>::Impl::yearFraction(
+    inline typename date_traits<Date>::Time SimpleDayCounter<Date>::Impl::yearFraction(
         const Date& d1,
                                               const Date& d2,
                                               const Date&,
@@ -85,9 +85,9 @@ namespace QuantLib {
 
         if (dm1 == dm2 ||
             // e.g., Aug 30 -> Feb 28 ?
-            (dm1 > dm2 && type_traits<Date>::isEndOfMonth(d2)) ||
+            (dm1 > dm2 && date_traits<Date>::isEndOfMonth(d2)) ||
             // e.g., Feb 28 -> Aug 30 ?
-            (dm1 < dm2 && type_traits<Date>::isEndOfMonth(d1))) {
+            (dm1 < dm2 && date_traits<Date>::isEndOfMonth(d1))) {
 
             return (d2.year() - d1.year()) + (int(d2.month()) - int(d1.month())) / 12.0;
 

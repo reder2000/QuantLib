@@ -28,76 +28,19 @@
 #ifndef quantlib_calendar_hpp
 #define quantlib_calendar_hpp
 
-#include <ql/errors.hpp>
+#include "../errors.hpp"
 #include "businessdayconvention.hpp"
-#include <ql/shared_ptr.hpp>
 #include <set>
 #include <vector>
 #include <string>
 #include "../timeunit.hpp"
 #include "../weekday.hpp"
+#include "../date_traits.h"
 
-
-    namespace QuantLib {
-
-
-        enum Month {
-        January = 1,
-        February = 2,
-        March = 3,
-        April = 4,
-        May = 5,
-        June = 6,
-        July = 7,
-        August = 8,
-        September = 9,
-        October = 10,
-        November = 11,
-        December = 12,
-        Jan = 1,
-        Feb = 2,
-        Mar = 3,
-        Apr = 4,
-        Jun = 6,
-        Jul = 7,
-        Aug = 8,
-        Sep = 9,
-        Oct = 10,
-        Nov = 11,
-        Dec = 12
-    };
-
-}
 
     using Day=int;
     using Year=int;
 
-    template <class T>
-    struct type_traits {
-        using serial_type = int;
-        using Time = double;
-        /*! \relates Date
-        \brief Difference in days (including fraction of days) between dates
-    */
-        static Time daysBetween(const T&, const T&);
-        /*! \relates Date
-            \brief Difference in days between dates
-        */
-        static serial_type onlyDaysBetween(const T&, const T&);
-        //! whether a date is the last day of its month
-        static bool isEndOfMonth(const T&);
-
-        static bool isLeap(int y);
-
-        static QuantLib::Weekday weekday(const T&);
-
-        static Day dayOfMonth(const T&);
-
-        static Day dayOfYear(const T&);
-
-        static QuantLib::Month month(const T&) ;
-        
-    };
 
 namespace QuantLib {
 
@@ -133,7 +76,7 @@ namespace QuantLib {
             virtual bool isWeekend(Weekday) const = 0;
             std::set<Date> addedHolidays, removedHolidays;
         };
-        ext::shared_ptr<Impl> impl_;
+        std::shared_ptr<Impl> impl_;
       public:
         /*! The default constructor returns a calendar with a null
             implementation, which is therefore unusable except as a
@@ -225,7 +168,7 @@ namespace QuantLib {
         /*! Calculates the number of business days between two given
             dates and returns the result.
         */
-        typename type_traits<Date>::serial_type businessDaysBetween(const Date& from,
+        typename date_traits<Date>::serial_type businessDaysBetween(const Date& from,
                                               const Date& to,
                                               bool includeFirst = true,
                                               bool includeLast = false) const;
@@ -483,12 +426,12 @@ namespace QuantLib {
     }
 
       template <class Date>
-    inline typename type_traits<Date>::serial_type Calendar<Date>::businessDaysBetween(
+    inline typename date_traits<Date>::serial_type Calendar<Date>::businessDaysBetween(
         const Date& from,
                                                                        const Date& to,
                                                                        bool includeFirst,
                                                                        bool includeLast) const {
-        type_traits<Date>::serial_type wd = 0;
+        date_traits<Date>::serial_type wd = 0;
         if (from != to) {
             if (from < to) {
                 // the last one is treated separately to avoid

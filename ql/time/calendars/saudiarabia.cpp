@@ -137,7 +137,7 @@ namespace QuantLib {
 
     SaudiArabia::SaudiArabia(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<Date>::Impl> tadawulImpl(
+        static std::shared_ptr<Calendar<Date>::Impl> tadawulImpl(
                                                 new SaudiArabia::TadawulImpl);
         switch (market) {
           case Tadawul:

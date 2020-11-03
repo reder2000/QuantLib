@@ -6,8 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include_directories(../..)
-
 include_directories(c:/dev/src/blpapi_cpp_3.15.0.1/include)
 
 find_package(boost REQUIRED preprocessor)

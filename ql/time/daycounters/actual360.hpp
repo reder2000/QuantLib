@@ -48,16 +48,16 @@ namespace QuantLib {
                     std::string("Actual/360 (inc)")
                     : std::string("Actual/360");
             }
-            typename type_traits<Date>::serial_type dayCount(const Date& d1,
+            typename date_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const {
-                return type_traits<Date>::onlyDaysBetween(d1, d2) + (includeLastDay_ ? 1 : 0);
+                return date_traits<Date>::onlyDaysBetween(d1, d2) + (includeLastDay_ ? 1 : 0);
             }
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return (type_traits<Date>::daysBetween(d1, d2)
+                return (date_traits<Date>::daysBetween(d1, d2)
                         + (includeLastDay_ ? 1.0 : 0.0))/360.0;
             }
         };

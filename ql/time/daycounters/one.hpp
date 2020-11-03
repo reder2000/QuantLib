@@ -36,16 +36,16 @@ namespace QuantLib {
         class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("1/1"); }
-            typename type_traits<Date>::serial_type dayCount(const Date& d1, const Date& d2) const {
+            typename date_traits<Date>::serial_type dayCount(const Date& d1, const Date& d2) const {
                 // the sign is all we need
                 return (d2 >= d1 ? 1 : -1);
             };
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return typename type_traits<Date>::Time(dayCount(d1, d2));
+                return typename date_traits<Date>::Time(dayCount(d1, d2));
             }
         };
       public:

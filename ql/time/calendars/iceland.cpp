@@ -24,7 +24,7 @@ namespace QuantLib {
 
     Iceland::Iceland(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<Date>::Impl> impl(new Iceland::IcexImpl);
+        static std::shared_ptr<Calendar<Date>::Impl> impl(new Iceland::IcexImpl);
         impl_ = impl;
     }
 

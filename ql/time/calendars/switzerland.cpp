@@ -24,7 +24,7 @@ namespace QuantLib {
 
     Switzerland::Switzerland() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<Date>::Impl> impl(new Switzerland::Impl);
+        static std::shared_ptr<Calendar<Date>::Impl> impl(new Switzerland::Impl);
         impl_ = impl;
     }
 

@@ -53,12 +53,12 @@ namespace QuantLib {
         class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("Actual/365 (Fixed)"); }
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
-                return type_traits<Date>::daysBetween(d1, d2) / 365.0;
+                return date_traits<Date>::daysBetween(d1, d2) / 365.0;
             }
         };
         class CA_Impl : public DayCounter<Date>::Impl {
@@ -66,7 +66,7 @@ namespace QuantLib {
             std::string name() const {
                 return std::string("Actual/365 (Fixed) Canadian Bond");
             }
-            typename type_traits<Date>::Time yearFraction(const Date& d1,
+            typename date_traits<Date>::Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
@@ -76,9 +76,9 @@ namespace QuantLib {
             std::string name() const {
                 return std::string("Actual/365 (No Leap)");
             }
-            typename type_traits<Date>::serial_type dayCount(const Date& d1,
+            typename date_traits<Date>::serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
-            typename type_traits<Date>::Time yearFraction(const Date& d1,
+            typename date_traits<Date>::Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
@@ -102,7 +102,7 @@ namespace QuantLib {
     }
 
 template <class Date>
-    inline typename type_traits<Date>::Time
+    inline typename date_traits<Date>::Time
     Actual365Fixed<Date>::CA_Impl::yearFraction(const Date& d1,
                                                const Date& d2,
                                                const Date& refPeriodStart,
@@ -114,9 +114,9 @@ template <class Date>
         QL_REQUIRE(refPeriodStart != Date(), "invalid refPeriodStart");
         QL_REQUIRE(refPeriodEnd != Date(), "invalid refPeriodEnd");
 
-        typename type_traits<Date>::Time dcs =  type_traits<Date>::daysBetween(d1, d2);
-        typename type_traits<Date>::Time dcc =
-            type_traits<Date>::daysBetween(refPeriodStart, refPeriodEnd);
+        typename date_traits<Date>::Time dcs =  date_traits<Date>::daysBetween(d1, d2);
+        typename date_traits<Date>::Time dcc =
+            date_traits<Date>::daysBetween(refPeriodStart, refPeriodEnd);
         int months = int(0.5 + 12 * dcc / 365);
         QL_REQUIRE(months != 0, "invalid reference period for Act/365 Canadian; "
                                 "must be longer than a month");
@@ -129,7 +129,7 @@ template <class Date>
     }
 
     template <class Date>
-    inline typename type_traits<Date>::serial_type
+    inline typename date_traits<Date>::serial_type
     Actual365Fixed<Date>::NL_Impl::dayCount(const Date& d1, const Date& d2) const {
 
         static const int MonthOffset[] = {
@@ -137,8 +137,8 @@ template <class Date>
             181, 212, 243, 273, 304, 334  // Jun - Dec
         };
 
-        typename type_traits<Date>::serial_type s1 = dayOfMonth(d1) + MonthOffset[d1.month() - 1] + (d1.year() * 365);
-        typename type_traits<Date>::serial_type s2 =
+        typename date_traits<Date>::serial_type s1 = dayOfMonth(d1) + MonthOffset[d1.month() - 1] + (d1.year() * 365);
+        typename date_traits<Date>::serial_type s2 =
             dayOfMonth(d2) + MonthOffset[d2.month() - 1] + (d2.year() * 365);
 
         if (d1.month() == Feb && dayOfMonth(d1) == 29) {
@@ -153,7 +153,7 @@ template <class Date>
     }
 
         template <class Date>
-        inline typename type_traits<Date>::Time Actual365Fixed<Date>::NL_Impl::yearFraction(
+        inline typename date_traits<Date>::Time Actual365Fixed<Date>::NL_Impl::yearFraction(
         const Date& d1,
                                                const Date& d2,
                                                const Date& d3,

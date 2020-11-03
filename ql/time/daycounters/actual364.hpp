@@ -36,7 +36,7 @@ namespace QuantLib {
         class Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const { return std::string("Actual/364"); }
-            typename type_traits<Date>::Time
+            typename date_traits<Date>::Time
             yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,

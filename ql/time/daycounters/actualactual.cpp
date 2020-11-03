@@ -6,10 +6,10 @@ using Datetime = BloombergLP::blpapi::Datetime;
 int dayOfMonth(const Datetime&);
 
 //template <class T>
-//struct type_traits ; 
+//struct date_traits ; 
 //    
 //template <>
-//struct type_traits<class DateTime> 
+//struct date_traits<class DateTime> 
 //{
 //    using T = DateTime;
 //    using serial_type = int;

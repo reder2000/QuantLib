@@ -21,7 +21,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/weekday.hpp>
+#include "weekday.hpp"
 #include <ql/types.hpp>
 #include <ql/errors.hpp>
 

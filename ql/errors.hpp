@@ -144,7 +144,7 @@ namespace QuantLib {
                 MREQUIRE0(__VA_ARGS__))
 
 #define QL_REQUIRE MREQUIRE
-#define QL_FAIL(msg) MREQUIRE(false,msg)
+#define QL_FAIL(...) MREQUIRE(false, __VA_ARGS__)
 
 #endif
 

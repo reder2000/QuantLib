@@ -19,14 +19,15 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/schedule.hpp>
-#include <ql/time/imm.hpp>
+#include "schedule.hpp"
+#include "imm.hpp"
 #include <ql/settings.hpp>
 
 namespace QuantLib {
 
     namespace {
 
+        template <class Date>
         Date nextTwentieth(const Date& d, DateGeneration::Rule rule) {
             Date result = Date(20, d.month(), d.year());
             if (result < d)
@@ -44,6 +45,7 @@ namespace QuantLib {
             return result;
         }
 
+        template <class Date>
         Date previousTwentieth(const Date& d, DateGeneration::Rule rule) {
             Date result = Date(20, d.month(), d.year());
             if (result > d)
@@ -69,8 +71,9 @@ namespace QuantLib {
     }
 
 
-    Schedule::Schedule(const std::vector<Date>& dates,
-                       const Calendar& calendar,
+            template <class Date>
+    Schedule<Date>::Schedule(const std::vector<Date>& dates,
+                       const Calendar<Date>& calendar,
                        BusinessDayConvention convention,
                        const boost::optional<BusinessDayConvention>& terminationDateConvention,
                        const boost::optional<Period>& tenor,
@@ -92,10 +95,11 @@ namespace QuantLib {
                                       << dates.size() - 1 << ")");
     }
 
-    Schedule::Schedule(Date effectiveDate,
+    template <class Date>
+    Schedule<Date>::Schedule(Date effectiveDate,
                        const Date& terminationDate,
                        const Period& tenor,
-                       const Calendar& cal,
+                       const Calendar<Date>& cal,
                        BusinessDayConvention convention,
                        BusinessDayConvention terminationDateConvention,
                        DateGeneration::Rule rule,
@@ -458,7 +462,8 @@ namespace QuantLib {
 
     }
 
-    Schedule Schedule::after(const Date& truncationDate) const {
+            template <class Date>
+    Schedule<Date> Schedule<Date>::after(const Date& truncationDate) const {
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate < result.dates_.back(),
@@ -492,7 +497,8 @@ namespace QuantLib {
         return result;
     }
 
-    Schedule Schedule::until(const Date& truncationDate) const {
+            template <class Date>
+    Schedule<Date> Schedule<Date>::until(const Date& truncationDate) const {
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate>result.dates_[0],
@@ -525,15 +531,17 @@ namespace QuantLib {
         return result;
     }
 
-    std::vector<Date>::const_iterator
-    Schedule::lower_bound(const Date& refDate) const {
+            template <class Date>
+    typename std::vector<Date>::const_iterator
+    Schedule<Date>::lower_bound(const Date& refDate) const {
         Date d = (refDate==Date() ?
                   Settings::instance().evaluationDate() :
                   refDate);
         return std::lower_bound(dates_.begin(), dates_.end(), d);
     }
 
-    Date Schedule::nextDate(const Date& refDate) const {
+            template <class Date>
+    Date Schedule<Date>::nextDate(const Date& refDate) const {
         std::vector<Date>::const_iterator res = lower_bound(refDate);
         if (res!=dates_.end())
             return *res;
@@ -541,7 +549,8 @@ namespace QuantLib {
             return Date();
     }
 
-    Date Schedule::previousDate(const Date& refDate) const {
+            template <class Date>
+    Date Schedule<Date>::previousDate(const Date& refDate) const {
         std::vector<Date>::const_iterator res = lower_bound(refDate);
         if (res!=dates_.begin())
             return *(--res);
@@ -549,9 +558,13 @@ namespace QuantLib {
             return Date();
     }
 
-    bool Schedule::hasIsRegular() const { return !isRegular_.empty(); }
+            template <class Date>
+    bool Schedule<Date>::hasIsRegular() const {
+        return !isRegular_.empty();
+    }
 
-    bool Schedule::isRegular(Size i) const {
+            template <class Date>
+    bool Schedule<Date>::isRegular(Size i) const {
         QL_REQUIRE(hasIsRegular(),
                    "full interface (isRegular) not available");
         QL_REQUIRE(i<=isRegular_.size() && i>0,
@@ -560,81 +573,98 @@ namespace QuantLib {
         return isRegular_[i-1];
     }
 
-    const std::vector<bool>& Schedule::isRegular() const {
+            template <class Date>
+    const std::vector<bool>& Schedule<Date>::isRegular() const {
         QL_REQUIRE(!isRegular_.empty(), "full interface (isRegular) not available");
         return isRegular_;
     }
 
-    MakeSchedule::MakeSchedule()
+            template <class Date>
+    MakeSchedule<Date>::MakeSchedule()
     : rule_(DateGeneration::Backward), endOfMonth_(false) {}
 
-    MakeSchedule& MakeSchedule::from(const Date& effectiveDate) {
+            template <class Date>
+            MakeSchedule<Date>& MakeSchedule<Date>::from(const Date& effectiveDate) {
         effectiveDate_ = effectiveDate;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::to(const Date& terminationDate) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::to(const Date& terminationDate) {
         terminationDate_ = terminationDate;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withTenor(const Period& tenor) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withTenor(const Period& tenor) {
         tenor_ = tenor;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withFrequency(Frequency frequency) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withFrequency(Frequency frequency) {
         tenor_ = Period(frequency);
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withCalendar(const Calendar& calendar) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withCalendar(const Calendar<Date>& calendar) {
         calendar_ = calendar;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withConvention(BusinessDayConvention conv) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withConvention(BusinessDayConvention conv) {
         convention_ = conv;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withTerminationDateConvention(
+            template <class Date>
+    MakeSchedule<Date>&
+    MakeSchedule<Date>::withTerminationDateConvention(
                                                 BusinessDayConvention conv) {
         terminationDateConvention_ = conv;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withRule(DateGeneration::Rule r) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withRule(DateGeneration::Rule r) {
         rule_ = r;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::forwards() {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::forwards() {
         rule_ = DateGeneration::Forward;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::backwards() {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::backwards() {
         rule_ = DateGeneration::Backward;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::endOfMonth(bool flag) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::endOfMonth(bool flag) {
         endOfMonth_ = flag;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withFirstDate(const Date& d) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withFirstDate(const Date& d) {
         firstDate_ = d;
         return *this;
     }
 
-    MakeSchedule& MakeSchedule::withNextToLastDate(const Date& d) {
+            template <class Date>
+    MakeSchedule<Date>& MakeSchedule<Date>::withNextToLastDate(const Date& d) {
         nextToLastDate_ = d;
         return *this;
     }
 
-    MakeSchedule::operator Schedule() const {
+            template <class Date>
+    MakeSchedule<Date>::operator Schedule<Date>() const {
         // check for mandatory arguments
         QL_REQUIRE(effectiveDate_ != Date(), "effective date not provided");
         QL_REQUIRE(terminationDate_ != Date(), "termination date not provided");

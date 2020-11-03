@@ -20,7 +20,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/businessdayconvention.hpp>
+#include "businessdayconvention.hpp"
 #include <ql/types.hpp>
 #include <ql/errors.hpp>
 
@@ -44,7 +44,7 @@ namespace QuantLib {
           case Nearest:
             return out << "Nearest";
           default:
-            QL_FAIL("unknown BusinessDayConvention (" << Integer(b) << ")");
+            QL_FAIL("unknown BusinessDayConvention ({})" , Integer(b) );
         }
     }
 

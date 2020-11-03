@@ -1,3 +1,4 @@
+#if defined(FIXME_MAYBE)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -18,7 +19,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/ecb.hpp>
+#include "ecb.hpp"
 #include <ql/settings.hpp>
 #include <ql/utilities/dataparsers.hpp>
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
@@ -277,3 +278,4 @@ namespace QuantLib {
     }
 
 }
+#endif //defined(FIXME_MAYBE)

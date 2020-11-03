@@ -1,4 +1,6 @@
-/* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+#if defined(FIXME_MAYBE) 
+/* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 \
+                            -*- */
 
 /*
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
@@ -28,7 +30,7 @@
 #ifndef quantlib_asx_hpp
 #define quantlib_asx_hpp
 
-#include <ql/time/date.hpp>
+#include "date.hpp"
 
 namespace QuantLib {
 
@@ -98,3 +100,4 @@ namespace QuantLib {
 }
 
 #endif
+#endif //defined(FIXME_MAYBE)

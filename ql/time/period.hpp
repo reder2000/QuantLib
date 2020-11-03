@@ -27,10 +27,10 @@
 #ifndef quantlib_period_hpp
 #define quantlib_period_hpp
 
-#include <ql/time/frequency.hpp>
-#include <ql/time/timeunit.hpp>
+#include "frequency.hpp"
+#include "timeunit.hpp"
 #include <ql/types.hpp>
-
+#include <fmt/ostream.h>
 
 namespace QuantLib {
 

@@ -21,7 +21,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/period.hpp>
+#include "period.hpp"
 #include <ql/errors.hpp>
 
 namespace QuantLib {
@@ -62,7 +62,7 @@ namespace QuantLib {
           case OtherFrequency:
             QL_FAIL("unknown frequency");  // no point in showing 999...
           default:
-            QL_FAIL("unknown frequency (" << Integer(f) << ")");
+            QL_FAIL("unknown frequency ({})", Integer(f) );
         }
     }
 
@@ -101,7 +101,7 @@ namespace QuantLib {
             else
                 return OtherFrequency;
           default:
-            QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+            QL_FAIL("unknown time unit ({})" , Integer(units_));
         }
     }
 
@@ -119,7 +119,7 @@ namespace QuantLib {
               case Years:
                 break;
               default:
-                QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(units_));
             }
     }
 
@@ -143,11 +143,10 @@ namespace QuantLib {
                   case Weeks:
                   case Days:
                     QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                               "impossible addition between {} and {}" , *this , p);
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -158,12 +157,11 @@ namespace QuantLib {
                     break;
                   case Weeks:
                   case Days:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
-                    break;
+                      QL_REQUIRE(p.length() == 0, "impossible addition between {} and {}", *this,
+                                 p);
+                      break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -175,12 +173,12 @@ namespace QuantLib {
                     break;
                   case Years:
                   case Months:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                      QL_REQUIRE(p.length() == 0, "impossible addition between {} and {}", *this,
+                                 p);
+
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -191,17 +189,17 @@ namespace QuantLib {
                     break;
                   case Years:
                   case Months:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                      QL_REQUIRE(p.length() == 0, "impossible addition between {} and {}", *this,
+                                 p);
+
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
               default:
-                QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(units_));
             }
         }
 
@@ -236,8 +234,7 @@ namespace QuantLib {
               default:
                 ;
             }
-            QL_REQUIRE(length % n == 0,
-                       *this << " cannot be divided by " << n);
+            QL_REQUIRE(length % n == 0, "{} cannot be divided by {}", * this , n);
             length_ = length/n;
             units_ = units;
             // if normalization were possible, we wouldn't be
@@ -262,7 +259,8 @@ namespace QuantLib {
               case Years:
                 return std::make_pair(365*p.length(), 366*p.length());
               default:
-                QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(p.units()));
+
             }
         }
 
@@ -281,7 +279,8 @@ namespace QuantLib {
           case Years:
               return p.length();
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
+
         }
     }
 
@@ -298,7 +297,7 @@ namespace QuantLib {
           case Years:
               return p.length()*12.0;
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
 
@@ -315,7 +314,7 @@ namespace QuantLib {
           case Years:
             QL_FAIL("cannot convert Years into Weeks");
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
 
@@ -332,7 +331,7 @@ namespace QuantLib {
           case Years:
             QL_FAIL("cannot convert Years into Days");
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
 
@@ -365,7 +364,7 @@ namespace QuantLib {
         else if (p1lim.first > p2lim.second)
             return false;
         else
-            QL_FAIL("undecidable comparison between " << p1 << " and " << p2);
+            QL_FAIL("undecidable comparison between {} and {}" , p1 , p2);
     }
 
 
@@ -423,7 +422,7 @@ namespace QuantLib {
               case Years:
                 return out << n << (n == 1 ? " year" : " years");
               default:
-                QL_FAIL("unknown time unit (" << Integer(holder.p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(holder.p.units()));
             }
         }
 
@@ -457,7 +456,7 @@ namespace QuantLib {
               case Years:
                 return out << n << "Y";
               default:
-                QL_FAIL("unknown time unit (" << Integer(holder.p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(holder.p.units()));
             }
         }
 

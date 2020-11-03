@@ -1,3 +1,4 @@
+#if defined(FIXME_MAYBE)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -27,7 +28,7 @@
 #ifndef quantlib_imm_hpp
 #define quantlib_imm_hpp
 
-#include <ql/time/date.hpp>
+#include "date.hpp>
 
 namespace QuantLib {
 
@@ -101,3 +102,4 @@ namespace QuantLib {
 }
 
 #endif
+#endif //defined(FIXME_MAYBE)

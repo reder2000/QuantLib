@@ -17,7 +17,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/timeunit.hpp>
+#include "timeunit.hpp"
 #include <ql/types.hpp>
 #include <ql/errors.hpp>
 

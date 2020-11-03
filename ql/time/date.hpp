@@ -1,3 +1,4 @@
+#if defined(FIXME_MAYBE)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -31,8 +32,8 @@
 #ifndef quantlib_date_hpp
 #define quantlib_date_hpp
 
-#include <ql/time/period.hpp>
-#include <ql/time/weekday.hpp>
+#include "period.hpp"
+#include "weekday.hpp"
 #include <ql/utilities/null.hpp>
 #include <boost/cstdint.hpp>
 
@@ -461,3 +462,4 @@ namespace QuantLib {
 }
 
 #endif
+#endif defined(FIXME_MAYBE)

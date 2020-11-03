@@ -29,53 +29,17 @@
 #define quantlib_calendar_hpp
 
 #include <ql/errors.hpp>
-#include <ql/time/businessdayconvention.hpp>
+#include "businessdayconvention.hpp"
 #include <ql/shared_ptr.hpp>
 #include <set>
 #include <vector>
 #include <string>
+#include "../timeunit.hpp"
+#include "../weekday.hpp"
 
-
-namespace QuantLib {
-
-    //! Units used to describe time periods
-    /*! \ingroup datetime */
-    enum TimeUnit {
-        Days,
-        Weeks,
-        Months,
-        Years,
-        Hours,
-        Minutes,
-        Seconds,
-        Milliseconds,
-        Microseconds
-    };
-}
 
     namespace QuantLib {
 
-    /*! Day's serial number MOD 7;
-        WEEKDAY Excel function is the same except for Sunday = 7.
-
-        \ingroup datetime
-    */
-    enum Weekday {
-        Sunday = 1,
-        Monday = 2,
-        Tuesday = 3,
-        Wednesday = 4,
-        Thursday = 5,
-        Friday = 6,
-        Saturday = 7,
-        Sun = 1,
-        Mon = 2,
-        Tue = 3,
-        Wed = 4,
-        Thu = 5,
-        Fri = 6,
-        Sat = 7
-    };
 
         enum Month {
         January = 1,

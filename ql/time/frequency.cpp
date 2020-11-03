@@ -20,7 +20,7 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#include <ql/time/frequency.hpp>
+#include "frequency.hpp"
 #include <ql/types.hpp>
 #include <ql/errors.hpp>
 
@@ -55,7 +55,7 @@ namespace QuantLib {
           case OtherFrequency:
             return out << "Unknown frequency";
           default:
-            QL_FAIL("unknown frequency (" << Integer(f) << ")");
+            QL_FAIL("unknown frequency ({})" , Integer(f) );
         }
     }
 

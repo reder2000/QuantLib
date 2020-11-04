@@ -143,7 +143,7 @@ namespace QuantLib {
     template <class Date>
     inline typename date_traits<Date>::serial_type
     Thirty360<Date>::US_Impl::dayCount(const Date& d1, const Date& d2) const {
-        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto dd1 = date_traits<Date>::dayOfMonth(d1), dd2 = date_traits<Date>::dayOfMonth(d2);
         int mm1 = d1.month(), mm2 = d2.month();
         auto yy1 = d1.year(), yy2 = d2.year();
 
@@ -159,7 +159,7 @@ namespace QuantLib {
     template <class Date>
     inline typename date_traits<Date>::serial_type
     Thirty360<Date>::EU_Impl::dayCount(const Date& d1, const Date& d2) const {
-        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto dd1 = date_traits<Date>::dayOfMonth(d1), dd2 = date_traits<Date>::dayOfMonth(d2);
         auto mm1 = d1.month(), mm2 = d2.month();
         auto yy1 = d1.year(), yy2 = d2.year();
 
@@ -170,7 +170,7 @@ namespace QuantLib {
     template <class Date>
     inline typename date_traits<Date>::serial_type
     Thirty360<Date>::IT_Impl::dayCount(const Date& d1, const Date& d2) const {
-        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto dd1 = date_traits<Date>::dayOfMonth(d1), dd2 = date_traits<Date>::dayOfMonth(d2);
         auto mm1 = d1.month(), mm2 = d2.month();
         auto yy1 = d1.year(), yy2 = d2.year();
 
@@ -186,13 +186,13 @@ namespace QuantLib {
     template <class Date>
     inline typename date_traits<Date>::serial_type
     Thirty360<Date>::GER_Impl::dayCount(const Date& d1, const Date& d2) const {
-        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto dd1 = date_traits<Date>::dayOfMonth(d1), dd2 = date_traits<Date>::dayOfMonth(d2);
         auto mm1 = d1.month(), mm2 = d2.month();
         auto yy1 = d1.year(), yy2 = d2.year();
 
-        if (mm1 == 2 && dd1 == 28 + (date_traits<Date>::isLeap(yy1) ? 1 : 0))
+        if (mm1 == 2 && dd1 == 28 + (isLeap(yy1) ? 1 : 0))
             dd1 = 30;
-        if (!isLastPeriod_ && mm2 == 2 && dd2 == 28 + (date_traits<Date>::isLeap(yy2) ? 1 : 0))
+        if (!isLastPeriod_ && mm2 == 2 && dd2 == 28 + (isLeap(yy2) ? 1 : 0))
             dd2 = 30;
 
         return 360 * (yy2 - yy1) + 30 * (mm2 - mm1 - 1) + std::max(int(0), 30 - dd1) +

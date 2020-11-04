@@ -19,8 +19,12 @@
 */
 
 #include "dategenerationrule.hpp"
+#include "../errors.hpp"
+#include <iostream>
 
 namespace QuantLib {
+
+    using Integer = int;
 
     std::ostream& operator<<(std::ostream& out, DateGeneration::Rule r) {
         switch (r) {

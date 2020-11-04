@@ -81,7 +81,7 @@ namespace QuantLib {
                                               const Date& d2,
                                               const Date&,
                                               const Date&) const {
-        auto dm1 = dayOfMonth(d1), dm2 = dayOfMonth(d2);
+        auto dm1 = date_traits<Date>::dayOfMonth(d1), dm2 = date_traits<Date>::dayOfMonth(d2);
 
         if (dm1 == dm2 ||
             // e.g., Aug 30 -> Feb 28 ?

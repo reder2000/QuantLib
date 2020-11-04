@@ -52,7 +52,7 @@ namespace QuantLib {
         template <class Date>
     inline typename date_traits<Date>::serial_type
     Thirty365<Date>::Impl::dayCount(const Date& d1, const Date& d2) const {
-        auto dd1 = dayOfMonth(d1), dd2 = dayOfMonth(d2);
+        auto dd1 = date_traits<Date>::dayOfMonth(d1), dd2 = date_traits<Date>::dayOfMonth(d2);
         int mm1 = d1.month(), mm2 = d2.month();
         auto yy1 = d1.year(), yy2 = d2.year();
 

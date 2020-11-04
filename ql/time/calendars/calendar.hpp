@@ -28,8 +28,8 @@
 #ifndef quantlib_calendar_hpp
 #define quantlib_calendar_hpp
 
-#include "../errors.hpp"
-#include "businessdayconvention.hpp"
+#include "../../errors.hpp"
+#include "../businessdayconvention.hpp"
 #include <set>
 #include <vector>
 #include <string>
@@ -265,7 +265,7 @@ namespace QuantLib {
 
     template <class Date>
     inline bool Calendar<Date>::isEndOfMonth(const Date& d) const {
-        return (d.month() != adjust((date_traits<Date>::add_1(d))).month());
+        return (d.month() != adjust((date_traits<Date>::add(d,1))).month());
     }
 
     template <class Date>
@@ -432,19 +432,19 @@ namespace QuantLib {
                                                                        const Date& to,
                                                                        bool includeFirst,
                                                                        bool includeLast) const {
-        date_traits<Date>::serial_type wd = 0;
+        typename date_traits<Date>::serial_type wd = 0;
         if (from != to) {
             if (from < to) {
                 // the last one is treated separately to avoid
                 // incrementing Date::maxDate()
-                for (Date d = from; d < to; ++d) {
+                for (Date d = from; d < to; date_traits<Date>::inc(d)) {
                     if (isBusinessDay(d))
                         ++wd;
                 }
                 if (isBusinessDay(to))
                     ++wd;
             } else if (from > to) {
-                for (Date d = to; d < from; ++d) {
+                for (Date d = to; d < from;  date_traits<Date>::inc(d)) {
                     if (isBusinessDay(d))
                         ++wd;
                 }

@@ -22,6 +22,8 @@
 */
 
 #include "weekday.hpp"
+#include <iostream>
+#include "../errors.hpp"
 
 namespace QuantLib {
 

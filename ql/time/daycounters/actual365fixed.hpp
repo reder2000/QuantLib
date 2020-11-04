@@ -137,15 +137,16 @@ template <class Date>
             181, 212, 243, 273, 304, 334  // Jun - Dec
         };
 
-        typename date_traits<Date>::serial_type s1 = dayOfMonth(d1) + MonthOffset[d1.month() - 1] + (d1.year() * 365);
+        typename date_traits<Date>::serial_type s1 =
+            date_traits<Date>::dayOfMonth(d1) + MonthOffset[d1.month() - 1] + (d1.year() * 365);
         typename date_traits<Date>::serial_type s2 =
-            dayOfMonth(d2) + MonthOffset[d2.month() - 1] + (d2.year() * 365);
+            date_traits<Date>::dayOfMonth(d2) + MonthOffset[d2.month() - 1] + (d2.year() * 365);
 
-        if (d1.month() == Feb && dayOfMonth(d1) == 29) {
+        if (d1.month() == Feb && date_traits<Date>::dayOfMonth(d1) == 29) {
             --s1;
         }
 
-        if (d2.month() == Feb && dayOfMonth(d2) == 29) {
+        if (d2.month() == Feb && date_traits<Date>::dayOfMonth(d2) == 29) {
             --s2;
         }
 

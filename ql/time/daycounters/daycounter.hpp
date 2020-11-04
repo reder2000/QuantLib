@@ -26,7 +26,8 @@
 #define quantlib_day_counter_hpp
 
 
-#include "../errors.hpp"
+#include "../../errors.hpp"
+#include "../date_traits.h"
 
 namespace QuantLib {
 

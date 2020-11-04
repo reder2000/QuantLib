@@ -21,10 +21,12 @@
 */
 
 #include "businessdayconvention.hpp"
-//#include <ql/types.hpp>
-//#include <ql/errors.hpp>
+#include "../errors.hpp"
+#include <iostream>
 
 namespace QuantLib {
+
+    using Integer = int;
 
     std::ostream& operator<<(std::ostream& out,
                              BusinessDayConvention b) {

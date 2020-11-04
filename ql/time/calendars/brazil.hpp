@@ -95,14 +95,15 @@ namespace QuantLib {
         Brazil(Market market = Settlement) {
             // all calendar instances on the same market share the same
             // implementation instance
-            static std::shared_ptr<Calendar<Date>::Impl> settlementImpl(new Brazil::SettlementImpl);
-            static std::shared_ptr<Calendar<Date>::Impl> exchangeImpl(new Brazil::ExchangeImpl);
+            static std::shared_ptr<typename Calendar<Date>::Impl> settlementImpl(new Brazil<Date>::SettlementImpl);
+            static std::shared_ptr<typename Calendar<Date>::Impl> exchangeImpl(
+                new Brazil<Date>::ExchangeImpl);
             switch (market) {
                 case Settlement:
-                    impl_ = settlementImpl;
+                    this->impl_ = settlementImpl;
                     break;
                 case Exchange:
-                    impl_ = exchangeImpl;
+                    this->impl_ = exchangeImpl;
                     break;
                 default:
                     QL_FAIL("unknown market");
@@ -117,9 +118,9 @@ namespace QuantLib {
         Day dd = date_traits<Date>::dayOfYear(date);
         Month m = date_traits<Date>::month(date);
         Year y = date.year();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Tiradentes Day
@@ -153,9 +154,9 @@ template <class Date>
         Day dd = date_traits<Date>::dayOfYear(date);
         Month m = date_traits<Date>::month(date);
         Year y = date.year();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Sao Paulo City Day

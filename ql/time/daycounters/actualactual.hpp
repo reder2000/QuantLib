@@ -54,7 +54,7 @@ namespace QuantLib {
                           ISDA, Historical, Actual365,
                           AFB, Euro };
       private:
-        class ISMA_Impl : public DayCounter::Impl {
+        class ISMA_Impl : public DayCounter<Date>::Impl {
           public:
             explicit ISMA_Impl(const Schedule<Date>& schedule)
             : schedule_(schedule) {}
@@ -69,7 +69,7 @@ namespace QuantLib {
           private:
             Schedule<Date> schedule_;
         };
-        class Old_ISMA_Impl : public DayCounter::Impl {
+        class Old_ISMA_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISMA)");
@@ -79,7 +79,7 @@ namespace QuantLib {
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        class ISDA_Impl : public DayCounter::Impl {
+        class ISDA_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISDA)");
@@ -90,7 +90,7 @@ namespace QuantLib {
                               const Date&,
                               const Date&) const;
         };
-        class AFB_Impl : public DayCounter::Impl {
+        class AFB_Impl : public DayCounter<Date>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (AFB)");
@@ -101,13 +101,14 @@ namespace QuantLib {
                               const Date&,
                               const Date&) const;
         };
-        static std::shared_ptr<DayCounter::Impl> implementation(
+        static std::shared_ptr<typename DayCounter<Date>::Impl>
+        implementation(
                                                                Convention c, 
                                                                const Schedule<Date>& schedule);
       public:
         ActualActual(Convention c = ActualActual::ISDA, 
                      const Schedule<Date>& schedule = Schedule<Date>())
-        : DayCounter(implementation(c, schedule)) {}
+        : DayCounter<Date>(implementation(c, schedule)) {}
     };
 
         namespace {
@@ -183,16 +184,16 @@ namespace QuantLib {
             case ISMA:
             case Bond:
                 if (!schedule.empty())
-                    return std::shared_ptr<DayCounter::Impl>(new ISMA_Impl(schedule));
+                    return std::shared_ptr<typename DayCounter<Date>::Impl>(new ISMA_Impl(schedule));
                 else
-                    return std::shared_ptr<DayCounter::Impl>(new Old_ISMA_Impl);
+                    return std::shared_ptr<typename DayCounter<Date>::Impl>(new Old_ISMA_Impl);
             case ISDA:
             case Historical:
             case Actual365:
-                return std::shared_ptr<DayCounter::Impl>(new ISDA_Impl);
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new ISDA_Impl);
             case AFB:
             case Euro:
-                return std::shared_ptr<DayCounter::Impl>(new AFB_Impl);
+                return std::shared_ptr<typename DayCounter<Date>::Impl>(new AFB_Impl);
             default:
                 QL_FAIL("unknown act/act convention");
         }
@@ -262,7 +263,7 @@ namespace QuantLib {
             months = 12;
         }
 
-         date_traits<Date>::Time period = Real(months) / 12.0;
+         typename date_traits<Date>::Time period = Real(months) / 12.0;
 
         if (d2 <= refPeriodEnd) {
             // here refPeriodEnd is a future (notional?) payment date
@@ -300,7 +301,7 @@ namespace QuantLib {
             // now it is: refPeriodStart <= d1 < refPeriodEnd < d2
 
             // the part from d1 to refPeriodEnd
-            date_traits<Date>::Time sum =
+            typename date_traits<Date>::Time sum =
                 yearFraction(d1, refPeriodEnd, refPeriodStart, refPeriodEnd);
 
             // the part from refPeriodEnd to d2
@@ -337,10 +338,10 @@ namespace QuantLib {
             return -yearFraction(d2, d1, Date(), Date());
 
         int y1 = d1.year(), y2 = d2.year();
-        Real dib1 = (date_traits<Date>::isLeap(y1) ? 366.0 : 365.0),
-             dib2 = (date_traits<Date>::isLeap(y2) ? 366.0 : 365.0);
+        Real dib1 = (isLeap(y1) ? 366.0 : 365.0),
+             dib2 = (isLeap(y2) ? 366.0 : 365.0);
 
-         date_traits<Date>::Time sum = y2 - y1 - 1;
+         typename date_traits<Date>::Time sum = y2 - y1 - 1;
         // FLOATING_POINT_EXCEPTION
          sum += date_traits<Date>::daysBetween(d1, Date(1, January, y1 + 1)) / dib1;
          sum += date_traits<Date>::daysBetween(Date(1, January, y2), d2) / dib2;
@@ -361,11 +362,11 @@ namespace QuantLib {
             return -yearFraction(d2, d1, Date(), Date());
 
         Date newD2 = d2, temp = d2;
-        date_traits<Date>::Time sum = 0.0;
+        typename date_traits<Date>::Time sum = 0.0;
         while (temp > d1) {
             temp = date_traits<Date>::plusPeriod( newD2 , - 1 * Years );
             if (date_traits<Date>::dayOfMonth(temp) == 28 && temp.month() == 2 &&
-               date_traits<Date>::isLeap(temp.year())) {
+               isLeap(temp.year())) {
                 date_traits<Date>::inc(temp);
             }
             if (temp >= d1) {
@@ -376,11 +377,11 @@ namespace QuantLib {
 
         Real den = 365.0;
 
-        if (date_traits<Date>::isLeap(newD2.year())) {
+        if (isLeap(newD2.year())) {
             temp = Date(29, February, newD2.year());
             if (newD2 > temp && d1 <= temp)
                 den += 1.0;
-        } else if (date_traits<Date>::isLeap(d1.year())) {
+        } else if (isLeap(d1.year())) {
             temp = Date(29, February, d1.year());
             if (newD2 > temp && d1 <= temp)
                 den += 1.0;

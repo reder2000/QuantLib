@@ -1,4 +1,4 @@
-#if defined(FIXME_MAYBE)
+//#if defined(FIXME_MAYBE)
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
@@ -34,8 +34,9 @@
 
 #include "period.hpp"
 #include "weekday.hpp"
-#include <ql/utilities/null.hpp>
-#include <boost/cstdint.hpp>
+#include "date_traits.h"
+//#include <ql/utilities/null.hpp>
+//#include <boost/cstdint.hpp>
 
 #ifdef QL_HIGH_RESOLUTION_DATE
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -46,6 +47,7 @@
 #include <functional>
 #include <string>
 
+using Time = double;
 
 namespace QuantLib {
 
@@ -55,30 +57,30 @@ namespace QuantLib {
 
     //! Month names
     /*! \ingroup datetime */
-    enum Month { January   = 1,
-                 February  = 2,
-                 March     = 3,
-                 April     = 4,
-                 May       = 5,
-                 June      = 6,
-                 July      = 7,
-                 August    = 8,
-                 September = 9,
-                 October   = 10,
-                 November  = 11,
-                 December  = 12,
-                 Jan = 1,
-                 Feb = 2,
-                 Mar = 3,
-                 Apr = 4,
-                 Jun = 6,
-                 Jul = 7,
-                 Aug = 8,
-                 Sep = 9,
-                 Oct = 10,
-                 Nov = 11,
-                 Dec = 12
-    };
+    //enum Month { January   = 1,
+    //             February  = 2,
+    //             March     = 3,
+    //             April     = 4,
+    //             May       = 5,
+    //             June      = 6,
+    //             July      = 7,
+    //             August    = 8,
+    //             September = 9,
+    //             October   = 10,
+    //             November  = 11,
+    //             December  = 12,
+    //             Jan = 1,
+    //             Feb = 2,
+    //             Mar = 3,
+    //             Apr = 4,
+    //             Jun = 6,
+    //             Jul = 7,
+    //             Aug = 8,
+    //             Sep = 9,
+    //             Oct = 10,
+    //             Nov = 11,
+    //             Dec = 12
+    //};
 
     /*! \relates Month */
     std::ostream& operator<<(std::ostream&, Month);
@@ -126,7 +128,9 @@ namespace QuantLib {
     class Date {
       public:
         //! serial number type
-        typedef boost::int_fast32_t serial_type;
+        //typedef boost::int_fast32_t serial_type;
+        using serial_type = int;
+        using Size = size_t;
         //! \name constructors
         //@{
         //! Default constructor returning a null date.
@@ -373,12 +377,12 @@ namespace QuantLib {
     }
 
     //! specialization of Null template for the Date class
-    template <>
-    class Null<Date> {
-      public:
-        Null() {}
-        operator Date() const { return Date(); }
-    };
+    //template <>
+    //class Null<Date> {
+    //  public:
+    //    Null() {}
+    //    operator Date() const { return Date(); }
+    //};
 
 
 #ifndef QL_HIGH_RESOLUTION_DATE
@@ -462,4 +466,4 @@ namespace QuantLib {
 }
 
 #endif
-#endif defined(FIXME_MAYBE)
+//#endif //defined(FIXME_MAYBE)

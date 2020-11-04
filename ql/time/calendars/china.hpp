@@ -73,7 +73,7 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             bool isBusinessDay(const Date&) const;
           private:
-            std::shared_ptr<Calendar<Date>::Impl> sseImpl;
+            std::shared_ptr<typename Calendar<Date>::Impl> sseImpl;
         };
       public:
         enum Market { SSE,    //!< Shanghai stock exchange

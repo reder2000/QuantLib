@@ -1,52 +1,28 @@
 #include "all.hpp"
-
 #include <blpapi_datetime.h>
 using Datetime = BloombergLP::blpapi::Datetime;
 
 template <>
-struct date_traits<Datetime> {
-    using T = Datetime;
-    using serial_type = int;
-    using Time = double;
-    using Day = int;
+int base_date_traits<Datetime>::day(const Datetime& d) {
+return static_cast<int>(d.day());
+}
 
-    static Time daysBetween(const T& d1, const T& d2) { return 0; // TODO
-        }
-    static serial_type onlyDaysBetween(const T&, const T&) {
-        return 0; // TODO
-    }
-    static Day dayOfMonth(const T& d) { return d.day();
-    }
-    static bool isEndOfMonth(const T&) { return false;  // TODO
-    }
-    static T plusPeriod(const T& d, const QuantLib::Period&) {
-        return d; // TODO
-    }
-    static QuantLib::Month month(const T& d) {
-        return static_cast<QuantLib::Month>(d.month()); }
-    static T& addSelf(T&d, serial_type) { return d;  // TODO
-    }
-    static T& addSelf(T&d, const QuantLib::Period&) {
-        return d; // TODO
-    }
-    static QuantLib::Weekday weekday(const T& d) { return QuantLib::Sunday; // TODO
-    }
+template <>
+int base_date_traits<Datetime>::month(const Datetime& d) {
+    return static_cast<int>(d.month());
+}
 
-    static Day dayOfYear(const T&) { return 0; //TODO
-    }
-    static bool isLeap(int y) { return true;  //TODO
-    }
-    static T& inc(T&d) { return d; //TODO
-    }
+template <>
+int base_date_traits<Datetime>::year(const Datetime& d) {
+    return static_cast<int>(d.year());
+}
 
-    static T& dec(T& d) {
-        return d; // TODO
-    }
-    static T add(const T&d, serial_type) { return d; //TODO
-    }
-    static T endOfMonth(const T& d) { return d;  //TODO
-    }
-};
+template <>
+Datetime base_date_traits<Datetime> :: from_simple_date(const SimpleDate&sd) {
+    Datetime res(sd.y, sd.m, sd.d);
+    return res;
+
+}
 
 
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */

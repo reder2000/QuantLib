@@ -143,7 +143,7 @@ namespace QuantLib {
             // then, we add any whole months (whose figures might be
             // cached already) in the middle of our period.
             while (!detail::sameMonth(d, d2)) {
-                total += detail::businessDays<Date>(cache, calendar_, date_traits<Date>::month(d),
+                total += detail::businessDays<Date>(cache, calendar_, date_traits<Date>::ql_month(d),
                                                     d.year());
                 date_traits<Date>::addSelf(d , 1 * Months);
             }

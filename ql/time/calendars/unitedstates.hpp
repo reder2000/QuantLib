@@ -275,7 +275,7 @@ namespace QuantLib {
     inline bool UnitedStates<Date>::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date_traits<Date>::weekday(date);
         Day d = date_traits<Date>::dayOfMonth(date);
-        Month m = date_traits<Date>::month(date);
+        Month m = date_traits<Date>::ql_month(date);
         Year y = date.year();
         if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -310,7 +310,7 @@ namespace QuantLib {
         // on a weekday
            Weekday w = date_traits<Date>::weekday(date);
            Day d = date_traits<Date>::dayOfMonth(date);
-           Month m = date_traits<Date>::month(date);
+           Month m = date_traits<Date>::ql_month(date);
            Year y = date.year();
            if (((d == 5 && w == Monday) || (d == 3 && w == Friday)) && m == July && y >= 2015)
             return true;
@@ -322,7 +322,7 @@ namespace QuantLib {
         Weekday w = date_traits<Date>::weekday(date);
         Day d = date_traits<Date>::dayOfMonth(date);
         Day dd = date_traits<Date>::dayOfYear(date);
-        Month m = date_traits<Date>::month(date);
+        Month m = date_traits<Date>::ql_month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)
@@ -405,7 +405,7 @@ namespace QuantLib {
         Weekday w = date_traits<Date>::weekday(date);
         Day d = date_traits<Date>::dayOfMonth(date);
         Day dd = date_traits<Date>::dayOfYear(date);
-        Month m = date_traits<Date>::month(date);
+        Month m = date_traits<Date>::ql_month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)
@@ -451,7 +451,7 @@ namespace QuantLib {
         Weekday w = date_traits<Date>::weekday(date);
         Day d = date_traits<Date>::dayOfMonth(date);
         Day dd = date_traits<Date>::dayOfYear(date);
-        Month m = date_traits<Date>::month(date);
+        Month m = date_traits<Date>::ql_month(date);
         Year y = date.year();
         if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -477,7 +477,7 @@ namespace QuantLib {
            Weekday w = date_traits<Date>::weekday(date);
            Day d = date_traits<Date>::dayOfMonth(date);
            Day dd = date_traits<Date>::dayOfYear(date);
-           Month m = date_traits<Date>::month(date);
+           Month m = date_traits<Date>::ql_month(date);
            Year y = date.year();
            if (isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)

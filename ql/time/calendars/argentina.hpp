@@ -76,7 +76,7 @@ inline
         Weekday w = date_traits<Date>::weekday(date);
         Day d = date_traits<Date>::dayOfMonth(date);
         Day dd = date_traits<Date>::dayOfYear(date);
-        Month m = date_traits<Date>::month(date);
+        Month m = date_traits<Date>::ql_month(date);
         Year y = date.year();
         Day em = easterMonday(y);
         if (isWeekend(w)

@@ -379,7 +379,7 @@ int SerialNumberDate::month() const {
     return (m);
 }
 
-
+inline
     SerialNumberDate advance(SerialNumberDate date, Integer n, QuantLib::TimeUnit units) {
     using namespace QuantLib;
     switch (units) {
@@ -426,7 +426,7 @@ int SerialNumberDate::month() const {
     }
 }
 
-
+inline
 SerialNumberDate SerialNumberDate::operator+(const QuantLib::Period& p) const {
     return advance(*this, p.length(), p.units());
 }

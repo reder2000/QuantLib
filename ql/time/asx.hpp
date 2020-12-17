@@ -24,7 +24,7 @@
 /*! \file asx.hpp
     \brief ASX-related date functions
 */
-
+#pragma once
 #ifndef quantlib_asx_hpp
 #define quantlib_asx_hpp
 
@@ -96,5 +96,5 @@ namespace QuantLib {
     };
 
 }
-
+#include "asx.cpp"
 #endif

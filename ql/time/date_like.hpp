@@ -28,13 +28,12 @@
     \brief date- and time-related classes, typedefs and enumerations
 */
 #pragma once
-#ifndef quantlib_date_hpp
-#define quantlib_date_hpp
-#include <fmt/format.h>
-#include <sstream>
+#ifndef quantlib_date_like_hpp
+#define quantlib_date_like_hpp
+#include <ql/time/date.hpp> // we hate to, but we somehow still need it until we throw away ql_setting
 #include <ql/time/period.hpp>
 #include <ql/time/weekday.hpp>
-#include "ql_utilities_null.hpp"
+//#include <ql/utilities/null.hpp>
 //#include <boost/cstdint.hpp>
 
 #ifdef QL_HIGH_RESOLUTION_DATE
@@ -52,40 +51,47 @@ namespace QuantLib {
     //! Day number
     /*! \ingroup datetime */
     typedef Integer Day;
-
+#if defined(QL_SETTINGS_ARE_REMOVED)
     //! Month names
     /*! \ingroup datetime */
-    enum Month { January   = 1,
-                 February  = 2,
-                 March     = 3,
-                 April     = 4,
-                 May       = 5,
-                 June      = 6,
-                 July      = 7,
-                 August    = 8,
-                 September = 9,
-                 October   = 10,
-                 November  = 11,
-                 December  = 12,
-                 Jan = 1,
-                 Feb = 2,
-                 Mar = 3,
-                 Apr = 4,
-                 Jun = 6,
-                 Jul = 7,
-                 Aug = 8,
-                 Sep = 9,
-                 Oct = 10,
-                 Nov = 11,
-                 Dec = 12
+    enum Month {
+        January = 1,
+        February = 2,
+        March = 3,
+        April = 4,
+        May = 5,
+        June = 6,
+        July = 7,
+        August = 8,
+        September = 9,
+        October = 10,
+        November = 11,
+        December = 12,
+        Jan = 1,
+        Feb = 2,
+        Mar = 3,
+        Apr = 4,
+        Jun = 6,
+        Jul = 7,
+        Aug = 8,
+        Sep = 9,
+        Oct = 10,
+        Nov = 11,
+        Dec = 12
     };
-
+#endif //defined(QL_SETTINGS_ARE_REMOVED)
     /*! \relates Month */
     std::ostream& operator<<(std::ostream&, Month);
 
     //! Year number
     /*! \ingroup datetime */
     typedef Integer Year;
+
+}
+
+#include "date_adaptor.h"
+
+namespace QuantLib {
 
 #ifdef QL_HIGH_RESOLUTION_DATE
     //! Hour number
@@ -123,18 +129,19 @@ namespace QuantLib {
               date range.
     */
 
-    class Date {
+template <class ExtDate>
+    class DateLike : public ExtDate {
       public:
         //! serial number type
-        typedef std::int_fast32_t serial_type;
+        using serial_type = std::int_fast32_t ;
         //! \name constructors
         //@{
         //! Default constructor returning a null date.
-        Date();
+        //Date();
         //! Constructor taking a serial number as given by Applix or Excel.
-        explicit Date(Date::serial_type serialNumber);
+        //explicit Date(serial_type serialNumber);
         //! More traditional constructor.
-        Date(Day d, Month m, Year y);
+        //Date(Day d, Month m, Year y);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         //! Constructor taking boost posix date time object
@@ -154,7 +161,7 @@ namespace QuantLib {
         Day dayOfYear() const;
         Month month() const;
         Year year() const;
-        Date::serial_type serialNumber() const;
+        serial_type serialNumber() const;
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         Hour hours() const;
@@ -173,52 +180,52 @@ namespace QuantLib {
         //! \name date algebra
         //@{
         //! increments date by the given number of days
-        Date& operator+=(Date::serial_type days);
+        DateLike<ExtDate>& operator+=(serial_type days);
         //! increments date by the given period
-        Date& operator+=(const Period&);
+        DateLike<ExtDate>& operator+=(const Period&);
         //! decrement date by the given number of days
-        Date& operator-=(Date::serial_type days);
+        DateLike<ExtDate>& operator-=(serial_type days);
         //! decrements date by the given period
-        Date& operator-=(const Period&);
+        DateLike<ExtDate>& operator-=(const Period&);
         //! 1-day pre-increment
-        Date& operator++();
+        DateLike<ExtDate>& operator++();
         //! 1-day post-increment
-        Date operator++(int );
+        DateLike operator++(int );
         //! 1-day pre-decrement
-        Date& operator--();
+        DateLike<ExtDate>& operator--();
         //! 1-day post-decrement
-        Date operator--(int );
+        DateLike operator--(int );
         //! returns a new date incremented by the given number of days
-        Date operator+(Date::serial_type days) const;
+        DateLike operator+(serial_type days) const;
         //! returns a new date incremented by the given period
-        Date operator+(const Period&) const;
+        DateLike operator+(const Period&) const;
         //! returns a new date decremented by the given number of days
-        Date operator-(Date::serial_type days) const;
+        DateLike operator-(serial_type days) const;
         //! returns a new date decremented by the given period
-        Date operator-(const Period&) const;
+        DateLike operator-(const Period&) const;
         //@}
 
         //! \name static methods
         //@{
         //! today's date.
-        static Date todaysDate();
+        static DateLike todaysDate();
         //! earliest allowed date
-        static Date minDate();
+        static DateLike minDate();
         //! latest allowed date
-        static Date maxDate();
+        static DateLike maxDate();
         //! whether the given year is a leap one
         static bool isLeap(Year y);
         //! last day of the month to which the given date belongs
-        static Date endOfMonth(const Date& d);
+        static DateLike endOfMonth(const DateLike<ExtDate>& d);
         //! whether a date is the last day of its month
-        static bool isEndOfMonth(const Date& d);
+        static bool isEndOfMonth(const DateLike<ExtDate>& d);
         //! next given weekday following or equal to the given date
         /*! E.g., the Friday following Tuesday, January 15th, 2002
             was January 18th, 2002.
 
             see http://www.cpearson.com/excel/DateTimeWS.htm
         */
-        static Date nextWeekday(const Date& d,
+        static DateLike nextWeekday(const DateLike<ExtDate>& d,
                                 Weekday w);
         //! n-th given weekday in the given month and year
         /*! E.g., the 4th Thursday of March, 1998 was March 26th,
@@ -226,16 +233,16 @@ namespace QuantLib {
 
             see http://www.cpearson.com/excel/DateTimeWS.htm
         */
-        static Date nthWeekday(Size n,
+        static DateLike nthWeekday(Size n,
                                Weekday w,
                                Month m,
                                Year y);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         //! local date time, based on the time zone settings of the computer
-        static Date localDateTime();
+        static DateLike localDateTime();
         //! UTC date time
-        static Date universalDateTime();
+        static DateLike universalDateTime();
 
         //! underlying resolution of the  posix date time object
         static boost::posix_time::time_duration::tick_type ticksPerSecond();
@@ -244,42 +251,50 @@ namespace QuantLib {
         //@}
 
       private:
-        static Date::serial_type minimumSerialNumber();
-        static Date::serial_type maximumSerialNumber();
-        static void checkSerialNumber(Date::serial_type serialNumber);
+        static serial_type minimumSerialNumber();
+        static serial_type maximumSerialNumber();
+        static void checkSerialNumber(serial_type serialNumber);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         boost::posix_time::ptime dateTime_;
 #else
-        Date::serial_type serialNumber_;
-        static Date advance(const Date& d, Integer units, TimeUnit);
+        //serial_type serialNumber_;
+        static DateLike advance(const DateLike<ExtDate>& d, Integer units, TimeUnit);
         static Integer monthLength(Month m, bool leapYear);
         static Integer monthOffset(Month m, bool leapYear);
-        static Date::serial_type yearOffset(Year y);
+        static serial_type yearOffset(Year y);
 #endif
     };
 
     /*! \relates Date
         \brief Difference in days between dates
     */
-    Date::serial_type operator-(const Date&, const Date&);
+    template <class ExtDate> inline
+    typename DateLike<ExtDate>::serial_type operator-(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date
         \brief Difference in days (including fraction of days) between dates
     */
-    Time daysBetween(const Date&, const Date&);
+    template <class ExtDate>
+    Time daysBetween(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
 
     /*! \relates Date */
-    bool operator==(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator==(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date */
-    bool operator!=(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator!=(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date */
-    bool operator<(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator<(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date */
-    bool operator<=(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator<=(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date */
-    bool operator>(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator>(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
     /*! \relates Date */
-    bool operator>=(const Date&, const Date&);
+    template <class ExtDate>
+    bool operator>=(const DateLike<ExtDate>&, const DateLike<ExtDate>&);
 
     /*!
       Compute a hash value of @p d.
@@ -302,183 +317,195 @@ namespace QuantLib {
       \return A hash value of @p d
       \relates Date
     */
-    std::size_t hash_value(const Date& d);
+    template <class ExtDate>
+    std::size_t hash_value(const DateLike<ExtDate>& d);
 
     /*! \relates Date */
-    std::ostream& operator<<(std::ostream&, const Date&);
+    template <class ExtDate>
+    std::ostream& operator<<(std::ostream&, const DateLike<ExtDate>&);
 
-    namespace detail {
+    namespace ext_detail {
 
+    template <class ExtDate>
         struct short_date_holder {
-            explicit short_date_holder(const Date d) : d(d) {}
-            Date d;
+            explicit short_date_holder(const DateLike<ExtDate> d) : d(d) {}
+            DateLike<ExtDate> d;
         };
-        std::ostream& operator<<(std::ostream&, const short_date_holder&);
+    template <class ExtDate>
+    std::ostream& operator<<(std::ostream&, const short_date_holder<ExtDate>&);
 
-        struct long_date_holder {
-            explicit long_date_holder(const Date& d) : d(d) {}
-            Date d;
+    template <class ExtDate>
+    struct long_date_holder {
+            explicit long_date_holder(const DateLike<ExtDate>& d) : d(d) {}
+            DateLike<ExtDate> d;
         };
-        std::ostream& operator<<(std::ostream&, const long_date_holder&);
+    template <class ExtDate>
+        std::ostream& operator<<(std::ostream&, const long_date_holder<ExtDate>&);
 
-        struct iso_date_holder {
-            explicit iso_date_holder(const Date& d) : d(d) {}
-            Date d;
+    template <class ExtDate>
+    struct iso_date_holder {
+            explicit iso_date_holder(const DateLike<ExtDate>& d) : d(d) {}
+            DateLike<ExtDate> d;
         };
-        std::ostream& operator<<(std::ostream&, const iso_date_holder&);
+    template <class ExtDate>
+        std::ostream& operator<<(std::ostream&, const iso_date_holder<ExtDate>&);
 
-        struct formatted_date_holder {
-            formatted_date_holder(const Date& d, const std::string& f)
+    template <class ExtDate>
+    struct formatted_date_holder {
+            formatted_date_holder(const DateLike<ExtDate>& d, const std::string& f)
             : d(d), f(f) {}
-            Date d;
+            DateLike<ExtDate> d;
             std::string f;
         };
-        std::ostream& operator<<(std::ostream&,
-                                 const formatted_date_holder&);
+    template <class ExtDate>
+    std::ostream& operator<<(std::ostream&, const formatted_date_holder<ExtDate>&);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         struct iso_datetime_holder {
-            explicit iso_datetime_holder(const Date& d) : d(d) {}
-            Date d;
+            explicit iso_datetime_holder(const DateLike<ExtDate>& d) : d(d) {}
+            DateLike d;
         };
         std::ostream& operator<<(std::ostream&, const iso_datetime_holder&);
 #endif
     }
 
-    namespace io {
+    namespace ext_io {
 
         //! output dates in short format (mm/dd/yyyy)
         /*! \ingroup manips */
-        detail::short_date_holder short_date(const Date&);
+        template <class ExtDate>
+        ext_detail::short_date_holder<ExtDate> short_date(const DateLike<ExtDate>&);
 
         //! output dates in long format (Month ddth, yyyy)
         /*! \ingroup manips */
-        detail::long_date_holder long_date(const Date&);
+        template <class ExtDate>
+        ext_detail::long_date_holder<ExtDate> long_date(const DateLike<ExtDate>&);
 
         //! output dates in ISO format (yyyy-mm-dd)
         /*! \ingroup manips */
-        detail::iso_date_holder iso_date(const Date&);
+        template <class ExtDate>
+        ext_detail::iso_date_holder<ExtDate> iso_date(const DateLike<ExtDate>&);
 
         //! output dates in user defined format using boost date functionality
         /*! \ingroup manips */
-        detail::formatted_date_holder formatted_date(const Date&,
+        template <class ExtDate>
+        ext_detail::formatted_date_holder<ExtDate> formatted_date(const DateLike<ExtDate>&,
                                                      const std::string& fmt);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         //! output datetimes in ISO format (YYYY-MM-DDThh:mm:ss,SSSSSS)
         /*! \ingroup manips */
-        detail::iso_datetime_holder iso_datetime(const Date&);
+        detail::iso_datetime_holder iso_datetime(const DateLike<ExtDate>&);
 #endif
 
     }
 
-    //! specialization of Null template for the Date class
-    template <>
-    class Null<Date> {
-      public:
-        Null() {}
-        operator Date() const { return Date(); }
-    };
+    ////! specialization of Null template for the Date class
+    //template <>
+    //class Null<Date> {
+    //  public:
+    //    Null() {}
+    //    operator Date() const { return Date(); }
+    //};
 
 
 #ifndef QL_HIGH_RESOLUTION_DATE
     // inline definitions
 
-    inline Weekday Date::weekday() const {
-        Integer w = serialNumber_ % 7;
+    template <class ExtDate>
+    inline Weekday DateLike<ExtDate>::weekday() const {
+        Integer w = serialNumber() % 7;
         return Weekday(w == 0 ? 7 : w);
     }
 
-    inline Day Date::dayOfMonth() const {
+    template <class ExtDate>
+    inline Day DateLike<ExtDate>::dayOfMonth() const {
         return dayOfYear() - monthOffset(month(),isLeap(year()));
     }
 
-    inline Day Date::dayOfYear() const {
-        return serialNumber_ - yearOffset(year());
+    template <class ExtDate>
+    inline Day DateLike<ExtDate>::dayOfYear() const {
+        return serialNumber() - yearOffset(year());
     }
 
-    inline Date::serial_type Date::serialNumber() const {
-        return serialNumber_;
+    template <class ExtDate>
+    inline typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::serialNumber() const {
+        return serialNumber();
     }
 
-    inline Date Date::operator+(Date::serial_type days) const {
-        return Date(serialNumber_+days);
+    template <class ExtDate>
+    inline DateLike<ExtDate> DateLike<ExtDate>::operator+(serial_type days) const {
+        return Date(serialNumber()+days);
     }
 
-    inline Date Date::operator-(Date::serial_type days) const {
-        return Date(serialNumber_-days);
+    template <class ExtDate>
+    inline DateLike<ExtDate> DateLike<ExtDate>::operator-(serial_type days) const {
+        return Date(serialNumber()-days);
     }
 
-    inline Date Date::operator+(const Period& p) const {
+    template <class ExtDate>
+    inline DateLike<ExtDate> DateLike<ExtDate>::operator+(const Period& p) const {
         return advance(*this,p.length(),p.units());
     }
 
-    inline Date Date::operator-(const Period& p) const {
+    template <class ExtDate>
+    inline DateLike<ExtDate> DateLike<ExtDate>::operator-(const Period& p) const {
         return advance(*this,-p.length(),p.units());
     }
 
-    inline Date Date::endOfMonth(const Date& d) {
+    template <class ExtDate>
+    inline DateLike<ExtDate> DateLike<ExtDate>::endOfMonth(const DateLike<ExtDate>& d) {
         Month m = d.month();
         Year y = d.year();
         return Date(monthLength(m, isLeap(y)), m, y);
     }
 
-    inline bool Date::isEndOfMonth(const Date& d) {
+    template <class ExtDate>
+    inline bool DateLike<ExtDate>::isEndOfMonth(const DateLike<ExtDate>& d) {
        return (d.dayOfMonth() == monthLength(d.month(), isLeap(d.year())));
     }
 
-    inline Date::serial_type operator-(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline typename DateLike<ExtDate>::serial_type operator-(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return d1.serialNumber()-d2.serialNumber();
     }
 
-    inline Time daysBetween(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline Time daysBetween(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return Time(d2-d1);
     }
 
-    inline bool operator==(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator==(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() == d2.serialNumber());
     }
 
-    inline bool operator!=(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator!=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() != d2.serialNumber());
     }
 
-    inline bool operator<(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator<(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() < d2.serialNumber());
     }
 
-    inline bool operator<=(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator<=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() <= d2.serialNumber());
     }
 
-    inline bool operator>(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator>(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() > d2.serialNumber());
     }
 
-    inline bool operator>=(const Date& d1, const Date& d2) {
+    template <class ExtDate>
+    inline bool operator>=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() >= d2.serialNumber());
     }
 #endif
 }
-template <>
-struct fmt::formatter<QuantLib::Date> : formatter<std::string> {
-    // parse is inherited from formatter<string_view>.
-    template <typename FormatContext>
-    auto format(QuantLib::Date c, FormatContext& ctx) {
-        std::stringstream ss;
-        ss << c;
-        return formatter<std::string>::format(ss.str(), ctx);
-    }
-};
 
-#include "date.cpp"
+#include "date_like.cpp"
 #endif
-#include "date_adaptor.h"
-template <>
-struct DateAdaptor<QuantLib::Date> {
-    static QuantLib::Date Date(std::int_fast32_t i) { return QuantLib::Date(i); }
-    static QuantLib::Date Date(QuantLib::Day d, QuantLib::Month m, QuantLib::Year y) {
-        return QuantLib::Date(d,m,y);
-    }
-    static std::int_fast32_t serialNumber(const QuantLib::Date& d) { return d.serialNumber(); }
-};

@@ -22,22 +22,22 @@
 */
 
 #include <ql/time/asx.hpp>
-#include <ql/settings.hpp>
-#include <ql/utilities/dataparsers.hpp>
+#include "ql_settings.hpp"
+#include "ql_utilities_dataparsers.hpp"
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
-#include <boost/algorithm/string/case_conv.hpp>
+//#include <boost/algorithm/string/case_conv.hpp>
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
 #endif
 
-using boost::algorithm::to_upper_copy;
-using std::string;
+//using boost::algorithm::to_upper_copy;
+//using std::string;
 
 namespace QuantLib {
-
+    inline
     bool ASX::isASXdate(const Date& date, bool mainCycle) {
         if (date.weekday()!=Friday)
             return false;
@@ -58,25 +58,25 @@ namespace QuantLib {
             return false;
         }
     }
-
+    inline
     bool ASX::isASXcode(const std::string& in, bool mainCycle) {
         if (in.length() != 2)
             return false;
 
-        string str1("0123456789");
-        string::size_type loc = str1.find(in.substr(1,1), 0);
-        if (loc == string::npos)
+        std::string str1("0123456789");
+        std::string::size_type loc = str1.find(in.substr(1, 1), 0);
+        if (loc == std::string::npos)
             return false;
 
         if (mainCycle) str1 = "hmzuHMZU";
         else           str1 = "fghjkmnquvxzFGHJKMNQUVXZ";
         loc = str1.find(in.substr(0,1), 0);
-        return loc != string::npos;
+        return loc != std::string::npos;
     }
-
+    inline
     std::string ASX::code(const Date& date) {
         QL_REQUIRE(isASXdate(date, false),
-                   date << " is not an ASX date");
+                   "{} is not an ASX date",date);
 
         std::ostringstream ASXcode;
         unsigned int y = date.year() % 10;
@@ -123,21 +123,19 @@ namespace QuantLib {
 
         #if defined(QL_EXTRA_SAFETY_CHECKS)
         QL_ENSURE(isASXcode(ASXcode.str(), false),
-                  "the result " << ASXcode.str() <<
-                  " is an invalid ASX code");
+                  "the result {} is an invalid ASX code", ASXcode.str() );
         #endif
         return ASXcode.str();
     }
-
+    inline
     Date ASX::date(const std::string& asxCode,
                    const Date& refDate) {
-        QL_REQUIRE(isASXcode(asxCode, false),
-                   asxCode << " is not a valid ASX code");
+        QL_REQUIRE(isASXcode(asxCode, false), "{} is not a valid ASX code", asxCode );
 
         Date referenceDate = (refDate != Date() ?
                               refDate :
                               Date(Settings::instance().evaluationDate()));
-
+        auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
         std::string code = to_upper_copy(asxCode);
         std::string ms = code.substr(0,1);
         QuantLib::Month m;
@@ -169,7 +167,7 @@ namespace QuantLib {
 
         return result;
     }
-
+    inline
     Date ASX::nextDate(const Date& date, bool mainCycle) {
         Date refDate = (date == Date() ?
                         Date(Settings::instance().evaluationDate()) :
@@ -194,20 +192,20 @@ namespace QuantLib {
             result = nextDate(Date(15, m, y), mainCycle);
         return result;
     }
-
+    inline
     Date ASX::nextDate(const std::string& ASXcode,
                        bool mainCycle,
                        const Date& referenceDate)  {
         Date asxDate = date(ASXcode, referenceDate);
         return nextDate(asxDate+1, mainCycle);
     }
-
+    inline
     std::string ASX::nextCode(const Date& d,
                               bool mainCycle) {
         Date date = nextDate(d, mainCycle);
         return code(date);
     }
-
+    inline
     std::string ASX::nextCode(const std::string& asxCode,
                               bool mainCycle,
                               const Date& referenceDate) {

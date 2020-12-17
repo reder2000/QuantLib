@@ -20,7 +20,7 @@
 /*! \file ecb.hpp
     \brief European Central Bank reserve maintenance date functions
 */
-
+#pragma once
 #ifndef quantlib_ecb_hpp
 #define quantlib_ecb_hpp
 
@@ -97,5 +97,5 @@ namespace QuantLib {
     };
 
 }
-
+#include "ecb.cpp"
 #endif

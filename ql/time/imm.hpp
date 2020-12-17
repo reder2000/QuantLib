@@ -23,23 +23,23 @@
 /*! \file imm.hpp
     \brief IMM-related date functions
 */
-
+#pragma once
 #ifndef quantlib_imm_hpp
 #define quantlib_imm_hpp
 
-#include <ql/time/date.hpp>
+#include <ql/time/date_like.hpp>
 
 namespace QuantLib {
 
     //! Main cycle of the International %Money Market (a.k.a. %IMM) months
-    struct IMM {
+    template <class ExtDate> struct IMM {
         enum Month { F =  1, G =  2, H =  3,
                      J =  4, K =  5, M =  6,
                      N =  7, Q =  8, U =  9,
                      V = 10, X = 11, Z = 12 };
 
         //! returns whether or not the given date is an IMM date
-        static bool isIMMdate(const Date& d,
+        static bool isIMMdate(const ExtDate& d,
                               bool mainCycle = true);
 
         //! returns whether or not the given string is an IMM code
@@ -52,7 +52,7 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      date is not an IMM date
         */
-        static std::string code(const Date& immDate);
+        static std::string code(const ExtDate& immDate);
 
         /*! returns the IMM date for the given IMM code
             (e.g. March 20th, 2013 for H3).
@@ -60,15 +60,15 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      string is not an IMM code
         */
-        static Date date(const std::string& immCode,
-                         const Date& referenceDate = Date());
+        static ExtDate date(const std::string& immCode,
+                         const ExtDate& referenceDate = ExtDate());
 
         //! next IMM date following the given date
         /*! returns the 1st delivery date for next contract listed in the
             International Money Market section of the Chicago Mercantile
             Exchange.
         */
-        static Date nextDate(const Date& d = Date(),
+        static ExtDate nextDate(const ExtDate& d = ExtDate(),
                              bool mainCycle = true);
 
         //! next IMM date following the given IMM code
@@ -76,16 +76,16 @@ namespace QuantLib {
             International Money Market section of the Chicago Mercantile
             Exchange.
         */
-        static Date nextDate(const std::string& immCode,
+        static ExtDate nextDate(const std::string& immCode,
                              bool mainCycle = true,
-                             const Date& referenceDate = Date());
+                             const ExtDate& referenceDate = ExtDate());
 
         //! next IMM code following the given date
         /*! returns the IMM code for next contract listed in the
             International Money Market section of the Chicago Mercantile
             Exchange.
         */
-        static std::string nextCode(const Date& d = Date(),
+        static std::string nextCode(const ExtDate& d = ExtDate(),
                                     bool mainCycle = true);
 
         //! next IMM code following the given code
@@ -95,9 +95,9 @@ namespace QuantLib {
         */
         static std::string nextCode(const std::string& immCode,
                                     bool mainCycle = true,
-                                    const Date& referenceDate = Date());
+                                    const ExtDate& referenceDate = ExtDate());
     };
 
 }
-
+#include "imm.cpp"
 #endif

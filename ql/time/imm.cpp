@@ -21,23 +21,23 @@
 */
 
 #include <ql/time/imm.hpp>
-#include <ql/settings.hpp>
-#include <ql/utilities/dataparsers.hpp>
+#include "ql_settings.hpp"
+#include "ql_utilities_dataparsers.hpp"
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
-#include <boost/algorithm/string/case_conv.hpp>
+//#include <boost/algorithm/string/case_conv.hpp>
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
 #endif
 
-using boost::algorithm::to_upper_copy;
-using std::string;
+//using boost::algorithm::to_upper_copy;
+//using std::string;
 
 namespace QuantLib {
-
-    bool IMM::isIMMdate(const Date& date, bool mainCycle) {
+    template <class ExtDate> inline
+    bool IMM<ExtDate>::isIMMdate(const ExtDate& date, bool mainCycle) {
         if (date.weekday()!=Wednesday)
             return false;
 
@@ -57,25 +57,25 @@ namespace QuantLib {
             return false;
         }
     }
-
-    bool IMM::isIMMcode(const std::string& in, bool mainCycle) {
+    template <class ExtDate>    inline
+    bool IMM<ExtDate>::isIMMcode(const std::string& in, bool mainCycle) {
         if (in.length() != 2)
             return false;
 
-        string str1("0123456789");
-        string::size_type loc = str1.find(in.substr(1,1), 0);
-        if (loc == string::npos)
+        std::string str1("0123456789");
+        std::string::size_type loc = str1.find(in.substr(1,1), 0);
+        if (loc == std::string::npos)
             return false;
 
         if (mainCycle) str1 = "hmzuHMZU";
         else           str1 = "fghjkmnquvxzFGHJKMNQUVXZ";
         loc = str1.find(in.substr(0,1), 0);
-        return loc != string::npos;
+        return loc != std::string::npos;
     }
-
-    std::string IMM::code(const Date& date) {
+    template <class ExtDate>    inline
+    std::string IMM<ExtDate>::code(const ExtDate& date) {
         QL_REQUIRE(isIMMdate(date, false),
-                   date << " is not an IMM date");
+                   "{} is not an IMM date",date);
 
         std::ostringstream IMMcode;
         unsigned int y = date.year() % 10;
@@ -122,21 +122,19 @@ namespace QuantLib {
 
         #if defined(QL_EXTRA_SAFETY_CHECKS)
         QL_ENSURE(isIMMcode(IMMcode.str(), false),
-                  "the result " << IMMcode.str() <<
-                  " is an invalid IMM code");
+                  "the result {} is an invalid IMM code",IMMcode.str());
         #endif
         return IMMcode.str();
     }
+    template <class ExtDate>    inline
+    ExtDate IMM<ExtDate>::date(const std::string& immCode, const ExtDate& refDate) {
+        QL_REQUIRE(isIMMcode(immCode, false), "{} is not a valid IMM code"
+            , immCode);
 
-    Date IMM::date(const std::string& immCode,
-                   const Date& refDate) {
-        QL_REQUIRE(isIMMcode(immCode, false),
-                   immCode << " is not a valid IMM code");
-
-        Date referenceDate = (refDate != Date() ?
-                              refDate :
-                              Date(Settings::instance().evaluationDate()));
-
+        ExtDate referenceDate =
+            (refDate != ExtDate() ?
+                              refDate : ExtDate(Settings::instance().evaluationDate()));
+        auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
         std::string code = to_upper_copy(immCode);
         std::string ms = code.substr(0,1);
         QuantLib::Month m;
@@ -162,14 +160,14 @@ namespace QuantLib {
         if (y==0 && referenceDate.year()<=1909) y+=10;
         Year referenceYear = (referenceDate.year() % 10);
         y += referenceDate.year() - referenceYear;
-        Date result = IMM::nextDate(Date(1, m, y), false);
+        Date result = IMM<ExtDate>::nextDate(Date(1, m, y), false);
         if (result<referenceDate)
-            return IMM::nextDate(Date(1, m, y+10), false);
+            return IMM<ExtDate>::nextDate(Date(1, m, y+10), false);
 
         return result;
     }
-
-    Date IMM::nextDate(const Date& date, bool mainCycle) {
+    template <class ExtDate>    inline
+    ExtDate IMM<ExtDate>::nextDate(const ExtDate& date, bool mainCycle) {
         Date refDate = (date == Date() ?
                         Date(Settings::instance().evaluationDate()) :
                         date);
@@ -193,24 +191,24 @@ namespace QuantLib {
             result = nextDate(Date(22, m, y), mainCycle);
         return result;
     }
-
-    Date IMM::nextDate(const std::string& IMMcode,
+    template <class ExtDate>    inline
+    ExtDate IMM<ExtDate>::nextDate(const std::string& IMMcode,
                        bool mainCycle,
-                       const Date& referenceDate)  {
+                       const ExtDate& referenceDate)  {
         Date immDate = date(IMMcode, referenceDate);
         return nextDate(immDate+1, mainCycle);
     }
-
-    std::string IMM::nextCode(const Date& d,
+    template <class ExtDate>    inline
+    std::string IMM<ExtDate>::nextCode(const ExtDate& d,
                               bool mainCycle) {
-        Date date = nextDate(d, mainCycle);
+        ExtDate date = nextDate(d, mainCycle);
         return code(date);
     }
-
-    std::string IMM::nextCode(const std::string& immCode,
+    template <class ExtDate>    inline
+    std::string IMM<ExtDate>::nextCode(const std::string& immCode,
                               bool mainCycle,
-                              const Date& referenceDate) {
-        Date date = nextDate(immCode, mainCycle, referenceDate);
+                              const ExtDate& referenceDate) {
+        ExtDate date = nextDate(immCode, mainCycle, referenceDate);
         return code(date);
     }
 

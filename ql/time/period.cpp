@@ -22,10 +22,10 @@
 */
 
 #include <ql/time/period.hpp>
-#include <ql/errors.hpp>
+#include "ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     Period::Period(Frequency f) {
         switch (f) {
           case NoFrequency:
@@ -62,10 +62,10 @@ namespace QuantLib {
           case OtherFrequency:
             QL_FAIL("unknown frequency");  // no point in showing 999...
           default:
-            QL_FAIL("unknown frequency (" << Integer(f) << ")");
+            QL_FAIL("unknown frequency ({})" , Integer(f));
         }
     }
-
+    inline
     Frequency Period::frequency() const {
         // unsigned version
         Size length = std::abs(length_);
@@ -101,10 +101,10 @@ namespace QuantLib {
             else
                 return OtherFrequency;
           default:
-            QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+              QL_FAIL("unknown time unit ({})",  Integer(units_));
         }
     }
-
+    inline
     void Period::normalize() {
         if (length_!=0)
             switch (units_) {
@@ -119,10 +119,10 @@ namespace QuantLib {
               case Years:
                 break;
               default:
-                QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+                QL_FAIL("unknown time unit ({})" , Integer(units_) );
             }
     }
-
+    inline
     Period& Period::operator+=(const Period& p) {
 
         if (length_==0) {
@@ -143,11 +143,10 @@ namespace QuantLib {
                   case Weeks:
                   case Days:
                     QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                               "impossible addition between {} and {}" , *this, p);
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -158,12 +157,11 @@ namespace QuantLib {
                     break;
                   case Weeks:
                   case Days:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                    QL_REQUIRE(p.length()==0, "impossible addition between {} and {}", *this,
+                                 p);
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -175,12 +173,11 @@ namespace QuantLib {
                     break;
                   case Years:
                   case Months:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                    QL_REQUIRE(p.length()==0, "impossible addition between {} and {}", *this,
+                                 p);
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
@@ -191,28 +188,27 @@ namespace QuantLib {
                     break;
                   case Years:
                   case Months:
-                    QL_REQUIRE(p.length()==0,
-                               "impossible addition between " << *this <<
-                               " and " << p);
+                    QL_REQUIRE(p.length()==0, "impossible addition between {} and {}", *this,
+                                 p);
                     break;
                   default:
-                    QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                      QL_FAIL("unknown time unit ({})", Integer(p.units()));
                 }
                 break;
 
               default:
-                QL_FAIL("unknown time unit (" << Integer(units_) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(p.units()));
             }
         }
 
         //this->normalize();
         return *this;
     }
-
+    inline
     Period& Period::operator-=(const Period& p) {
         return operator+=(-p);
     }
-
+    inline
     Period& Period::operator/=(Integer n) {
         QL_REQUIRE(n != 0, "cannot be divided by zero");
         if (length_ % n == 0) {
@@ -237,7 +233,7 @@ namespace QuantLib {
                 ;
             }
             QL_REQUIRE(length % n == 0,
-                       *this << " cannot be divided by " << n);
+                       "{} cannot be divided by {}" , *this , n);
             length_ = length/n;
             units_ = units;
             // if normalization were possible, we wouldn't be
@@ -250,7 +246,7 @@ namespace QuantLib {
 
 
     namespace {
-
+        inline
         std::pair<Integer,Integer> daysMinMax(const Period& p) {
             switch (p.units()) {
               case Days:
@@ -262,12 +258,12 @@ namespace QuantLib {
               case Years:
                 return std::make_pair(365*p.length(), 366*p.length());
               default:
-                QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(p.units()));
             }
         }
 
     }
-
+    inline
     Real years(const Period& p) {
         if (p.length()==0) return 0.0;
 
@@ -281,10 +277,10 @@ namespace QuantLib {
           case Years:
               return p.length();
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
-
+    inline
     Real months(const Period& p) {
         if (p.length()==0) return 0.0;
 
@@ -298,10 +294,10 @@ namespace QuantLib {
           case Years:
               return p.length()*12.0;
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
-
+    inline
     Real weeks(const Period& p) {
         if (p.length()==0) return 0.0;
 
@@ -315,10 +311,10 @@ namespace QuantLib {
           case Years:
             QL_FAIL("cannot convert Years into Weeks");
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
-
+    inline
     Real days(const Period& p) {
         if (p.length()==0) return 0.0;
 
@@ -332,10 +328,10 @@ namespace QuantLib {
           case Years:
             QL_FAIL("cannot convert Years into Days");
           default:
-            QL_FAIL("unknown time unit (" << Integer(p.units()) << ")");
+              QL_FAIL("unknown time unit ({})", Integer(p.units()));
         }
     }
-
+    inline
     bool operator<(const Period& p1, const Period& p2) {
 
         // special cases
@@ -365,20 +361,20 @@ namespace QuantLib {
         else if (p1lim.first > p2lim.second)
             return false;
         else
-            QL_FAIL("undecidable comparison between " << p1 << " and " << p2);
+            QL_FAIL("undecidable comparison between {} and {}" , p1 ,  p2);
     }
 
-
+    inline
     Period operator+(const Period& p1, const Period& p2) {
         Period result = p1;
         result += p2;
         return result;
     }
-
+    inline
     Period operator-(const Period& p1, const Period& p2) {
         return p1+(-p2);
     }
-
+    inline
     Period operator/(const Period& p, Integer n) {
         Period result = p;
         result /= n;
@@ -386,13 +382,13 @@ namespace QuantLib {
     }
 
     // period formatting
-
+    inline
     std::ostream& operator<<(std::ostream& out, const Period& p) {
         return out << io::short_period(p);
     }
 
     namespace detail {
-
+        inline
         std::ostream& operator<<(std::ostream& out,
                                  const long_period_holder& holder) {
             Integer n = holder.p.length();
@@ -423,10 +419,10 @@ namespace QuantLib {
               case Years:
                 return out << n << (n == 1 ? " year" : " years");
               default:
-                QL_FAIL("unknown time unit (" << Integer(holder.p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(holder.p.units()));
             }
         }
-
+        inline
         std::ostream& operator<<(std::ostream& out,
                                  const short_period_holder& holder) {
             Integer n = holder.p.length();
@@ -457,18 +453,18 @@ namespace QuantLib {
               case Years:
                 return out << n << "Y";
               default:
-                QL_FAIL("unknown time unit (" << Integer(holder.p.units()) << ")");
+                  QL_FAIL("unknown time unit ({})", Integer(holder.p.units()));
             }
         }
 
     }
 
     namespace io {
-
+        inline
         detail::long_period_holder long_period(const Period& p) {
             return detail::long_period_holder(p);
         }
-
+        inline
         detail::short_period_holder short_period(const Period& p) {
             return detail::short_period_holder(p);
         }

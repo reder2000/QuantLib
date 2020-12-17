@@ -23,7 +23,7 @@
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
-#pragma warning(disable : 4996 4267)
+
 #include <ql/time/date.hpp>
 #include "ql_utilities_dataformatters.hpp"
 #include "ql_errors.hpp"
@@ -54,30 +54,31 @@ using boost::posix_time::time_duration;
 namespace QuantLib {
 #ifndef QL_HIGH_RESOLUTION_DATE
     // constructors
-inline    Date::Date()
-    : serialNumber_(Date::serial_type(0)) {}
-    inline
-    Date::Date(Date::serial_type serialNumber)
-    : serialNumber_(serialNumber) {
-        checkSerialNumber(serialNumber);
-    }
-    inline
-    Date::Date(Day d, Month m, Year y) {
-        QL_REQUIRE(y > 1900 && y < 2200,
-                   "year {} out of bound. It must be in [1901,2199]",y);
-        QL_REQUIRE(Integer(m) > 0 && Integer(m) < 13,
-                   "month {} outside January-December range [1,12]",m);
+    //DateLike<ExtDate>::Date()
+    //: serialNumber_(typename DateLike<ExtDate>::serial_type(0)) {}
 
-        bool leap = isLeap(y);
-        Day len = monthLength(m,leap), offset = monthOffset(m,leap);
-        QL_REQUIRE(d <= len && d > 0,
-                   "day outside month ({}) day-range [1,{}]",
-                   Integer(m) , len);
+    //DateLike<ExtDate>::Date(typename DateLike<ExtDate>::serial_type serialNumber)
+    //: serialNumber_(serialNumber) {
+    //    checkSerialNumber(serialNumber);
+    //}
 
-        serialNumber_ = d + offset + yearOffset(y);
-    }
-    inline
-    Month Date::month() const {
+    //DateLike<ExtDate>::Date(Day d, Month m, Year y) {
+    //    QL_REQUIRE(y > 1900 && y < 2200,
+    //               "year " << y << " out of bound. It must be in [1901,2199]");
+    //    QL_REQUIRE(Integer(m) > 0 && Integer(m) < 13,
+    //               "month " << Integer(m)
+    //               << " outside January-December range [1,12]");
+
+    //    bool leap = isLeap(y);
+    //    Day len = monthLength(m,leap), offset = monthOffset(m,leap);
+    //    QL_REQUIRE(d <= len && d > 0,
+    //               "day outside month (" << Integer(m) << ") day-range "
+    //               << "[1," << len << "]");
+
+    //    serialNumber_ = d + offset + yearOffset(y);
+    //}
+    template <class ExtDate> inline
+    Month DateLike<ExtDate>::month() const {
         Day d = dayOfYear(); // dayOfYear is 1 based
         Integer m = d/30 + 1;
         bool leap = isLeap(year());
@@ -87,54 +88,54 @@ inline    Date::Date()
             ++m;
         return Month(m);
     }
-    inline
-    Year Date::year() const {
-        Year y = (serialNumber_ / 365)+1900;
+    template <class ExtDate>    inline
+    Year DateLike<ExtDate>::year() const {
+        Year y = (serialNumber() / 365)+1900;
         // yearOffset(y) is December 31st of the preceding year
-        if (serialNumber_ <= yearOffset(y))
+        if (serialNumber() <= yearOffset(y))
             --y;
         return y;
     }
-    inline
-    Date& Date::operator+=(Date::serial_type days) {
-        Date::serial_type serial = serialNumber_ + days;
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator+=(typename DateLike<ExtDate>::serial_type days) {
+        typename DateLike<ExtDate>::serial_type serial = serialNumber() + days;
         checkSerialNumber(serial);
-        serialNumber_ = serial;
+        serialNumber() = serial;
         return *this;
     }
-    inline
-    Date& Date::operator+=(const Period& p) {
-        serialNumber_ = advance(*this,p.length(),p.units()).serialNumber();
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator+=(const Period& p) {
+        serialNumber() = advance(*this,p.length(),p.units()).serialNumber();
         return *this;
     }
-    inline
-    Date& Date::operator-=(Date::serial_type days) {
-        Date::serial_type serial = serialNumber_ - days;
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator-=(typename DateLike<ExtDate>::serial_type days) {
+        typename DateLike<ExtDate>::serial_type serial = serialNumber() - days;
         checkSerialNumber(serial);
-        serialNumber_ = serial;
+        serialNumber() = serial;
         return *this;
     }
-    inline
-    Date& Date::operator-=(const Period& p) {
-        serialNumber_ = advance(*this,-p.length(),p.units()).serialNumber();
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator-=(const Period& p) {
+        serialNumber() = advance(*this,-p.length(),p.units()).serialNumber();
         return *this;
     }
-    inline
-    Date& Date::operator++() {
-        Date::serial_type serial = serialNumber_ + 1;
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator++() {
+        typename DateLike<ExtDate>::serial_type serial = serialNumber() + 1;
         checkSerialNumber(serial);
-        serialNumber_ = serial;
+        serialNumber() = serial;
         return *this;
     }
-    inline
-    Date& Date::operator--() {
-        Date::serial_type serial = serialNumber_ - 1;
+    template <class ExtDate>    inline
+    DateLike<ExtDate>& DateLike<ExtDate>::operator--() {
+        typename DateLike<ExtDate>::serial_type serial = serialNumber() - 1;
         checkSerialNumber(serial);
-        serialNumber_ = serial;
+        serialNumber() = serial;
         return *this;
     }
-    inline
-    Date Date::advance(const Date& date, Integer n, TimeUnit units) {
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::advance(const DateLike<ExtDate>& date, Integer n, TimeUnit units) {
         switch (units) {
           case Days:
             return date + n;
@@ -154,7 +155,8 @@ inline    Date::Date()
             }
 
             QL_ENSURE(y >= 1900 && y <= 2199,
-                      "year {} out of bounds. It must be in [1901,2199]",y);
+                      "year " << y << " out of bounds. "
+                      << "It must be in [1901,2199]");
 
             Integer length = monthLength(Month(m), isLeap(y));
             if (d > length)
@@ -167,7 +169,9 @@ inline    Date::Date()
               Month m = date.month();
               Year y = date.year()+n;
 
-              QL_ENSURE(y >= 1900 && y <= 2199, "year  out of bounds. It must be in [1901,2199]",y);
+              QL_ENSURE(y >= 1900 && y <= 2199,
+                        "year " << y << " out of bounds. "
+                        << "It must be in [1901,2199]");
 
               if (d == 29 && m == February && !isLeap(y))
                   d = 28;
@@ -178,8 +182,8 @@ inline    Date::Date()
             QL_FAIL("undefined time units");
         }
     }
-    inline
-    bool Date::isLeap(Year y) {
+    template <class ExtDate>    inline
+    bool DateLike<ExtDate>::isLeap(Year y) {
         static const bool YearIsLeap[] = {
             // 1900 is leap in agreement with Excel's bug
             // 1900 is out of valid date range anyway
@@ -250,8 +254,8 @@ inline    Date::Date()
         return YearIsLeap[y-1900];
     }
 
-    inline
-    Integer Date::monthLength(Month m, bool leapYear) {
+    template <class ExtDate>    inline
+    Integer DateLike<ExtDate>::monthLength(Month m, bool leapYear) {
         static const Integer MonthLength[] = {
             31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
         };
@@ -260,8 +264,8 @@ inline    Date::Date()
         };
         return (leapYear? MonthLeapLength[m-1] : MonthLength[m-1]);
     }
-    inline
-    Integer Date::monthOffset(Month m, bool leapYear) {
+    template <class ExtDate>    inline
+    Integer DateLike<ExtDate>::monthOffset(Month m, bool leapYear) {
         static const Integer MonthOffset[] = {
               0,  31,  59,  90, 120, 151,   // Jan - Jun
             181, 212, 243, 273, 304, 334,   // Jun - Dec
@@ -274,11 +278,11 @@ inline    Date::Date()
         };
         return (leapYear? MonthLeapOffset[m-1] : MonthOffset[m-1]);
     }
-    inline
-    Date::serial_type Date::yearOffset(Year y) {
+    template <class ExtDate>    inline
+    typename typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::yearOffset(Year y) {
         // the list of all December 31st in the preceding year
         // e.g. for 1901 yearOffset[1] is 366, that is, December 31 1900
-        static const Date::serial_type YearOffset[] = {
+        static const typename DateLike<ExtDate>::serial_type YearOffset[] = {
             // 1900-1909
                 0,  366,  731, 1096, 1461, 1827, 2192, 2557, 2922, 3288,
             // 1910-1919
@@ -348,7 +352,7 @@ inline    Date::Date()
 #else
 
     namespace {
-        const boost::gregorian::date& serialNumberDateReference() {
+        const boost::gregorian::DateLike<ExtDate>& serialNumberDateReference() {
             static const boost::gregorian::date dateReference(
                 1899, boost::gregorian::Dec, 30);
             return dateReference;
@@ -508,16 +512,16 @@ inline    Date::Date()
     }
 
 
-    Date::Date()
+    DateLike<ExtDate>::Date()
     : dateTime_(serialNumberDateReference()) {}
 
-    Date::Date(const ptime& dateTime)
+    DateLike<ExtDate>::Date(const ptime& dateTime)
     : dateTime_(dateTime) {}
 
-    Date::Date(Day d, Month m, Year y)
+    DateLike<ExtDate>::Date(Day d, Month m, Year y)
     : dateTime_(gregorianDate(y, m, d)) {}
 
-    Date::Date(Day d, Month m, Year y,
+    DateLike<ExtDate>::Date(Day d, Month m, Year y,
                Hour hours, Minute minutes, Second seconds,
                Millisecond millisec, Microsecond microsec)
     : dateTime_(
@@ -527,47 +531,47 @@ inline    Date::Date()
                millisec*(time_duration::ticks_per_second()/1000)
              + microsec*(time_duration::ticks_per_second()/1000000))) {}
 
-    Date::Date(Date::serial_type serialNumber)
+    DateLike<ExtDate>::Date(typename typename DateLike<ExtDate>::serial_type serialNumber)
     : dateTime_(
          serialNumberDateReference() +
          boost::gregorian::days(serialNumber)) {
         checkSerialNumber(serialNumber);
     }
 
-    Weekday Date::weekday() const {
+    Weekday DateLike<ExtDate>::weekday() const {
         return mapBoostDateType2QL<compatibleEnums>(
             dateTime_.date().day_of_week());
     }
 
-    Day Date::dayOfMonth() const {
+    Day DateLike<ExtDate>::dayOfMonth() const {
         return dateTime_.date().day();
     }
 
-    Day Date::dayOfYear() const {
+    Day DateLike<ExtDate>::dayOfYear() const {
         return dateTime_.date().day_of_year();
     }
 
-    Month Date::month() const {
+    Month DateLike<ExtDate>::month() const {
         return mapBoostDateType2QL<compatibleEnums>(dateTime_.date().month());
     }
 
-    Year Date::year() const {
+    Year DateLike<ExtDate>::year() const {
         return dateTime_.date().year();
     }
 
-    Hour Date::hours() const {
+    Hour DateLike<ExtDate>::hours() const {
         return dateTime_.time_of_day().hours();
     }
 
-    Minute Date::minutes() const {
+    Minute DateLike<ExtDate>::minutes() const {
         return dateTime_.time_of_day().minutes();
     }
 
-    Second Date::seconds() const {
+    Second DateLike<ExtDate>::seconds() const {
         return dateTime_.time_of_day().seconds();
     }
 
-    Time Date::fractionOfDay() const {
+    Time DateLike<ExtDate>::fractionOfDay() const {
         const time_duration t = dateTime().time_of_day();
 
         const Time seconds
@@ -577,106 +581,106 @@ inline    Date::Date()
         return seconds/86400.0; // ignore any DST hocus-pocus
     }
 
-    Time Date::fractionOfSecond() const {
+    Time DateLike<ExtDate>::fractionOfSecond() const {
         return dateTime_.time_of_day().fractional_seconds()
             /Real(ticksPerSecond());
     }
 
-    Millisecond Date::milliseconds() const {
+    Millisecond DateLike<ExtDate>::milliseconds() const {
         return dateTime_.time_of_day().fractional_seconds()
                /(ticksPerSecond()/1000);
     }
 
-    Microsecond Date::microseconds() const {
+    Microsecond DateLike<ExtDate>::microseconds() const {
         return (dateTime_.time_of_day().fractional_seconds()
                 - milliseconds()*(time_duration::ticks_per_second()/1000))
             /(ticksPerSecond()/1000000);
     }
 
-    time_duration::tick_type Date::ticksPerSecond() {
+    time_duration::tick_type DateLike<ExtDate>::ticksPerSecond() {
         return time_duration::ticks_per_second();
     }
 
-    Date::serial_type Date::serialNumber() const {
-        const Date::serial_type n = (dateTime_.date()
+    typename typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::serialNumber() const {
+        const typename typename DateLike<ExtDate>::serial_type n = (dateTime_.date()
             - serialNumberDateReference()).days();
         checkSerialNumber(n);
 
         return n;
     }
 
-    const ptime& Date::dateTime() const { return dateTime_; }
+    const ptime& DateLike<ExtDate>::dateTime() const { return dateTime_; }
 
-    Date& Date::operator+=(Date::serial_type d) {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator+=(typename DateLike<ExtDate>::serial_type d) {
         dateTime_ += boost::gregorian::days(d);
         return *this;
     }
 
-    Date& Date::operator+=(const Period& p) {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator+=(const Period& p) {
         advance(dateTime_, p.length(), p.units());
         return *this;
     }
 
-    Date& Date::operator-=(Date::serial_type d) {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator-=(typename DateLike<ExtDate>::serial_type d) {
         dateTime_ -= boost::gregorian::days(d);
         return *this;
     }
-    Date& Date::operator-=(const Period& p) {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator-=(const Period& p) {
         advance(dateTime_, -p.length(), p.units());
         return *this;
     }
 
-    Date& Date::operator++() {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator++() {
         dateTime_ +=boost::gregorian::days(1);
         return *this;
     }
 
-    Date& Date::operator--() {
+    DateLike<ExtDate>& DateLike<ExtDate>::operator--() {
         dateTime_ -=boost::gregorian::days(1);
         return *this;
     }
 
-    Date Date::operator+(Date::serial_type days) const {
-        Date retVal(*this);
+    DateLike<ExtDate> DateLike<ExtDate>::operator+(typename DateLike<ExtDate>::serial_type days) const {
+        DateLike<ExtDate> retVal(*this);
         retVal+=days;
 
         return retVal;
     }
 
-    Date Date::operator-(Date::serial_type days) const {
-        Date retVal(*this);
+    DateLike<ExtDate> DateLike<ExtDate>::operator-(typename DateLike<ExtDate>::serial_type days) const {
+        DateLike<ExtDate> retVal(*this);
         retVal-=days;
 
         return retVal;
     }
 
-    Date Date::operator+(const Period& p) const {
-        Date retVal(*this);
+    DateLike<ExtDate> DateLike<ExtDate>::operator+(const Period& p) const {
+        DateLike<ExtDate> retVal(*this);
         retVal+=p;
 
         return retVal;
     }
 
-    Date Date::operator-(const Period& p) const {
-        Date retVal(*this);
+    DateLike<ExtDate> DateLike<ExtDate>::operator-(const Period& p) const {
+        DateLike<ExtDate> retVal(*this);
         retVal-=p;
 
         return retVal;
     }
 
-    Date Date::localDateTime() {
+    DateLike<ExtDate> DateLike<ExtDate>::localDateTime() {
         return Date(boost::posix_time::microsec_clock::local_time());
     }
 
-    Date Date::universalDateTime() {
+    DateLike<ExtDate> DateLike<ExtDate>::universalDateTime() {
         return Date(boost::posix_time::microsec_clock::universal_time());
     }
 
-    bool Date::isLeap(Year y) {
+    bool DateLike<ExtDate>::isLeap(Year y) {
         return boost::gregorian::gregorian_calendar::is_leap_year(y);
     }
 
-    Date Date::endOfMonth(const Date& d) {
+    DateLike<ExtDate> DateLike<ExtDate>::endOfMonth(const DateLike<ExtDate>& d) {
         const Month m = d.month();
         const Year y = d.year();
         const Day eoM = boost::gregorian::gregorian_calendar::end_of_month_day(
@@ -685,56 +689,56 @@ inline    Date::Date()
         return Date(eoM, m, y);
     }
 
-    bool Date::isEndOfMonth(const Date& d) {
+    bool DateLike<ExtDate>::isEndOfMonth(const DateLike<ExtDate>& d) {
         return d.dayOfMonth() ==
             boost::gregorian::gregorian_calendar::end_of_month_day(
                 d.year(), mapQLDateType2Boost<compatibleEnums>(d.month()));
     }
 
 
-    Date::serial_type operator-(const Date& d1, const Date& d2) {
+    typename DateLike<ExtDate>::serial_type operator-(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime().date() - d2.dateTime().date()).days();
     }
 
-    Time daysBetween(const Date& d1, const Date& d2) {
-        const Date::serial_type days = d2 - d1;
+    Time daysBetween(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
+        const typename DateLike<ExtDate>::serial_type days = d2 - d1;
         return days + d2.fractionOfDay() - d1.fractionOfDay();
     }
 
-    bool operator<(const Date& d1, const Date& d2) {
+    bool operator<(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() < d2.dateTime());
     }
 
-    bool operator<=(const Date& d1, const Date& d2) {
+    bool operator<=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() <= d2.dateTime());
     }
 
-    bool operator>(const Date& d1, const Date& d2) {
+    bool operator>(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() > d2.dateTime());
     }
 
-    bool operator>=(const Date& d1, const Date& d2) {
+    bool operator>=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() >= d2.dateTime());
     }
 
-    bool operator==(const Date& d1, const Date& d2) {
+    bool operator==(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() == d2.dateTime());
     }
 
-    bool operator!=(const Date& d1, const Date& d2) {
+    bool operator!=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.dateTime() != d2.dateTime());
     }
 #endif
-    inline
-    Date::serial_type Date::minimumSerialNumber() {
+    template <class ExtDate>    inline
+    typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::minimumSerialNumber() {
         return 367;       // Jan 1st, 1901
     }
-    inline
-    Date::serial_type Date::maximumSerialNumber() {
+    template <class ExtDate>    inline
+    typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::maximumSerialNumber() {
         return 109574;    // Dec 31st, 2199
     }
-    inline
-    void Date::checkSerialNumber(typename Date::serial_type serialNumber) {
+    template <class ExtDate>    inline
+    void DateLike<ExtDate>::checkSerialNumber(typename DateLike<ExtDate>::serial_type serialNumber) {
         QL_REQUIRE(serialNumber >= minimumSerialNumber() && serialNumber <= maximumSerialNumber(),
                    "Date's serial number ( {} ) outside "
                    "allowed range [{}-{}], i.e. [{}{}-{}]",
@@ -742,56 +746,56 @@ inline    Date::Date()
                    maxDate());
                               
     }
-    inline
-    Date Date::minDate() {
-        static const Date minimumDate(minimumSerialNumber());
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::minDate() {
+        static const DateLike<ExtDate> minimumDate(minimumSerialNumber());
         return minimumDate;
     }
-    inline
-    Date Date::maxDate() {
-        static const Date maximumDate(maximumSerialNumber());
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::maxDate() {
+        static const DateLike<ExtDate> maximumDate(maximumSerialNumber());
         return maximumDate;
     }
-    inline
-    Date Date::operator++(int ) {
-        Date old(*this);
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::operator++(int ) {
+        DateLike<ExtDate> old(*this);
         ++*this; // use the pre-increment
         return old;
     }
-    inline
-    Date Date::operator--(int ) {
-        Date old(*this);
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::operator--(int ) {
+        DateLike<ExtDate> old(*this);
         --*this; // use the pre-decrement
         return old;
     }
-    inline
-    Date Date::todaysDate() {
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::todaysDate() {
         std::time_t t;
 
         if (std::time(&t) == std::time_t(-1)) // -1 means time() didn't work
-            return Date();
+            return DateLike<ExtDate>();
         std::tm *lt = std::localtime(&t);
-        return Date(Day(lt->tm_mday),
+        return DateAdaptor<ExtDate>::Date(Day(lt->tm_mday),
                         Month(lt->tm_mon+1),
                         Year(lt->tm_year+1900));
     }
-    inline
-    Date Date::nextWeekday(const Date& d, Weekday dayOfWeek) {
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::nextWeekday(const DateLike<ExtDate>& d, Weekday dayOfWeek) {
         Weekday wd = d.weekday();
         return d + ((wd>dayOfWeek ? 7 : 0) - wd + dayOfWeek);
     }
-    inline
-    Date Date::nthWeekday(Size nth, Weekday dayOfWeek,
+    template <class ExtDate>    inline
+    DateLike<ExtDate> DateLike<ExtDate>::nthWeekday(Size nth, Weekday dayOfWeek,
                           Month m, Year y) {
         QL_REQUIRE(nth>0,
                    "zeroth day of week in a given (month, year) is undefined");
         QL_REQUIRE(nth<6,
                    "no more than 5 weekday in a given (month, year)");
-        Weekday first = Date(1, m, y).weekday();
+        Weekday first = DateAdaptor<ExtDate>::Date(1, m, y).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
         return Date((1 + dayOfWeek + skip*7) - first, m, y);
     }
-
+#if defined(QL_SETTINGS_ARE_REMOVED)
     // month formatting
     inline
     std::ostream& operator<<(std::ostream& out, Month m) {
@@ -824,8 +828,9 @@ inline    Date::Date()
             QL_FAIL("unknown month ({})" , Integer(m));
         }
     }
-    inline
-    std::size_t hash_value(const Date& d) {
+#endif //defined(QL_SETTINGS_ARE_REMOVED)
+    template <class ExtDate>    inline
+    std::size_t hash_value(const DateLike<ExtDate>& d) {
 #ifdef QL_HIGH_RESOLUTION_DATE
         std::size_t seed = 0;
         boost::hash_combine(seed, d.serialNumber());
@@ -833,17 +838,17 @@ inline    Date::Date()
         return seed;
 #else
 
-        return std::hash<Date::serial_type>()(d.serialNumber());
+        return std::hash<typename DateLike<ExtDate>::serial_type>()(d.serialNumber());
 #endif
     }
 
     // date formatting
-    inline
-    std::ostream& operator<<(std::ostream& out, const Date& d) {
+    template <class ExtDate>    inline
+    std::ostream& operator<<(std::ostream& out, const DateLike<ExtDate>& d) {
         return out << io::long_date(d);
     }
 
-    namespace detail {
+    namespace ext_detail {
 
         struct FormatResetter {
             // An instance of this object will have undefined behaviour
@@ -873,11 +878,11 @@ inline    Date::Date()
             char filler_;
             std::locale loc_;
         };
-        inline
+        template <class ExtDate>        inline
         std::ostream& operator<<(std::ostream& out,
-                                 const short_date_holder& holder) {
-            const Date& d = holder.d;
-            if (d == Date()) {
+                                 const short_date_holder<ExtDate>& holder) {
+            const DateLike<ExtDate>& d = holder.d;
+            if (d == DateLike<ExtDate>()) {
                 out << "null date";
             } else {
                 FormatResetter resetter(out);
@@ -891,11 +896,11 @@ inline    Date::Date()
             }
             return out;
         }
-        inline
+        template <class ExtDate>        inline
         std::ostream& operator<<(std::ostream& out,
-                                 const long_date_holder& holder) {
-            const Date& d = holder.d;
-            if (d == Date()) {
+                                 const long_date_holder<ExtDate>& holder) {
+            const DateLike<ExtDate>& d = holder.d;
+            if (d == DateLike<ExtDate>()) {
                 out << "null date";
             } else {
                 FormatResetter resetter(out);
@@ -905,11 +910,11 @@ inline    Date::Date()
             }
             return out;
         }
-        inline
+        template <class ExtDate>        inline
         std::ostream& operator<<(std::ostream& out,
-                                 const iso_date_holder& holder) {
-            const Date& d = holder.d;
-            if (d == Date()) {
+                                 const iso_date_holder<ExtDate>& holder) {
+            const DateLike<ExtDate>& d = holder.d;
+            if (d == DateLike<ExtDate>()) {
                 out << "null date";
             } else {
                 FormatResetter resetter(out);
@@ -921,9 +926,9 @@ inline    Date::Date()
             }
             return out;
         }
-        inline
+        template <class ExtDate>        inline
         std::ostream& operator<<(std::ostream& out,
-                                 const formatted_date_holder& holder) {
+                                 const formatted_date_holder<ExtDate>& holder) {
             QL_FAIL("don't want to use boost");
             //using namespace boost::gregorian;
             //const DateLike<ExtDate>& d = holder.d;
@@ -942,7 +947,7 @@ inline    Date::Date()
 #ifdef QL_HIGH_RESOLUTION_DATE
         std::ostream& operator<<(std::ostream& out,
                                  const iso_datetime_holder& holder) {
-            const Date& d = holder.d;
+            const DateLike<ExtDate>& d = holder.d;
 
             out << io::iso_date(d) << "T";
             FormatResetter resetter(out);
@@ -963,27 +968,27 @@ inline    Date::Date()
 #endif
     }
 
-    namespace io {
-        inline
-        detail::short_date_holder short_date(const Date& d) {
+    namespace ext_io {
+        template <class ExtDate>        inline 
+        ext_detail::short_date_holder<ExtDate> short_date(const DateLike<ExtDate>& d) {
             return detail::short_date_holder(d);
         }
-        inline
-        detail::long_date_holder long_date(const Date& d) {
+        template <class ExtDate>        inline 
+        ext_detail::long_date_holder<ExtDate> long_date(const DateLike<ExtDate>& d) {
             return detail::long_date_holder(d);
         }
-        inline
-        detail::iso_date_holder iso_date(const Date& d) {
+        template <class ExtDate>        inline 
+        ext_detail::iso_date_holder<ExtDate> iso_date(const DateLike<ExtDate>& d) {
             return detail::iso_date_holder(d);
         }
-        inline
-        detail::formatted_date_holder formatted_date(const Date& d,
+        template <class ExtDate>        inline 
+        ext_detail::formatted_date_holder<ExtDate> formatted_date(const DateLike<ExtDate>& d,
                                                      const std::string& f) {
             return detail::formatted_date_holder(d, f);
         }
 
 #ifdef QL_HIGH_RESOLUTION_DATE
-        detail::iso_datetime_holder iso_datetime(const Date& d) {
+        detail::iso_datetime_holder iso_datetime(const DateLike<ExtDate>& d) {
             return detail::iso_datetime_holder(d);
         }
 #endif

@@ -23,13 +23,13 @@
 /*! \file period.hpp
     \brief period- and frequency-related classes and enumerations
 */
-
+#pragma once
 #ifndef quantlib_period_hpp
 #define quantlib_period_hpp
 
 #include <ql/time/frequency.hpp>
 #include <ql/time/timeunit.hpp>
-#include <ql/types.hpp>
+#include <ql/time/types.hpp>
 
 
 namespace QuantLib {
@@ -179,5 +179,16 @@ namespace QuantLib {
     }
 
 }
+template <>
+struct fmt::formatter<QuantLib::Period> : formatter<std::string> {
+    // parse is inherited from formatter<string_view>.
+    template <typename FormatContext>
+    auto format(QuantLib::Period c, FormatContext& ctx) {
+        std::stringstream ss;
+        ss << c;
+        return formatter<std::string>::format(ss.str(), ctx);
+    }
+};
 
+#include "period.cpp"
 #endif

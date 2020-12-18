@@ -59,13 +59,14 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Japan : public Calendar {
+    template <class ExtDate=Date>
+    class Japan : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Japan"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         Japan();

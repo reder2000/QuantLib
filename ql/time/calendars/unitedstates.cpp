@@ -84,53 +84,53 @@ namespace QuantLib {
             }
         }
     }
-    inline
-    UnitedStates::UnitedStates(UnitedStates::Market market) {
+    template <class ExtDate> inline
+    UnitedStates<ExtDate>::UnitedStates(UnitedStates<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-                                        new UnitedStates::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> liborImpactImpl(
-                                        new UnitedStates::LiborImpactImpl);
-        static std::shared_ptr<Calendar::Impl> nyseImpl(
-                                        new UnitedStates::NyseImpl);
-        static std::shared_ptr<Calendar::Impl> governmentImpl(
-                                        new UnitedStates::GovernmentBondImpl);
-        static std::shared_ptr<Calendar::Impl> nercImpl(
-                                        new UnitedStates::NercImpl);
-        static std::shared_ptr<Calendar::Impl> federalReserveImpl(
-                                        new UnitedStates::FederalReserveImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                        new UnitedStates<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> liborImpactImpl(
+                                        new UnitedStates<ExtDate>::LiborImpactImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> nyseImpl(
+                                        new UnitedStates<ExtDate>::NyseImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> governmentImpl(
+                                        new UnitedStates<ExtDate>::GovernmentBondImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> nercImpl(
+                                        new UnitedStates<ExtDate>::NercImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> federalReserveImpl(
+                                        new UnitedStates<ExtDate>::FederalReserveImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case LiborImpact:
-            impl_ = liborImpactImpl;
+            this->impl_ = liborImpactImpl;
             break;
           case NYSE:
-            impl_ = nyseImpl;
+            this->impl_ = nyseImpl;
             break;
           case GovernmentBond:
-            impl_ = governmentImpl;
+            this->impl_ = governmentImpl;
             break;
           case NERC:
-            impl_ = nercImpl;
+            this->impl_ = nercImpl;
             break;
           case FederalReserve:
-            impl_ = federalReserveImpl;
+            this->impl_ = federalReserveImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
 
-    inline
-    bool UnitedStates::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
             // (or to Friday if on Saturday)
@@ -159,8 +159,8 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool UnitedStates::LiborImpactImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::LiborImpactImpl::isBusinessDay(const ExtDate& date) const {
         // Since 2015 Independence Day only impacts Libor if it falls
         // on a weekday
         Weekday w = date.weekday();
@@ -172,14 +172,14 @@ namespace QuantLib {
             return true;
         return SettlementImpl::isBusinessDay(date);
     }
-    inline
-    bool UnitedStates::NyseImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::NyseImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
             // Washington's birthday (third Monday in February)
@@ -257,14 +257,14 @@ namespace QuantLib {
         return true;
     }
 
-    inline
-    bool UnitedStates::GovernmentBondImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::GovernmentBondImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
             // Martin Luther King's birthday (third Monday in January)
@@ -304,13 +304,13 @@ namespace QuantLib {
         return true;
     }
 
-    inline
-    bool UnitedStates::NercImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::NercImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
             // Memorial Day (last Monday in May)
@@ -327,14 +327,14 @@ namespace QuantLib {
         return true;
     }
  
- inline
-    bool UnitedStates::FederalReserveImpl::isBusinessDay(const Date& date) const {
+ template <class ExtDate> inline
+    bool UnitedStates<ExtDate>::FederalReserveImpl::isBusinessDay(const ExtDate& date) const {
         // see https://www.frbservices.org/holidayschedules/ for details
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
             // Martin Luther King's birthday (third Monday in January)

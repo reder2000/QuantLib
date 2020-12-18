@@ -73,18 +73,19 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class SouthKorea : public Calendar {
+    template <class ExtDate>
+    class SouthKorea : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::Impl {
+        class SettlementImpl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "South-Korean settlement"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
         class KrxImpl : public SettlementImpl {
           public:
             std::string name() const { return "South-Korea exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { Settlement,  //!< Public holidays

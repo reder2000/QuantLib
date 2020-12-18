@@ -22,18 +22,18 @@
 #include <ql/time/calendars/japan.hpp>
 
 namespace QuantLib {
-    inline
-    Japan::Japan() {
+    template <class ExtDate> inline
+    Japan<ExtDate>::Japan() {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar::Impl> impl(new Japan::Impl);
-        impl_ = impl;
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new Japan<ExtDate>::Impl);
+        this->impl_ = impl;
     }
-    inline
-    bool Japan::Impl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline
+    bool Japan<ExtDate>::Impl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    bool Japan::Impl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Japan<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -51,7 +51,7 @@ namespace QuantLib {
             Day(exact_autumnal_equinox_time
                 + moving_amount - number_of_leap_years);
         // checks
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1  && m == January)
             // Bank Holiday

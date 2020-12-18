@@ -58,6 +58,7 @@ namespace QuantLib {
               by inspecting the calendar before and after their
               invocation.
     */
+    template <class ExtDate=Date>
     class Calendar {
       protected:
         //! abstract base class for calendar implementations
@@ -65,9 +66,9 @@ namespace QuantLib {
           public:
             virtual ~Impl() {}
             virtual std::string name() const = 0;
-            virtual bool isBusinessDay(const Date&) const = 0;
+            virtual bool isBusinessDay(const ExtDate&) const = 0;
             virtual bool isWeekend(Weekday) const = 0;
-            std::set<Date> addedHolidays, removedHolidays;
+            std::set<ExtDate> addedHolidays, removedHolidays;
         };
         std::shared_ptr<Impl> impl_;
       public:
@@ -91,16 +92,16 @@ namespace QuantLib {
         */
 
         /*! Returns the set of added holidays for the given calendar */
-        const std::set<Date>& addedHolidays() const;
+        const std::set<ExtDate>& addedHolidays() const;
         
         /*! Returns the set of removed holidays for the given calendar */
-        const std::set<Date>& removedHolidays() const;
+        const std::set<ExtDate>& removedHolidays() const;
 
-        bool isBusinessDay(const Date& d) const;
+        bool isBusinessDay(const ExtDate& d) const;
         /*! Returns <tt>true</tt> iff the date is a holiday for the given
             market.
         */
-        bool isHoliday(const Date& d) const;
+        bool isHoliday(const ExtDate& d) const;
         /*! Returns <tt>true</tt> iff the weekday is part of the
             weekend for the given market.
         */
@@ -108,14 +109,14 @@ namespace QuantLib {
         /*! Returns <tt>true</tt> iff in the given market, the date is on
             or after the last business day for that month.
         */
-        bool isEndOfMonth(const Date& d) const;
+        bool isEndOfMonth(const ExtDate& d) const;
         //! last business day of the month to which the given date belongs
-        Date endOfMonth(const Date& d) const;
+        ExtDate endOfMonth(const ExtDate& d) const;
 
         /*! Adds a date to the set of holidays for the given calendar. */
-        void addHoliday(const Date&);
+        void addHoliday(const ExtDate&);
         /*! Removes a date from the set of holidays for the given calendar. */
-        void removeHoliday(const Date&);
+        void removeHoliday(const ExtDate&);
 
         /*! Returns the holidays between two dates.
 
@@ -123,29 +124,29 @@ namespace QuantLib {
                         Deprecated in version 1.18.
         */
         QL_DEPRECATED
-        static std::vector<Date> holidayList(const Calendar& calendar,
-                                             const Date& from,
-                                             const Date& to,
+        static std::vector<ExtDate> holidayList(const Calendar<ExtDate>& calendar,
+                                             const ExtDate& from,
+                                             const ExtDate& to,
                                              bool includeWeekEnds = false);
 
         /*! Returns the holidays between two dates. */
-        std::vector<Date> holidayList(const Date& from,
-                                      const Date& to,
+        std::vector<ExtDate> holidayList(const ExtDate& from,
+                                      const ExtDate& to,
                                       bool includeWeekEnds = false) const;
         /*! Returns the business days between two dates. */
-        std::vector<Date> businessDayList(const Date& from,
-                                          const Date& to) const;
+        std::vector<ExtDate> businessDayList(const ExtDate& from,
+                                          const ExtDate& to) const;
 
         /*! Adjusts a non-business day to the appropriate near business day
             with respect to the given convention.
         */
-        Date adjust(const Date&,
+        ExtDate adjust(const ExtDate&,
                     BusinessDayConvention convention = Following) const;
         /*! Advances the given date of the given number of business days and
             returns the result.
             \note The input date is not modified.
         */
-        Date advance(const Date&,
+        ExtDate advance(const ExtDate&,
                      Integer n,
                      TimeUnit unit,
                      BusinessDayConvention convention = Following,
@@ -154,15 +155,15 @@ namespace QuantLib {
             returns the result.
             \note The input date is not modified.
         */
-        Date advance(const Date& date,
+        ExtDate advance(const ExtDate& date,
                      const Period& period,
                      BusinessDayConvention convention = Following,
                      bool endOfMonth = false) const;
         /*! Calculates the number of business days between two given
             dates and returns the result.
         */
-        Date::serial_type businessDaysBetween(const Date& from,
-                                              const Date& to,
+        serial_type businessDaysBetween(const ExtDate& from,
+                                              const ExtDate& to,
                                               bool includeFirst = true,
                                               bool includeLast = false) const;
         //@}
@@ -196,45 +197,47 @@ namespace QuantLib {
         derived class.
         \relates Calendar
     */
-    bool operator==(const Calendar&, const Calendar&);
+    template <class ExtDate>
+    bool operator==(const Calendar<ExtDate>&, const Calendar<ExtDate>&);
 
-    /*! \relates Calendar */
-    bool operator!=(const Calendar&, const Calendar&);
+    /*! \relates Calendar */ template <class ExtDate>
+    bool operator!=(const Calendar<ExtDate>&, const Calendar<ExtDate>&);
 
-    /*! \relates Calendar */
-    std::ostream& operator<<(std::ostream&, const Calendar&);
+    /*! \relates Calendar */ template <class ExtDate>
+    std::ostream& operator<<(std::ostream&, const Calendar<ExtDate>&);
 
 
     // inline definitions
 
-    inline bool Calendar::empty() const {
+    template <class ExtDate>
+    inline bool Calendar<ExtDate>::empty() const {
         return !impl_;
     }
 
-    inline std::string Calendar::name() const {
+    template <class ExtDate> inline  std::string Calendar<ExtDate>::name() const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
         return impl_->name();
     }
 
-    inline const std::set<Date>& Calendar::addedHolidays() const {
+    template <class ExtDate> inline  const std::set<ExtDate>& Calendar<ExtDate>::addedHolidays() const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
         return impl_->addedHolidays;
     }
 
-    inline const std::set<Date>& Calendar::removedHolidays() const {
+    template <class ExtDate> inline  const std::set<ExtDate>& Calendar<ExtDate>::removedHolidays() const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
         return impl_->removedHolidays;
     }
 
-    inline bool Calendar::isBusinessDay(const Date& d) const {
+    template <class ExtDate> inline  bool Calendar<ExtDate>::isBusinessDay(const ExtDate& d) const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
 #ifdef QL_HIGH_RESOLUTION_DATE
-        const Date _d(d.dayOfMonth(), d.month(), d.year());
+        const ExtDate _d(d.dayOfMonth(), d.month(), d.year());
 #else
-        const Date& _d = d;
+        const ExtDate& _d = d;
 #endif
 
         if (!impl_->addedHolidays.empty() &&
@@ -248,33 +251,33 @@ namespace QuantLib {
         return impl_->isBusinessDay(_d);
     }
 
-    inline bool Calendar::isEndOfMonth(const Date& d) const {
+    template <class ExtDate> inline  bool Calendar<ExtDate>::isEndOfMonth(const ExtDate& d) const {
         return (d.month() != adjust(d+1).month());
     }
 
-    inline Date Calendar::endOfMonth(const Date& d) const {
-        return adjust(Date::endOfMonth(d), Preceding);
+    template <class ExtDate> inline  ExtDate Calendar<ExtDate>::endOfMonth(const ExtDate& d) const {
+        return adjust(ExtDate::endOfMonth(d), Preceding);
     }
 
-    inline bool Calendar::isHoliday(const Date& d) const {
+    template <class ExtDate> inline  bool Calendar<ExtDate>::isHoliday(const ExtDate& d) const {
         return !isBusinessDay(d);
     }
 
-    inline bool Calendar::isWeekend(Weekday w) const {
+    template <class ExtDate> inline  bool Calendar<ExtDate>::isWeekend(Weekday w) const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
         return impl_->isWeekend(w);
     }
 
-    inline bool operator==(const Calendar& c1, const Calendar& c2) {
+    template <class ExtDate> inline  bool operator==(const Calendar<ExtDate>& c1, const Calendar<ExtDate>& c2) {
         return (c1.empty() && c2.empty())
             || (!c1.empty() && !c2.empty() && c1.name() == c2.name());
     }
 
-    inline bool operator!=(const Calendar& c1, const Calendar& c2) {
+    template <class ExtDate> inline  bool operator!=(const Calendar<ExtDate>& c1, const Calendar<ExtDate>& c2) {
         return !(c1 == c2);
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const Calendar &c) {
+    template <class ExtDate> inline  std::ostream& operator<<(std::ostream& out, const Calendar<ExtDate> &c) {
         return out << c.name();
     }
 

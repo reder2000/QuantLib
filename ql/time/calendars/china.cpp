@@ -23,34 +23,34 @@
 #include <set>
 
 namespace QuantLib {
-    inline
-    China::China(Market m) {
+    template <class ExtDate> inline
+    China<ExtDate>::China(Market m) {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar::Impl> sseImpl(new China::SseImpl);
-        static std::shared_ptr<Calendar::Impl> IBImpl(new China::IbImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> sseImpl(new China<ExtDate>::SseImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> IBImpl(new China<ExtDate>::IbImpl);
         switch (m) {
           case SSE:
-            impl_ = sseImpl;
+            this->impl_ = sseImpl;
             break;
           case IB:
-            impl_ = IBImpl;
+            this->impl_ = IBImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-    inline
-    bool China::SseImpl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline
+    bool China<ExtDate>::SseImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    bool China::SseImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool China<ExtDate>::SseImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             || (y == 2005 && d == 3 && m == January)
@@ -175,12 +175,12 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool China::IbImpl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline
+    bool China<ExtDate>::IbImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    bool China::IbImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool China<ExtDate>::IbImpl::isBusinessDay(const ExtDate& date) const {
         static const Date working_weekends[] = {
             // 2005
             Date(5, February, 2005),
@@ -312,7 +312,7 @@ namespace QuantLib {
         };
         static const Size n =
             sizeof(working_weekends)/sizeof(working_weekends[0]);
-        static const std::set<Date> workingWeekends(working_weekends+0,
+        static const std::set<ExtDate> workingWeekends(working_weekends+0,
                                                     working_weekends+n);
 
         // If it is already a SSE business day, it must be a IB business day

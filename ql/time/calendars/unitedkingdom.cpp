@@ -22,38 +22,38 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    UnitedKingdom::UnitedKingdom(UnitedKingdom::Market market) {
+    template <class ExtDate> inline
+    UnitedKingdom<ExtDate>::UnitedKingdom(UnitedKingdom<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-                                           new UnitedKingdom::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> exchangeImpl(
-                                           new UnitedKingdom::ExchangeImpl);
-        static std::shared_ptr<Calendar::Impl> metalsImpl(
-                                           new UnitedKingdom::MetalsImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                           new UnitedKingdom<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
+                                           new UnitedKingdom<ExtDate>::ExchangeImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> metalsImpl(
+                                           new UnitedKingdom<ExtDate>::MetalsImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case Exchange:
-            impl_ = exchangeImpl;
+            this->impl_ = exchangeImpl;
             break;
           case Metals:
-            impl_ = metalsImpl;
+            this->impl_ = metalsImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-    inline
-    bool UnitedKingdom::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedKingdom<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday)) &&
                 m == January)
@@ -89,14 +89,14 @@ namespace QuantLib {
         return true;
     }
 
-    inline
-    bool UnitedKingdom::ExchangeImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedKingdom<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday)) &&
                 m == January)
@@ -132,14 +132,14 @@ namespace QuantLib {
         return true;
     }
 
-    inline
-    bool UnitedKingdom::MetalsImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool UnitedKingdom<ExtDate>::MetalsImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday)) &&
                 m == January)

@@ -41,7 +41,7 @@ namespace QuantLib {
     const std::set<Date>& ECB::knownDates() {
 
         // one-off inizialization
-        static const Date::serial_type knownDatesArray[] = {
+        static const serial_type knownDatesArray[] = {
               38371, 38391, 38420, 38455, 38483, 38511, 38546, 38574, 38602, 38637, 38665, 38692 // 2005
             , 38735, 38756, 38784, 38819, 38847, 38883, 38910, 38938, 38966, 39001, 39029, 39064 // 2006
             , 39099, 39127, 39155, 39190, 39217, 39246, 39274, 39302, 39337, 39365, 39400, 39428 // 2007
@@ -62,7 +62,7 @@ namespace QuantLib {
             , 42760, 42809, 42858, 42900, 42942, 42991, 43040, 43089 //2017
         };
         if (knownDateSet.empty()) {
-            Size n = sizeof(knownDatesArray)/sizeof(Date::serial_type);
+            Size n = sizeof(knownDatesArray)/sizeof(serial_type);
             for (Size i=0; i<n; ++i)
                 knownDateSet.insert(Date(knownDatesArray[i]));
         }

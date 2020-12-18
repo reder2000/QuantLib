@@ -22,35 +22,35 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    Brazil::Brazil(Brazil::Market market) {
+    template <class ExtDate> inline
+    Brazil<ExtDate>::Brazil(Brazil::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
                                                   new Brazil::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> exchangeImpl(
+        static std::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
                                                     new Brazil::ExchangeImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case Exchange:
-            impl_ = exchangeImpl;
+            this->impl_ = exchangeImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-    inline
-    bool Brazil::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Brazil<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
         Day dd = date.dayOfYear();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Tiradentes Day
@@ -77,16 +77,16 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool Brazil::ExchangeImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Brazil<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
         Day dd = date.dayOfYear();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Sao Paulo City Day

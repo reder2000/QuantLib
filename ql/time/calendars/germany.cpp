@@ -21,50 +21,50 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    Germany::Germany(Germany::Market market) {
+    template <class ExtDate> inline
+    Germany<ExtDate>::Germany(Germany<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-            new Germany::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> frankfurtStockExchangeImpl(
-            new Germany::FrankfurtStockExchangeImpl);
-        static std::shared_ptr<Calendar::Impl> xetraImpl(
-            new Germany::XetraImpl);
-        static std::shared_ptr<Calendar::Impl> eurexImpl(
-            new Germany::EurexImpl);
-        static std::shared_ptr<Calendar::Impl> euwaxImpl(
-            new Germany::EuwaxImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+            new Germany<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> frankfurtStockExchangeImpl(
+            new Germany<ExtDate>::FrankfurtStockExchangeImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> xetraImpl(
+            new Germany<ExtDate>::XetraImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> eurexImpl(
+            new Germany<ExtDate>::EurexImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> euwaxImpl(
+            new Germany<ExtDate>::EuwaxImpl);
 
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case FrankfurtStockExchange:
-            impl_ = frankfurtStockExchangeImpl;
+            this->impl_ = frankfurtStockExchangeImpl;
             break;
           case Xetra:
-            impl_ = xetraImpl;
+            this->impl_ = xetraImpl;
             break;
           case Eurex:
-            impl_ = eurexImpl;
+            this->impl_ = eurexImpl;
             break;
           case Euwax:
-            impl_ = euwaxImpl;
+            this->impl_ = euwaxImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
 
-    inline
-    bool Germany::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Germany<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday
@@ -90,15 +90,15 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
-    bool Germany::FrankfurtStockExchangeImpl::isBusinessDay(
-      const Date& date) const {
+    template <class ExtDate> inline
+    bool Germany<ExtDate>::FrankfurtStockExchangeImpl::isBusinessDay(
+      const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday
@@ -116,14 +116,14 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool Germany::XetraImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Germany<ExtDate>::XetraImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday
@@ -141,14 +141,14 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool Germany::EurexImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Germany<ExtDate>::EurexImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday
@@ -168,13 +168,13 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    inline
-    bool Germany::EuwaxImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Germany<ExtDate>::EuwaxImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
         if ((w == Saturday || w == Sunday)
             // New Year's Day
             || (d == 1 && m == January)

@@ -20,20 +20,20 @@
 #include <ql/time/calendars/target.hpp>
 
 namespace QuantLib {
-    inline
-    TARGET::TARGET() {
+    template <class ExtDate=Date> inline
+    TARGET<ExtDate>::TARGET() {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar::Impl> impl(new TARGET::Impl);
-        impl_ = impl;
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new TARGET<ExtDate>::Impl);
+        this->impl_ = impl;
     }
-    inline
-    bool TARGET::Impl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool TARGET<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = Calendar<ExtDate>::WesternImpl::easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1  && m == January)
             // Good Friday

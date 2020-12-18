@@ -26,14 +26,14 @@
 #include "ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    void Calendar::addHoliday(const Date& d) {
+    template <class ExtDate> inline 
+    void Calendar<ExtDate>::addHoliday(const ExtDate& d) {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
 #ifdef QL_HIGH_RESOLUTION_DATE
-        const Date _d(d.dayOfMonth(), d.month(), d.year());
+        const ExtDate _d(d.dayOfMonth(), d.month(), d.year());
 #else
-        const Date& _d = d;
+        const ExtDate& _d = d;
 #endif
 
         // if d was a genuine holiday previously removed, revert the change
@@ -43,14 +43,14 @@ namespace QuantLib {
         if (impl_->isBusinessDay(_d))
             impl_->addedHolidays.insert(_d);
     }
-
-    void Calendar::removeHoliday(const Date& d) {
+    template <class ExtDate> inline 
+    void Calendar<ExtDate>::removeHoliday(const ExtDate& d) {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
 #ifdef QL_HIGH_RESOLUTION_DATE
-        const Date _d(d.dayOfMonth(), d.month(), d.year());
+        const ExtDate _d(d.dayOfMonth(), d.month(), d.year());
 #else
-        const Date& _d = d;
+        const ExtDate& _d = d;
 #endif
 
         // if d was an artificially-added holiday, revert the change
@@ -60,15 +60,15 @@ namespace QuantLib {
         if (!impl_->isBusinessDay(_d))
             impl_->removedHolidays.insert(_d);
     }
-    inline
-    Date Calendar::adjust(const Date& d,
+    template <class ExtDate> inline 
+    ExtDate Calendar<ExtDate>::adjust(const ExtDate& d,
                           BusinessDayConvention c) const {
-        QL_REQUIRE(d != Date(), "null date");
+        QL_REQUIRE(d != ExtDate(), "null date");
 
         if (c == Unadjusted)
             return d;
 
-        Date d1 = d;
+        ExtDate d1 = d;
         if (c == Following || c == ModifiedFollowing 
             || c == HalfMonthModifiedFollowing) {
             while (isHoliday(d1))
@@ -91,7 +91,7 @@ namespace QuantLib {
                 return adjust(d,Following);
             }
         } else if (c == Nearest) {
-            Date d2 = d;
+            ExtDate d2 = d;
             while (isHoliday(d1) && isHoliday(d2))
             {
                 ++d1;
@@ -106,16 +106,16 @@ namespace QuantLib {
         }
         return d1;
     }
-    inline
-    Date Calendar::advance(const Date& d,
+    template <class ExtDate> inline 
+    ExtDate Calendar<ExtDate>::advance(const ExtDate& d,
                            Integer n, TimeUnit unit,
                            BusinessDayConvention c,
                            bool endOfMonth) const {
-        QL_REQUIRE(d!=Date(), "null date");
+        QL_REQUIRE(d!=ExtDate(), "null date");
         if (n == 0) {
             return adjust(d,c);
         } else if (unit == Days) {
-            Date d1 = d;
+            ExtDate d1 = d;
             if (n > 0) {
                 while (n > 0) {
                     ++d1;
@@ -133,43 +133,44 @@ namespace QuantLib {
             }
             return d1;
         } else if (unit == Weeks) {
-            Date d1 = d + n*unit;
+            ExtDate d1 = d + n*unit;
             return adjust(d1,c);
         } else {
-            Date d1 = d + n*unit;
+            ExtDate d1 = d + n*unit;
 
             // we are sure the unit is Months or Years
             if (endOfMonth && isEndOfMonth(d))
-                return Calendar::endOfMonth(d1);
+                return Calendar<ExtDate>::endOfMonth(d1);
 
             return adjust(d1, c);
         }
     }
-    inline
-    Date Calendar::advance(const Date & d,
+    template <class ExtDate> inline 
+    ExtDate Calendar<ExtDate>::advance(const ExtDate & d,
                            const Period & p,
                            BusinessDayConvention c,
                            bool endOfMonth) const {
         return advance(d, p.length(), p.units(), c, endOfMonth);
     }
-
-    Date::serial_type Calendar::businessDaysBetween(const Date& from,
-                                                    const Date& to,
+    template <class ExtDate>
+    inline 
+    serial_type Calendar<ExtDate>::businessDaysBetween(const ExtDate& from,
+                                                    const ExtDate& to,
                                                     bool includeFirst,
                                                     bool includeLast) const {
-        Date::serial_type wd = 0;
+        serial_type wd = 0;
         if (from != to) {
             if (from < to) {
                 // the last one is treated separately to avoid
-                // incrementing Date::maxDate()
-                for (Date d = from; d < to; ++d) {
+                // incrementing ExtDate::maxDate()
+                for (ExtDate d = from; d < to; ++d) {
                     if (isBusinessDay(d))
                         ++wd;
                 }
                 if (isBusinessDay(to))
                     ++wd;
             } else if (from > to) {
-                for (Date d = to; d < from; ++d) {
+                for (ExtDate d = to; d < from; ++d) {
                     if (isBusinessDay(d))
                         ++wd;
                 }
@@ -194,12 +195,12 @@ namespace QuantLib {
 
 
    // Western calendars
-    inline
-    bool Calendar::WesternImpl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline 
+    bool Calendar<ExtDate>::WesternImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    Day Calendar::WesternImpl::easterMonday(Year y) {
+    template <class ExtDate> inline 
+    Day Calendar<ExtDate>::WesternImpl::easterMonday(Year y) {
         static const Day EasterMonday[] = {
                   98,  90, 103,  95, 114, 106,  91, 111, 102,   // 1901-1909
              87, 107,  99,  83, 103,  95, 115,  99,  91, 111,   // 1910-1919
@@ -236,12 +237,12 @@ namespace QuantLib {
     }
 
     // Orthodox calendars
-    inline
-    bool Calendar::OrthodoxImpl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline 
+    bool Calendar<ExtDate>::OrthodoxImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    Day Calendar::OrthodoxImpl::easterMonday(Year y) {
+    template <class ExtDate> inline 
+    Day Calendar<ExtDate>::OrthodoxImpl::easterMonday(Year y) {
         static const Day EasterMonday[] = {
                  105, 118, 110, 102, 121, 106, 126, 118, 102,   // 1901-1909
             122, 114,  99, 118, 110,  95, 115, 106, 126, 111,   // 1910-1919
@@ -276,38 +277,38 @@ namespace QuantLib {
         };
         return EasterMonday[y-1901];
     }
-    inline
-    std::vector<Date> Calendar::holidayList(const Calendar& calendar,
-        const Date& from, const Date& to, bool includeWeekEnds) {
+    template <class ExtDate> inline 
+    std::vector<ExtDate> Calendar<ExtDate>::holidayList(const Calendar& calendar,
+        const ExtDate& from, const ExtDate& to, bool includeWeekEnds) {
 
         QL_REQUIRE(to>from, "'from' date ({}) must be earlier than 'to' date ({})",from,to);
-        std::vector<Date> result;
-        for (Date d = from; d <= to; ++d) {
+        std::vector<ExtDate> result;
+        for (ExtDate d = from; d <= to; ++d) {
             if (calendar.isHoliday(d)
                 && (includeWeekEnds || !calendar.isWeekend(d.weekday())))
                 result.push_back(d);
        }
        return result;
     }
-    inline
-    std::vector<Date> Calendar::holidayList(
-        const Date& from, const Date& to, bool includeWeekEnds) const {
+    template <class ExtDate> inline 
+    std::vector<ExtDate> Calendar<ExtDate>::holidayList(
+        const ExtDate& from, const ExtDate& to, bool includeWeekEnds) const {
     
     QL_REQUIRE(to > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);    
-        std::vector<Date> result;
-        for (Date d = from; d <= to; ++d) {
+        std::vector<ExtDate> result;
+        for (ExtDate d = from; d <= to; ++d) {
             if (isHoliday(d) && (includeWeekEnds || !isWeekend(d.weekday())))
                 result.push_back(d);
        }
        return result;
     }
-    inline
-    std::vector<Date> Calendar::businessDayList(
-        const Date& from, const Date& to) const {
+    template <class ExtDate> inline 
+    std::vector<ExtDate> Calendar<ExtDate>::businessDayList(
+        const ExtDate& from, const ExtDate& to) const {
 
         QL_REQUIRE(to > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);
-        std::vector<Date> result;
-        for (Date d = from; d <= to; ++d) {
+        std::vector<ExtDate> result;
+        for (ExtDate d = from; d <= to; ++d) {
             if (isBusinessDay(d))
                 result.push_back(d);
        }

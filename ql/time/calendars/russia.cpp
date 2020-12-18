@@ -22,20 +22,20 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    Russia::Russia(Russia::Market market) {
+    template <class ExtDate> inline
+    Russia<ExtDate>::Russia(Russia<ExtDate>::Market market) {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-                                                  new Russia::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> exchangeImpl(
-                                                    new Russia::ExchangeImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                                  new Russia<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
+                                                    new Russia<ExtDate>::ExchangeImpl);
 
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case MOEX:
-            impl_ = exchangeImpl;
+            this->impl_ = exchangeImpl;
             break;
           default:
             QL_FAIL("unknown market");
@@ -80,13 +80,13 @@ namespace QuantLib {
         }
 
     }
-    inline
-    bool Russia::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Russia<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's holidays
             || (y <= 2005 && d <= 2 && m == January)
             || (y >= 2005 && d <= 5 && m == January)
@@ -218,8 +218,8 @@ namespace QuantLib {
         }
 
     }
-    inline
-    bool Russia::ExchangeImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Russia<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -234,7 +234,7 @@ namespace QuantLib {
             return true;
 
         // Known holidays
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // Defender of the Fatherland Day
             || (d == 23 && m == February)
             // International Women's Day (possibly moved to Monday)

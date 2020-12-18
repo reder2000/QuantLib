@@ -122,17 +122,16 @@ namespace QuantLib {
               month, months, and weekdays is checked over the whole
               date range.
     */
-
+    using serial_type=std::int_fast32_t ;
     class Date {
       public:
         //! serial number type
-        typedef std::int_fast32_t serial_type;
         //! \name constructors
         //@{
         //! Default constructor returning a null date.
         Date();
         //! Constructor taking a serial number as given by Applix or Excel.
-        explicit Date(Date::serial_type serialNumber);
+        explicit Date(serial_type serialNumber);
         //! More traditional constructor.
         Date(Day d, Month m, Year y);
 
@@ -154,7 +153,7 @@ namespace QuantLib {
         Day dayOfYear() const;
         Month month() const;
         Year year() const;
-        Date::serial_type serialNumber() const;
+        serial_type serialNumber() const;
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         Hour hours() const;
@@ -173,11 +172,11 @@ namespace QuantLib {
         //! \name date algebra
         //@{
         //! increments date by the given number of days
-        Date& operator+=(Date::serial_type days);
+        Date& operator+=(serial_type days);
         //! increments date by the given period
         Date& operator+=(const Period&);
         //! decrement date by the given number of days
-        Date& operator-=(Date::serial_type days);
+        Date& operator-=(serial_type days);
         //! decrements date by the given period
         Date& operator-=(const Period&);
         //! 1-day pre-increment
@@ -189,11 +188,11 @@ namespace QuantLib {
         //! 1-day post-decrement
         Date operator--(int );
         //! returns a new date incremented by the given number of days
-        Date operator+(Date::serial_type days) const;
+        Date operator+(serial_type days) const;
         //! returns a new date incremented by the given period
         Date operator+(const Period&) const;
         //! returns a new date decremented by the given number of days
-        Date operator-(Date::serial_type days) const;
+        Date operator-(serial_type days) const;
         //! returns a new date decremented by the given period
         Date operator-(const Period&) const;
         //@}
@@ -244,25 +243,25 @@ namespace QuantLib {
         //@}
 
       private:
-        static Date::serial_type minimumSerialNumber();
-        static Date::serial_type maximumSerialNumber();
-        static void checkSerialNumber(Date::serial_type serialNumber);
+        static serial_type minimumSerialNumber();
+        static serial_type maximumSerialNumber();
+        static void checkSerialNumber(serial_type serialNumber);
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         boost::posix_time::ptime dateTime_;
 #else
-        Date::serial_type serialNumber_;
+        serial_type serialNumber_;
         static Date advance(const Date& d, Integer units, TimeUnit);
         static Integer monthLength(Month m, bool leapYear);
         static Integer monthOffset(Month m, bool leapYear);
-        static Date::serial_type yearOffset(Year y);
+        static serial_type yearOffset(Year y);
 #endif
     };
 
     /*! \relates Date
         \brief Difference in days between dates
     */
-    Date::serial_type operator-(const Date&, const Date&);
+    serial_type operator-(const Date&, const Date&);
     /*! \relates Date
         \brief Difference in days (including fraction of days) between dates
     */
@@ -291,7 +290,7 @@ namespace QuantLib {
       \code{.cpp}
       #include <boost/unordered_set.hpp>
 
-      boost::unordered_set<Date> set;
+      boost::unordered_set<ExtDate> set;
       Date d = Date(1, Jan, 2020); 
 
       set.insert(d);
@@ -397,15 +396,15 @@ namespace QuantLib {
         return serialNumber_ - yearOffset(year());
     }
 
-    inline Date::serial_type Date::serialNumber() const {
+    inline serial_type Date::serialNumber() const {
         return serialNumber_;
     }
 
-    inline Date Date::operator+(Date::serial_type days) const {
+    inline Date Date::operator+(serial_type days) const {
         return Date(serialNumber_+days);
     }
 
-    inline Date Date::operator-(Date::serial_type days) const {
+    inline Date Date::operator-(serial_type days) const {
         return Date(serialNumber_-days);
     }
 
@@ -427,7 +426,7 @@ namespace QuantLib {
        return (d.dayOfMonth() == monthLength(d.month(), isLeap(d.year())));
     }
 
-    inline Date::serial_type operator-(const Date& d1, const Date& d2) {
+    inline serial_type operator-(const Date& d1, const Date& d2) {
         return d1.serialNumber()-d2.serialNumber();
     }
 

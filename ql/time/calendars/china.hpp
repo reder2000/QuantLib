@@ -55,24 +55,24 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class China : public Calendar {
+    template <class ExtDate>
+    class China : public Calendar<ExtDate> {
       private:
-        class SseImpl : public Calendar::Impl {
+        class SseImpl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Shanghai stock exchange"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
 
-        class IbImpl : public Calendar::Impl {
+        class IbImpl : public Calendar<ExtDate>::Impl {
           public:
-            IbImpl()
-            : sseImpl(std::make_shared<China::SseImpl>()) {}
+            IbImpl() : sseImpl(std::make_shared<China<ExtDate>::SseImpl>()) {}
             std::string name() const { return "China inter bank market";}
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
           private:
-            std::shared_ptr<Calendar::Impl> sseImpl;
+            std::shared_ptr<Calendar<ExtDate>::Impl> sseImpl;
         };
       public:
         enum Market { SSE,    //!< Shanghai stock exchange

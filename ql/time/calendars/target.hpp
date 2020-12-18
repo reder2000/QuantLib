@@ -47,12 +47,13 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class TARGET : public Calendar {
+    template <class ExtDate=Date>
+    class TARGET : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::WesternImpl {
+        class Impl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "TARGET"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         TARGET();

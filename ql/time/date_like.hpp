@@ -306,7 +306,7 @@ template <class ExtDate>
       \code{.cpp}
       #include <boost/unordered_set.hpp>
 
-      boost::unordered_set<Date> set;
+      boost::unordered_set<ExtDate> set;
       Date d = Date(1, Jan, 2020); 
 
       set.insert(d);
@@ -402,7 +402,7 @@ template <class ExtDate>
 
     ////! specialization of Null template for the Date class
     //template <>
-    //class Null<Date> {
+    //class Null<ExtDate> {
     //  public:
     //    Null() {}
     //    operator Date() const { return Date(); }

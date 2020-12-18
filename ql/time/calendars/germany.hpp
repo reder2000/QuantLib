@@ -109,32 +109,33 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class Germany : public Calendar {
+    template <class ExtDate=Date>
+    class Germany : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "German settlement"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class FrankfurtStockExchangeImpl : public Calendar::WesternImpl {
+        class FrankfurtStockExchangeImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Frankfurt stock exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class XetraImpl : public Calendar::WesternImpl {
+        class XetraImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Xetra"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class EurexImpl : public Calendar::WesternImpl {
+        class EurexImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Eurex"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class EuwaxImpl : public Calendar::WesternImpl {
+        class EuwaxImpl : public Calendar<ExtDate>::WesternImpl {
         public:
             std::string name() const { return "Euwax"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
 
       public:

@@ -240,18 +240,18 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing dates...");
 
-    Date::serial_type minDate = Date::minDate().serialNumber()+1,
+    serial_type minDate = Date::minDate().serialNumber()+1,
                       maxDate = Date::maxDate().serialNumber();
 
-    Date::serial_type dyold = Date(minDate-1).dayOfYear(),
+    serial_type dyold = Date(minDate-1).dayOfYear(),
                       dold  = Date(minDate-1).dayOfMonth(),
                       mold  = Date(minDate-1).month(),
                       yold  = Date(minDate-1).year(),
                       wdold = Date(minDate-1).weekday();
 
-    for (Date::serial_type i=minDate; i<=maxDate; i++) {
+    for (serial_type i=minDate; i<=maxDate; i++) {
         Date t(i);
-        Date::serial_type serial = t.serialNumber();
+        serial_type serial = t.serialNumber();
 
         // check serial number consistency
         IF (serial != i)

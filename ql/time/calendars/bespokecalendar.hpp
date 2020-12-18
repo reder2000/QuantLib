@@ -37,20 +37,21 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class BespokeCalendar : public Calendar {
+    template <class ExtDate=Date>
+    class BespokeCalendar : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<ExtDate>::Impl {
           public:
             explicit Impl(const std::string& name = "");
             std::string name() const;
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
             void addWeekend(Weekday);
           private:
             std::set<Weekday> weekend_;
             std::string name_;
         };
-        std::shared_ptr<BespokeCalendar::Impl> bespokeImpl_;
+        std::shared_ptr<BespokeCalendar<ExtDate>::Impl> bespokeImpl_;
       public:
         /*! \warning different bespoke calendars created with the same
                      name (or different bespoke calendars created with

@@ -18,16 +18,16 @@
 */
 
 #include <ql/time/calendars/italy.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     Italy::Italy(Italy::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                                    new Italy::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> exchangeImpl(
+        static std::shared_ptr<Calendar::Impl> exchangeImpl(
                                                    new Italy::ExchangeImpl);
         switch (market) {
           case Settlement:
@@ -41,7 +41,7 @@ namespace QuantLib {
         }
     }
 
-
+    inline
     bool Italy::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -77,7 +77,7 @@ namespace QuantLib {
         return true;
     }
 
-
+    inline
     bool Italy::ExchangeImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();

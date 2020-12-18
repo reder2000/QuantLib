@@ -19,18 +19,18 @@
 */
 
 #include <ql/time/calendars/unitedkingdom.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     UnitedKingdom::UnitedKingdom(UnitedKingdom::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                            new UnitedKingdom::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> exchangeImpl(
+        static std::shared_ptr<Calendar::Impl> exchangeImpl(
                                            new UnitedKingdom::ExchangeImpl);
-        static ext::shared_ptr<Calendar::Impl> metalsImpl(
+        static std::shared_ptr<Calendar::Impl> metalsImpl(
                                            new UnitedKingdom::MetalsImpl);
         switch (market) {
           case Settlement:
@@ -46,7 +46,7 @@ namespace QuantLib {
             QL_FAIL("unknown market");
         }
     }
-
+    inline
     bool UnitedKingdom::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -89,7 +89,7 @@ namespace QuantLib {
         return true;
     }
 
-
+    inline
     bool UnitedKingdom::ExchangeImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -132,7 +132,7 @@ namespace QuantLib {
         return true;
     }
 
-
+    inline
     bool UnitedKingdom::MetalsImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();

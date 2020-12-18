@@ -22,14 +22,14 @@
 */
 
 #include <ql/time/calendars/unitedstates.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
 
     namespace {
 
         // a few rules used by multiple calendars
-
+        inline
         bool isWashingtonBirthday(Day d, Month m, Year y, Weekday w) {
             if (y >= 1971) {
                 // third Monday in February
@@ -40,7 +40,7 @@ namespace QuantLib {
                         || (d == 21 && w == Friday)) && m == February;
             }
         }
-
+        inline
         bool isMemorialDay(Day d, Month m, Year y, Weekday w) {
             if (y >= 1971) {
                 // last Monday in May
@@ -51,18 +51,18 @@ namespace QuantLib {
                         || (d == 29 && w == Friday)) && m == May;
             }
         }
-
+        inline
         bool isLaborDay(Day d, Month m, Year y, Weekday w) {
             // first Monday in September
             return d <= 7 && w == Monday && m == September;
         }
-
+        inline
         bool isColumbusDay(Day d, Month m, Year y, Weekday w) {
             // second Monday in October
             return (d >= 8 && d <= 14) && w == Monday && m == October
                 && y >= 1971;
         }
-
+        inline
         bool isVeteransDay(Day d, Month m, Year y, Weekday w) {
             if (y <= 1970 || y >= 1978) {
                 // November 11th, adjusted
@@ -73,7 +73,7 @@ namespace QuantLib {
                 return (d >= 22 && d <= 28) && w == Monday && m == October;
             }
         }
-     
+        inline
         bool isVeteransDayNoSaturday(Day d, Month m, Year y, Weekday w) {
             if (y <= 1970 || y >= 1978) {
                 // November 11th, adjusted, but no Saturday to Friday
@@ -84,21 +84,21 @@ namespace QuantLib {
             }
         }
     }
-    
+    inline
     UnitedStates::UnitedStates(UnitedStates::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                         new UnitedStates::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> liborImpactImpl(
+        static std::shared_ptr<Calendar::Impl> liborImpactImpl(
                                         new UnitedStates::LiborImpactImpl);
-        static ext::shared_ptr<Calendar::Impl> nyseImpl(
+        static std::shared_ptr<Calendar::Impl> nyseImpl(
                                         new UnitedStates::NyseImpl);
-        static ext::shared_ptr<Calendar::Impl> governmentImpl(
+        static std::shared_ptr<Calendar::Impl> governmentImpl(
                                         new UnitedStates::GovernmentBondImpl);
-        static ext::shared_ptr<Calendar::Impl> nercImpl(
+        static std::shared_ptr<Calendar::Impl> nercImpl(
                                         new UnitedStates::NercImpl);
-        static ext::shared_ptr<Calendar::Impl> federalReserveImpl(
+        static std::shared_ptr<Calendar::Impl> federalReserveImpl(
                                         new UnitedStates::FederalReserveImpl);
         switch (market) {
           case Settlement:
@@ -124,7 +124,7 @@ namespace QuantLib {
         }
     }
 
-
+    inline
     bool UnitedStates::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -159,7 +159,7 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
+    inline
     bool UnitedStates::LiborImpactImpl::isBusinessDay(const Date& date) const {
         // Since 2015 Independence Day only impacts Libor if it falls
         // on a weekday
@@ -172,7 +172,7 @@ namespace QuantLib {
             return true;
         return SettlementImpl::isBusinessDay(date);
     }
-
+    inline
     bool UnitedStates::NyseImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -257,7 +257,7 @@ namespace QuantLib {
         return true;
     }
 
-
+    inline
     bool UnitedStates::GovernmentBondImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -304,7 +304,7 @@ namespace QuantLib {
         return true;
     }
 
-
+    inline
     bool UnitedStates::NercImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -327,7 +327,7 @@ namespace QuantLib {
         return true;
     }
  
- 
+ inline
     bool UnitedStates::FederalReserveImpl::isBusinessDay(const Date& date) const {
         // see https://www.frbservices.org/holidayschedules/ for details
         Weekday w = date.weekday();

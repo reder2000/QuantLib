@@ -23,15 +23,15 @@
 */
 
 #include <ql/time/calendars/southkorea.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     SouthKorea::SouthKorea(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                               new SouthKorea::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> krxImpl(
+        static std::shared_ptr<Calendar::Impl> krxImpl(
                                                      new SouthKorea::KrxImpl);
         switch (market) {
           case Settlement:
@@ -44,11 +44,11 @@ namespace QuantLib {
             QL_FAIL("unknown market");
         }
     }
-
+    inline
     bool SouthKorea::SettlementImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-
+    inline
     bool SouthKorea::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -199,7 +199,7 @@ namespace QuantLib {
 
         return true;
     }
-
+    inline
     bool SouthKorea::KrxImpl::isBusinessDay(const Date& date) const {
         // public holidays
         if ( !SettlementImpl::isBusinessDay(date) )

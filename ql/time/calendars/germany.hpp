@@ -20,7 +20,7 @@
 /*! \file germany.hpp
     \brief German calendars
 */
-
+#pragma once
 #ifndef quantlib_germany_calendar_hpp
 #define quantlib_germany_calendar_hpp
 
@@ -150,5 +150,5 @@ namespace QuantLib {
 
 }
 
-
+#include "germany.cpp"
 #endif

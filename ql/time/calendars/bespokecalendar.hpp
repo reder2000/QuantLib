@@ -20,7 +20,7 @@
 /*! \file bespokecalendar.hpp
     \brief Bespoke calendar
 */
-
+#pragma once
 #ifndef quantlib_bespoke_calendar_hpp
 #define quantlib_bespoke_calendar_hpp
 
@@ -50,7 +50,7 @@ namespace QuantLib {
             std::set<Weekday> weekend_;
             std::string name_;
         };
-        ext::shared_ptr<BespokeCalendar::Impl> bespokeImpl_;
+        std::shared_ptr<BespokeCalendar::Impl> bespokeImpl_;
       public:
         /*! \warning different bespoke calendars created with the same
                      name (or different bespoke calendars created with
@@ -63,5 +63,5 @@ namespace QuantLib {
 
 }
 
-
+#include "bespokecalendar.cpp"
 #endif

@@ -25,7 +25,7 @@
 #ifndef quantlib_types_hpp
 #define quantlib_types_hpp
 
-#include <ql/qldefines.hpp>
+#include "ql_qldefines.hpp"
 #include <cstddef>
 
 namespace QuantLib {

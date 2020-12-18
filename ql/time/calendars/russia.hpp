@@ -20,7 +20,7 @@
 /*! \file russia.hpp
     \brief Russian calendar
 */
-
+#pragma once
 #ifndef quantlib_russia_calendar_hpp
 #define quantlib_russia_calendar_hpp
 
@@ -77,5 +77,5 @@ namespace QuantLib {
 
 }
 
-
+#include "russia.cpp"
 #endif

@@ -21,7 +21,7 @@
 /*! \file italy.hpp
     \brief Italian calendars
 */
-
+#pragma once
 #ifndef quantlib_italy_calendar_hpp
 #define quantlib_italy_calendar_hpp
 
@@ -89,5 +89,5 @@ namespace QuantLib {
 
 }
 
-
+#include "italy.cpp"
 #endif

@@ -18,22 +18,22 @@
 */
 
 #include <ql/time/calendars/germany.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     Germany::Germany(Germany::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
             new Germany::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> frankfurtStockExchangeImpl(
+        static std::shared_ptr<Calendar::Impl> frankfurtStockExchangeImpl(
             new Germany::FrankfurtStockExchangeImpl);
-        static ext::shared_ptr<Calendar::Impl> xetraImpl(
+        static std::shared_ptr<Calendar::Impl> xetraImpl(
             new Germany::XetraImpl);
-        static ext::shared_ptr<Calendar::Impl> eurexImpl(
+        static std::shared_ptr<Calendar::Impl> eurexImpl(
             new Germany::EurexImpl);
-        static ext::shared_ptr<Calendar::Impl> euwaxImpl(
+        static std::shared_ptr<Calendar::Impl> euwaxImpl(
             new Germany::EuwaxImpl);
 
         switch (market) {
@@ -57,7 +57,7 @@ namespace QuantLib {
         }
     }
 
-
+    inline
     bool Germany::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -116,7 +116,7 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
+    inline
     bool Germany::XetraImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -141,7 +141,7 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
+    inline
     bool Germany::EurexImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
@@ -168,7 +168,7 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-    
+    inline
     bool Germany::EuwaxImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();

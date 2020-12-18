@@ -24,7 +24,7 @@ FOR A PARTICULAR PURPOSE.  See the license for more details.
 #ifndef QL_ENABLE_THREAD_SAFE_OBSERVER_PATTERN
 
 namespace QuantLib {
-
+    inline
     void ObservableSettings::enableUpdates() {
         updatesEnabled_  = true;
         updatesDeferred_ = false;
@@ -53,7 +53,7 @@ namespace QuantLib {
         }
     }
 
-
+    inline
     void Observable::notifyObservers() {
         if (!settings_.updatesEnabled()) {
             // if updates are only deferred, flag this for later notification

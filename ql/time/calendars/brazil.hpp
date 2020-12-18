@@ -21,7 +21,7 @@
 /*! \file brazil.hpp
     \brief Brazilian calendar
 */
-
+#pragma once
 #ifndef quantlib_brazilian_calendar_hpp
 #define quantlib_brazilian_calendar_hpp
 
@@ -96,6 +96,6 @@ namespace QuantLib {
 
 }
 
-
+#include "brazil.cpp"
 #endif
 

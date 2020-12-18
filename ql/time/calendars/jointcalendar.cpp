@@ -24,30 +24,30 @@
 #include <sstream>
 
 namespace QuantLib {
-    inline
-    JointCalendar::Impl::Impl(const Calendar& c1,
-                              const Calendar& c2,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::Impl::Impl(const Calendar<ExtDate>& c1,
+                              const Calendar<ExtDate>& c2,
                               JointCalendarRule r)
     : rule_(r), calendars_(2) {
         calendars_[0] = c1;
         calendars_[1] = c2;
     }
 
-    inline
-    JointCalendar::Impl::Impl(const Calendar& c1,
-                              const Calendar& c2,
-                              const Calendar& c3,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::Impl::Impl(const Calendar<ExtDate>& c1,
+                              const Calendar<ExtDate>& c2,
+                              const Calendar<ExtDate>& c3,
                               JointCalendarRule r)
     : rule_(r), calendars_(3) {
         calendars_[0] = c1;
         calendars_[1] = c2;
         calendars_[2] = c3;
     }
-    inline
-    JointCalendar::Impl::Impl(const Calendar& c1,
-                              const Calendar& c2,
-                              const Calendar& c3,
-                              const Calendar& c4,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::Impl::Impl(const Calendar<ExtDate>& c1,
+                              const Calendar<ExtDate>& c2,
+                              const Calendar<ExtDate>& c3,
+                              const Calendar<ExtDate>& c4,
                               JointCalendarRule r)
     : rule_(r), calendars_(4) {
         calendars_[0] = c1;
@@ -55,13 +55,13 @@ namespace QuantLib {
         calendars_[2] = c3;
         calendars_[3] = c4;
     }
-    inline
-    JointCalendar::Impl::Impl(const std::vector<Calendar> &cv,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::Impl::Impl(const std::vector<Calendar<ExtDate>> &cv,
                               JointCalendarRule r)
     : rule_(r), calendars_(cv){
     }
-    inline
-    std::string JointCalendar::Impl::name() const {
+    template <class ExtDate> inline
+    std::string JointCalendar<ExtDate>::Impl::name() const {
         std::ostringstream out;
         switch (rule_) {
           case JoinHolidays:
@@ -74,24 +74,24 @@ namespace QuantLib {
             QL_FAIL("unknown joint calendar rule");
         }
         out << calendars_.front().name();
-        std::vector<Calendar>::const_iterator i;
-        for (i=calendars_.begin()+1; i!=calendars_.end(); ++i)
+        //std::vector<Calendar<ExtDate>>::const_iterator i;
+        for (auto i=calendars_.begin()+1; i!=calendars_.end(); ++i)
             out << ", " << i->name();
         out << ")";
         return out.str();
     }
-    inline
-    bool JointCalendar::Impl::isWeekend(Weekday w) const {
-        std::vector<Calendar>::const_iterator i;
+    template <class ExtDate> inline
+    bool JointCalendar<ExtDate>::Impl::isWeekend(Weekday w) const {
+        //std::vector<Calendar<ExtDate> >::const_iterator i;
         switch (rule_) {
           case JoinHolidays:
-            for (i=calendars_.begin(); i!=calendars_.end(); ++i) {
+            for (auto i=calendars_.begin(); i!=calendars_.end(); ++i) {
                 if (i->isWeekend(w))
                     return true;
             }
             return false;
           case JoinBusinessDays:
-            for (i=calendars_.begin(); i!=calendars_.end(); ++i) {
+            for (auto i=calendars_.begin(); i!=calendars_.end(); ++i) {
                 if (!i->isWeekend(w))
                     return false;
             }
@@ -100,18 +100,18 @@ namespace QuantLib {
             QL_FAIL("unknown joint calendar rule");
         }
     }
-    inline
-    bool JointCalendar::Impl::isBusinessDay(const Date& date) const {
-        std::vector<Calendar>::const_iterator i;
+    template <class ExtDate> inline
+    bool JointCalendar<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
+        //std::vector<Calendar<ExtDate>>::const_iterator i;
         switch (rule_) {
           case JoinHolidays:
-            for (i=calendars_.begin(); i!=calendars_.end(); ++i) {
+            for (auto i=calendars_.begin(); i!=calendars_.end(); ++i) {
                 if (i->isHoliday(date))
                     return false;
             }
             return true;
           case JoinBusinessDays:
-            for (i=calendars_.begin(); i!=calendars_.end(); ++i) {
+            for (auto i=calendars_.begin(); i!=calendars_.end(); ++i) {
                 if (i->isBusinessDay(date))
                     return true;
             }
@@ -121,35 +121,35 @@ namespace QuantLib {
         }
     }
 
-    inline
-    JointCalendar::JointCalendar(const Calendar& c1,
-                                 const Calendar& c2,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::JointCalendar(const Calendar<ExtDate>& c1,
+                                 const Calendar<ExtDate>& c2,
                                  JointCalendarRule r) {
-        impl_ = std::shared_ptr<Calendar::Impl>(
-                                            new JointCalendar::Impl(c1,c2,r));
+        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+                                            new JointCalendar<ExtDate>::Impl(c1,c2,r));
     }
-    inline
-    JointCalendar::JointCalendar(const Calendar& c1,
-                                 const Calendar& c2,
-                                 const Calendar& c3,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::JointCalendar(const Calendar<ExtDate>& c1,
+                                 const Calendar<ExtDate>& c2,
+                                 const Calendar<ExtDate>& c3,
                                  JointCalendarRule r) {
-        impl_ = std::shared_ptr<Calendar::Impl>(
-                                         new JointCalendar::Impl(c1,c2,c3,r));
+        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+                                         new JointCalendar<ExtDate>::Impl(c1,c2,c3,r));
     }
-    inline
-    JointCalendar::JointCalendar(const Calendar& c1,
-                                 const Calendar& c2,
-                                 const Calendar& c3,
-                                 const Calendar& c4,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::JointCalendar(const Calendar<ExtDate>& c1,
+                                 const Calendar<ExtDate>& c2,
+                                 const Calendar<ExtDate>& c3,
+                                 const Calendar<ExtDate>& c4,
                                  JointCalendarRule r) {
-        impl_ = std::shared_ptr<Calendar::Impl>(
-                                      new JointCalendar::Impl(c1,c2,c3,c4,r));
+        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+                                      new JointCalendar<ExtDate>::Impl(c1,c2,c3,c4,r));
     }
-    inline
-    JointCalendar::JointCalendar(const std::vector<Calendar> &cv,
+    template <class ExtDate> inline
+    JointCalendar<ExtDate>::JointCalendar(const std::vector<Calendar<ExtDate>> &cv,
                                  JointCalendarRule r) {
-        impl_ = std::shared_ptr<Calendar::Impl>(
-                                      new JointCalendar::Impl(cv,r));
+        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+                                      new JointCalendar<ExtDate>::Impl(cv,r));
     }
 
 }

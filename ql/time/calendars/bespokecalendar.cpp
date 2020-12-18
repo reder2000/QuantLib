@@ -21,34 +21,34 @@
 #include <sstream>
 
 namespace QuantLib {
-    inline
-    BespokeCalendar::Impl::Impl(const std::string& name)
+    template <class ExtDate> inline
+    BespokeCalendar<ExtDate>::Impl::Impl(const std::string& name)
     : name_(name) {}
-    inline
-    std::string BespokeCalendar::Impl::name() const {
+    template <class ExtDate> inline
+    std::string BespokeCalendar<ExtDate>::Impl::name() const {
         return name_;
     }
-    inline
-    bool BespokeCalendar::Impl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline
+    bool BespokeCalendar<ExtDate>::Impl::isWeekend(Weekday w) const {
         return (weekend_.find(w) != weekend_.end());
     }
-    inline
-    bool BespokeCalendar::Impl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool BespokeCalendar<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
         return !isWeekend(date.weekday());
     }
-    inline
-    void BespokeCalendar::Impl::addWeekend(Weekday w) {
+    template <class ExtDate> inline
+    void BespokeCalendar<ExtDate>::Impl::addWeekend(Weekday w) {
         weekend_.insert(w);
     }
 
-    inline
-    BespokeCalendar::BespokeCalendar(const std::string& name) {
-        bespokeImpl_ = std::make_shared<BespokeCalendar::Impl>(
+    template <class ExtDate> inline
+    BespokeCalendar<ExtDate>::BespokeCalendar(const std::string& name) {
+        bespokeImpl_ = std::make_shared<BespokeCalendar<ExtDate>::Impl>(
                                              name);
-        impl_ = bespokeImpl_;
+        this->impl_ = bespokeImpl_;
     }
-    inline
-    void BespokeCalendar::addWeekend(Weekday w) {
+    template <class ExtDate> inline
+    void BespokeCalendar<ExtDate>::addWeekend(Weekday w) {
         bespokeImpl_->addWeekend(w);
     }
 

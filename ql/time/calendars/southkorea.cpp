@@ -26,36 +26,36 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    SouthKorea::SouthKorea(Market market) {
+    template <class ExtDate> inline
+    SouthKorea<ExtDate>::SouthKorea(Market market) {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-                                              new SouthKorea::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> krxImpl(
-                                                     new SouthKorea::KrxImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                              new SouthKorea<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> krxImpl(
+                                                     new SouthKorea<ExtDate>::KrxImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case KRX:
-            impl_ = krxImpl;
+            this->impl_ = krxImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-    inline
-    bool SouthKorea::SettlementImpl::isWeekend(Weekday w) const {
+    template <class ExtDate> inline
+    bool SouthKorea<ExtDate>::SettlementImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-    inline
-    bool SouthKorea::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool SouthKorea<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Independence Day
@@ -199,8 +199,8 @@ namespace QuantLib {
 
         return true;
     }
-    inline
-    bool SouthKorea::KrxImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool SouthKorea<ExtDate>::KrxImpl::isBusinessDay(const ExtDate& date) const {
         // public holidays
         if ( !SettlementImpl::isBusinessDay(date) )
             return false;

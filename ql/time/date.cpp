@@ -55,9 +55,9 @@ namespace QuantLib {
 #ifndef QL_HIGH_RESOLUTION_DATE
     // constructors
 inline    Date::Date()
-    : serialNumber_(Date::serial_type(0)) {}
+    : serialNumber_(serial_type(0)) {}
     inline
-    Date::Date(Date::serial_type serialNumber)
+    Date::Date(serial_type serialNumber)
     : serialNumber_(serialNumber) {
         checkSerialNumber(serialNumber);
     }
@@ -96,8 +96,8 @@ inline    Date::Date()
         return y;
     }
     inline
-    Date& Date::operator+=(Date::serial_type days) {
-        Date::serial_type serial = serialNumber_ + days;
+    Date& Date::operator+=(serial_type days) {
+        serial_type serial = serialNumber_ + days;
         checkSerialNumber(serial);
         serialNumber_ = serial;
         return *this;
@@ -108,8 +108,8 @@ inline    Date::Date()
         return *this;
     }
     inline
-    Date& Date::operator-=(Date::serial_type days) {
-        Date::serial_type serial = serialNumber_ - days;
+    Date& Date::operator-=(serial_type days) {
+        serial_type serial = serialNumber_ - days;
         checkSerialNumber(serial);
         serialNumber_ = serial;
         return *this;
@@ -121,14 +121,14 @@ inline    Date::Date()
     }
     inline
     Date& Date::operator++() {
-        Date::serial_type serial = serialNumber_ + 1;
+        serial_type serial = serialNumber_ + 1;
         checkSerialNumber(serial);
         serialNumber_ = serial;
         return *this;
     }
     inline
     Date& Date::operator--() {
-        Date::serial_type serial = serialNumber_ - 1;
+        serial_type serial = serialNumber_ - 1;
         checkSerialNumber(serial);
         serialNumber_ = serial;
         return *this;
@@ -275,10 +275,10 @@ inline    Date::Date()
         return (leapYear? MonthLeapOffset[m-1] : MonthOffset[m-1]);
     }
     inline
-    Date::serial_type Date::yearOffset(Year y) {
+    serial_type Date::yearOffset(Year y) {
         // the list of all December 31st in the preceding year
         // e.g. for 1901 yearOffset[1] is 366, that is, December 31 1900
-        static const Date::serial_type YearOffset[] = {
+        static const serial_type YearOffset[] = {
             // 1900-1909
                 0,  366,  731, 1096, 1461, 1827, 2192, 2557, 2922, 3288,
             // 1910-1919
@@ -527,7 +527,7 @@ inline    Date::Date()
                millisec*(time_duration::ticks_per_second()/1000)
              + microsec*(time_duration::ticks_per_second()/1000000))) {}
 
-    Date::Date(Date::serial_type serialNumber)
+    Date::Date(serial_type serialNumber)
     : dateTime_(
          serialNumberDateReference() +
          boost::gregorian::days(serialNumber)) {
@@ -597,8 +597,8 @@ inline    Date::Date()
         return time_duration::ticks_per_second();
     }
 
-    Date::serial_type Date::serialNumber() const {
-        const Date::serial_type n = (dateTime_.date()
+    serial_type Date::serialNumber() const {
+        const serial_type n = (dateTime_.date()
             - serialNumberDateReference()).days();
         checkSerialNumber(n);
 
@@ -607,7 +607,7 @@ inline    Date::Date()
 
     const ptime& Date::dateTime() const { return dateTime_; }
 
-    Date& Date::operator+=(Date::serial_type d) {
+    Date& Date::operator+=(serial_type d) {
         dateTime_ += boost::gregorian::days(d);
         return *this;
     }
@@ -617,7 +617,7 @@ inline    Date::Date()
         return *this;
     }
 
-    Date& Date::operator-=(Date::serial_type d) {
+    Date& Date::operator-=(serial_type d) {
         dateTime_ -= boost::gregorian::days(d);
         return *this;
     }
@@ -636,14 +636,14 @@ inline    Date::Date()
         return *this;
     }
 
-    Date Date::operator+(Date::serial_type days) const {
+    Date Date::operator+(serial_type days) const {
         Date retVal(*this);
         retVal+=days;
 
         return retVal;
     }
 
-    Date Date::operator-(Date::serial_type days) const {
+    Date Date::operator-(serial_type days) const {
         Date retVal(*this);
         retVal-=days;
 
@@ -692,12 +692,12 @@ inline    Date::Date()
     }
 
 
-    Date::serial_type operator-(const Date& d1, const Date& d2) {
+    serial_type operator-(const Date& d1, const Date& d2) {
         return (d1.dateTime().date() - d2.dateTime().date()).days();
     }
 
     Time daysBetween(const Date& d1, const Date& d2) {
-        const Date::serial_type days = d2 - d1;
+        const serial_type days = d2 - d1;
         return days + d2.fractionOfDay() - d1.fractionOfDay();
     }
 
@@ -726,15 +726,15 @@ inline    Date::Date()
     }
 #endif
     inline
-    Date::serial_type Date::minimumSerialNumber() {
+    serial_type Date::minimumSerialNumber() {
         return 367;       // Jan 1st, 1901
     }
     inline
-    Date::serial_type Date::maximumSerialNumber() {
+    serial_type Date::maximumSerialNumber() {
         return 109574;    // Dec 31st, 2199
     }
     inline
-    void Date::checkSerialNumber(typename Date::serial_type serialNumber) {
+    void Date::checkSerialNumber(serial_type serialNumber) {
         QL_REQUIRE(serialNumber >= minimumSerialNumber() && serialNumber <= maximumSerialNumber(),
                    "Date's serial number ( {} ) outside "
                    "allowed range [{}-{}], i.e. [{}{}-{}]",
@@ -833,7 +833,7 @@ inline    Date::Date()
         return seed;
 #else
 
-        return std::hash<Date::serial_type>()(d.serialNumber());
+        return std::hash<serial_type>()(d.serialNumber());
 #endif
     }
 

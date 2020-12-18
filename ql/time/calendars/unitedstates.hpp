@@ -128,37 +128,38 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class UnitedStates : public Calendar {
+    template <class ExtDate>
+    class UnitedStates : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "US settlement"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
         class LiborImpactImpl : public SettlementImpl {
           public:
             std::string name() const { return "US with Libor impact"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class NyseImpl : public Calendar::WesternImpl {
+        class NyseImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "New York stock exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class GovernmentBondImpl : public Calendar::WesternImpl {
+        class GovernmentBondImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "US government bond market"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class NercImpl : public Calendar::WesternImpl {
+        class NercImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "North American Energy Reliability Council"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class FederalReserveImpl : public Calendar::WesternImpl {
+        class FederalReserveImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Federal Reserve Bankwire System"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         //! US calendars

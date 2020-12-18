@@ -21,34 +21,34 @@
 #include "../ql_errors.hpp"
 
 namespace QuantLib {
-    inline
-    Italy::Italy(Italy::Market market) {
+    template <class ExtDate> inline
+    Italy<ExtDate>::Italy(Italy<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar::Impl> settlementImpl(
-                                                   new Italy::SettlementImpl);
-        static std::shared_ptr<Calendar::Impl> exchangeImpl(
-                                                   new Italy::ExchangeImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                                   new Italy<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
+                                                   new Italy<ExtDate>::ExchangeImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case Exchange:
-            impl_ = exchangeImpl;
+            this->impl_ = exchangeImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
 
-    inline
-    bool Italy::SettlementImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Italy<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Epiphany
@@ -77,14 +77,14 @@ namespace QuantLib {
         return true;
     }
 
-    inline
-    bool Italy::ExchangeImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Italy<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday

@@ -74,17 +74,18 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    class Brazil : public Calendar {
+    template <class ExtDate=Date>
+    class Brazil : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Brazil"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class ExchangeImpl : public Calendar::WesternImpl {
+        class ExchangeImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "BOVESPA"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         //! Brazilian calendars

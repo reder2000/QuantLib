@@ -52,36 +52,37 @@ namespace QuantLib {
         \test the correctness of the returned results is tested by
               reproducing the calculations.
     */
-    class JointCalendar : public Calendar {
+    template <class ExtDate>
+    class JointCalendar : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<ExtDate>::Impl {
           public:
-            Impl(const Calendar&, const Calendar&,
+            Impl(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
                  JointCalendarRule);
-            Impl(const Calendar&, const Calendar&,
-                 const Calendar&, JointCalendarRule);
-            Impl(const Calendar&, const Calendar&,
-                 const Calendar&, const Calendar&,
+            Impl(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
+                 const Calendar<ExtDate>&, JointCalendarRule);
+            Impl(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
+                 const Calendar<ExtDate>&, const Calendar<ExtDate>&,
                  JointCalendarRule);
-            Impl(const std::vector<Calendar>&,
+            Impl(const std::vector<Calendar<ExtDate>>&,
                  JointCalendarRule);
             std::string name() const;
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
           private:
             JointCalendarRule rule_;
-            std::vector<Calendar> calendars_;
+            std::vector<Calendar<ExtDate>> calendars_;
         };
       public:
-        JointCalendar(const Calendar&, const Calendar&,
+        JointCalendar(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
                       JointCalendarRule = JoinHolidays);
-        JointCalendar(const Calendar&, const Calendar&,
-                      const Calendar&,
+        JointCalendar(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
+                      const Calendar<ExtDate>&,
                       JointCalendarRule = JoinHolidays);
-        JointCalendar(const Calendar&, const Calendar&,
-                      const Calendar&, const Calendar&,
+        JointCalendar(const Calendar<ExtDate>&, const Calendar<ExtDate>&,
+                      const Calendar<ExtDate>&, const Calendar<ExtDate>&,
                       JointCalendarRule = JoinHolidays);
-        explicit JointCalendar(const std::vector<Calendar>&,
+        explicit JointCalendar(const std::vector<Calendar<ExtDate>>&,
                                JointCalendarRule = JoinHolidays);
     };
 

@@ -55,17 +55,18 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class Russia : public Calendar {
+    template <class ExtDate=Date>
+    class Russia : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::OrthodoxImpl {
+        class SettlementImpl : public Calendar<ExtDate>::OrthodoxImpl {
           public:
             std::string name() const { return "Russian settlement"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
-        class ExchangeImpl : public Calendar::OrthodoxImpl {
+        class ExchangeImpl : public Calendar<ExtDate>::OrthodoxImpl {
           public:
             std::string name() const { return "Moscow exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         //! Russian calendars

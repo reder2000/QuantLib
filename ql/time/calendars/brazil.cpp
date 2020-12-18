@@ -19,16 +19,16 @@
 */
 
 #include <ql/time/calendars/brazil.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     Brazil::Brazil(Brazil::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                                   new Brazil::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> exchangeImpl(
+        static std::shared_ptr<Calendar::Impl> exchangeImpl(
                                                     new Brazil::ExchangeImpl);
         switch (market) {
           case Settlement:
@@ -41,7 +41,7 @@ namespace QuantLib {
             QL_FAIL("unknown market");
         }
     }
-
+    inline
     bool Brazil::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -77,7 +77,7 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
+    inline
     bool Brazil::ExchangeImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();

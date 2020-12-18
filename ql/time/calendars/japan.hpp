@@ -20,7 +20,7 @@
 /*! \file japan.hpp
     \brief Japanese calendar
 */
-
+#pragma once
 #ifndef quantlib_japanese_calendar_hpp
 #define quantlib_japanese_calendar_hpp
 
@@ -73,5 +73,5 @@ namespace QuantLib {
 
 }
 
-
+#include "japan.cpp"
 #endif

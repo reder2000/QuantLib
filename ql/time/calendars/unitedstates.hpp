@@ -27,7 +27,7 @@
 
 #ifndef quantlib_united_states_calendar_hpp
 #define quantlib_united_states_calendar_hpp
-
+#pragma once
 #include <ql/time/calendar.hpp>
 
 namespace QuantLib {
@@ -174,5 +174,5 @@ namespace QuantLib {
 
 }
 
-
+#include "unitedstates.cpp"
 #endif

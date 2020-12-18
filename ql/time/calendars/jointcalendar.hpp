@@ -21,7 +21,7 @@
 /*! \file jointcalendar.hpp
     \brief Joint calendar
 */
-
+#pragma once
 #ifndef quantlib_joint_calendar_h
 #define quantlib_joint_calendar_h
 
@@ -88,5 +88,5 @@ namespace QuantLib {
 }
 
 
-
+#include "jointcalendar.cpp"
 #endif

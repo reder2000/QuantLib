@@ -22,17 +22,17 @@
 #include <ql/time/calendars/japan.hpp>
 
 namespace QuantLib {
-
+    inline
     Japan::Japan() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Japan::Impl);
+        static std::shared_ptr<Calendar::Impl> impl(new Japan::Impl);
         impl_ = impl;
     }
-
+    inline
     bool Japan::Impl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-
+    inline
     bool Japan::Impl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();

@@ -19,15 +19,15 @@
 */
 
 #include <ql/time/calendars/russia.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     Russia::Russia(Russia::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static std::shared_ptr<Calendar::Impl> settlementImpl(
                                                   new Russia::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> exchangeImpl(
+        static std::shared_ptr<Calendar::Impl> exchangeImpl(
                                                     new Russia::ExchangeImpl);
 
         switch (market) {
@@ -43,7 +43,7 @@ namespace QuantLib {
     }
 
     namespace {
-
+        inline
         bool isExtraHolidaySettlementImpl(Day d, Month month, Year year) {
             switch (year) {
               case 2017:
@@ -80,7 +80,7 @@ namespace QuantLib {
         }
 
     }
-
+    inline
     bool Russia::SettlementImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -122,7 +122,7 @@ namespace QuantLib {
     }
 
     namespace {
-
+        inline
         bool isWorkingWeekend(Day d, Month month, Year year) {
             switch (year) {
               case 2012:
@@ -150,7 +150,7 @@ namespace QuantLib {
                 return false;
             }
         }
-
+        inline
         bool isExtraHolidayExchangeImpl(Day d, Month month, Year year) {
             switch (year) {
               case 2012:
@@ -218,7 +218,7 @@ namespace QuantLib {
         }
 
     }
-
+    inline
     bool Russia::ExchangeImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -228,8 +228,7 @@ namespace QuantLib {
         // the exchange was formally established in 2011, so data are only
         // available from 2012 to present
         if (y < 2012)
-            QL_FAIL("MOEX calendar for the year " << y
-                    << " does not exist.");
+            QL_FAIL("MOEX calendar for the year {} does not exist.",y);
 
         if (isWorkingWeekend(d,m,y))
             return true;

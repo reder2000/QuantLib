@@ -21,7 +21,7 @@
 /*! \file unitedkingdom.hpp
     \brief UK calendars
 */
-
+#pragma once
 #ifndef quantlib_united_kingdom_calendar_hpp
 #define quantlib_united_kingdom_calendar_hpp
 
@@ -113,5 +113,5 @@ namespace QuantLib {
 
 }
 
-
+#include "unitedkingdom.cpp"
 #endif

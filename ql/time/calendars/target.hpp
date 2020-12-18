@@ -20,7 +20,7 @@
 /*! \file target.hpp
     \brief TARGET calendar
 */
-
+#pragma once
 #ifndef quantlib_target_calendar_h
 #define quantlib_target_calendar_h
 
@@ -60,5 +60,5 @@ namespace QuantLib {
 
 }
 
-
+#include "target.cpp"
 #endif

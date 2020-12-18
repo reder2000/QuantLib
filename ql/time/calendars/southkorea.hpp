@@ -23,7 +23,7 @@
 /*! \file southkorea.hpp
     \brief South Korean calendars
 */
-
+#pragma once
 #ifndef quantlib_south_korean_calendar_hpp
 #define quantlib_south_korean_calendar_hpp
 
@@ -95,5 +95,5 @@ namespace QuantLib {
 
 }
 
-
+#include "southkorea.cpp"
 #endif

@@ -19,15 +19,15 @@
 */
 
 #include <ql/time/calendars/china.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 #include <set>
 
 namespace QuantLib {
-
+    inline
     China::China(Market m) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> sseImpl(new China::SseImpl);
-        static ext::shared_ptr<Calendar::Impl> IBImpl(new China::IbImpl);
+        static std::shared_ptr<Calendar::Impl> sseImpl(new China::SseImpl);
+        static std::shared_ptr<Calendar::Impl> IBImpl(new China::IbImpl);
         switch (m) {
           case SSE:
             impl_ = sseImpl;
@@ -39,11 +39,11 @@ namespace QuantLib {
             QL_FAIL("unknown market");
         }
     }
-
+    inline
     bool China::SseImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-
+    inline
     bool China::SseImpl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
@@ -175,11 +175,11 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
+    inline
     bool China::IbImpl::isWeekend(Weekday w) const {
         return w == Saturday || w == Sunday;
     }
-
+    inline
     bool China::IbImpl::isBusinessDay(const Date& date) const {
         static const Date working_weekends[] = {
             // 2005

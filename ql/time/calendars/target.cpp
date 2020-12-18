@@ -20,13 +20,13 @@
 #include <ql/time/calendars/target.hpp>
 
 namespace QuantLib {
-
+    inline
     TARGET::TARGET() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new TARGET::Impl);
+        static std::shared_ptr<Calendar::Impl> impl(new TARGET::Impl);
         impl_ = impl;
     }
-
+    inline
     bool TARGET::Impl::isBusinessDay(const Date& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();

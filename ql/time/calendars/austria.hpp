@@ -74,12 +74,12 @@ namespace QuantLib {
         class SettlementImpl : public Calendar::WesternImpl {
           public:
             std::string name() const { return "Austrian settlement"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
         class ExchangeImpl : public Calendar::WesternImpl {
           public:
             std::string name() const { return "Vienna stock exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         //! Austrian calendars

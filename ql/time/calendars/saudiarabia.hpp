@@ -49,11 +49,11 @@ namespace QuantLib {
     */
     class SaudiArabia : public Calendar {
       private:
-        class TadawulImpl : public Calendar::Impl {
+        class TadawulImpl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Tadawul"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { Tadawul    //!< Tadawul financial market

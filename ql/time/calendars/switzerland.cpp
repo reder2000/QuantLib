@@ -20,20 +20,20 @@
 #include <ql/time/calendars/switzerland.hpp>
 
 namespace QuantLib {
-
-    Switzerland::Switzerland() {
+    template <class ExtDate> inline
+    Switzerland<ExtDate>::Switzerland() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Switzerland::Impl);
-        impl_ = impl;
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new Switzerland::Impl);
+        this->impl_ = impl;
     }
-
-    bool Switzerland::Impl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool Switzerland<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1  && m == January)
             // Berchtoldstag

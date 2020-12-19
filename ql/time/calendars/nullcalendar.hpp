@@ -35,17 +35,18 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class NullCalendar : public Calendar {
+    template <class ExtDate = Date>
+    class NullCalendar : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Null"; }
             bool isWeekend(Weekday) const { return false; }
-            bool isBusinessDay(const Date&) const { return true; }
+            bool isBusinessDay(const ExtDate&) const { return true; }
         };
       public:
         NullCalendar() {
-            impl_ = ext::shared_ptr<Calendar::Impl>(new NullCalendar::Impl);
+            this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(new NullCalendar::Impl);
         }
     };
 

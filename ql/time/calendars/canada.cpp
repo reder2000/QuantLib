@@ -25,9 +25,9 @@ namespace QuantLib {
 
     Canada::Canada(Canada::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
                                                   new Canada::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> tsxImpl(new Canada::TsxImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> tsxImpl(new Canada::TsxImpl);
         switch (market) {
           case Settlement:
             impl_ = settlementImpl;
@@ -40,13 +40,13 @@ namespace QuantLib {
         }
     }
 
-    bool Canada::SettlementImpl::isBusinessDay(const Date& date) const {
+    bool Canada::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday)) && m == January)
             // Family Day (third Monday in February, since 2008)
@@ -78,13 +78,13 @@ namespace QuantLib {
         return true;
     }
 
-    bool Canada::TsxImpl::isBusinessDay(const Date& date) const {
+    bool Canada::TsxImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday)) && m == January)
             // Family Day (third Monday in February, since 2008)

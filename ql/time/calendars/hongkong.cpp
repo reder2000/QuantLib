@@ -19,30 +19,30 @@
 */
 
 #include <ql/time/calendars/hongkong.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
-    HongKong::HongKong(Market m) {
+    template <class ExtDate> inline
+    HongKong<ExtDate>::HongKong(Market m) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new HongKong::HkexImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new HongKong::HkexImpl);
         switch (m) {
           case HKEx:
-            impl_ = impl;
+            this->impl_ = impl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-
-    bool HongKong::HkexImpl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool HongKong<ExtDate>::HkexImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || ((d == 1 || ((d == 2) && w == Monday))
                 && m == January)

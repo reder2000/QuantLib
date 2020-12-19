@@ -23,17 +23,17 @@ namespace QuantLib {
 
     Poland::Poland() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Poland::Impl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Poland::Impl);
         impl_ = impl;
     }
 
-    bool Poland::Impl::isBusinessDay(const Date& date) const {
+    bool Poland::Impl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // Easter Monday
             || (dd == em)
             // Corpus Christi

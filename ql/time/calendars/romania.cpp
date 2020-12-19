@@ -27,9 +27,9 @@ namespace QuantLib {
 
     Romania::Romania(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> publicImpl =
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> publicImpl =
             ext::make_shared<Romania::PublicImpl>();
-        static ext::shared_ptr<Calendar::Impl> bvbImpl =
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> bvbImpl =
             ext::make_shared<Romania::BVBImpl>();
         switch (market) {
           case Public:
@@ -43,13 +43,13 @@ namespace QuantLib {
         }
     }
 
-    bool Romania::PublicImpl::isBusinessDay(const Date& date) const {
+    bool Romania::PublicImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Day after New Year's Day
@@ -78,7 +78,7 @@ namespace QuantLib {
         return true;
     }
 
-    bool Romania::BVBImpl::isBusinessDay(const Date& date) const {
+    bool Romania::BVBImpl::isBusinessDay(const ExtDate& date) const {
         if (!PublicImpl::isBusinessDay(date))
             return false;
         Day d = date.dayOfMonth();

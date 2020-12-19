@@ -136,7 +136,7 @@ namespace QuantLib {
 
     SaudiArabia::SaudiArabia(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> tadawulImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> tadawulImpl(
                                                 new SaudiArabia::TadawulImpl);
         switch (market) {
           case Tadawul:
@@ -151,7 +151,7 @@ namespace QuantLib {
         return w == Friday || w == Saturday;
     }
 
-    bool SaudiArabia::TadawulImpl::isBusinessDay(const Date& date) const {
+    bool SaudiArabia::TadawulImpl::isBusinessDay(const ExtDate& date) const {
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();

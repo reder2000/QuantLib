@@ -74,12 +74,12 @@ namespace QuantLib {
         class SettlementImpl : public Calendar::WesternImpl {
           public:
             std::string name() const { return "Canada"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
         class TsxImpl : public Calendar::WesternImpl {
           public:
             std::string name() const { return "TSX"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { Settlement,       //!< generic settlement calendar

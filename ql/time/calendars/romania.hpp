@@ -61,12 +61,12 @@ namespace QuantLib {
         class PublicImpl : public Calendar::OrthodoxImpl {
           public:
             std::string name() const { return "Romania"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
         class BVBImpl : public PublicImpl {
           public:
             std::string name() const { return "Bucharest stock exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { Public,     //!< Public holidays

@@ -20,14 +20,14 @@
 #include <ql/time/calendars/weekendsonly.hpp>
 
 namespace QuantLib {
-
-    WeekendsOnly::WeekendsOnly() {
+    template <class ExtDate> inline
+    WeekendsOnly<ExtDate>::WeekendsOnly() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new WeekendsOnly::Impl);
-        impl_ = impl;
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new WeekendsOnly::Impl);
+        this->impl_ = impl;
     }
-
-    bool WeekendsOnly::Impl::isBusinessDay(const Date& date) const {
+    template <class ExtDate> inline
+    bool WeekendsOnly<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
         return !isWeekend(date.weekday());
     }
 

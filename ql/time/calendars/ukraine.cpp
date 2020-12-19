@@ -23,17 +23,17 @@ namespace QuantLib {
 
     Ukraine::Ukraine(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Ukraine::UseImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Ukraine::UseImpl);
         impl_ = impl;
     }
 
-    bool Ukraine::UseImpl::isBusinessDay(const Date& date) const {
+    bool Ukraine::UseImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
             || ((d == 1 || ((d == 2 || d == 3) && w == Monday))
                 && m == January)

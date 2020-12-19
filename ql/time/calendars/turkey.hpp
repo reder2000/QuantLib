@@ -53,11 +53,11 @@ namespace QuantLib {
     */
     class Turkey : public Calendar {
       private:
-        class Impl : public Calendar::Impl {
+        class Impl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Turkey"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         Turkey();

@@ -42,7 +42,10 @@
 #include <ql/time/calendars/unitedkingdom.hpp>
 #include <ql/time/calendars/unitedstates.hpp>
 #include <fstream>
-
+#include <ql/time/calendars/hongkong.hpp>
+#include <ql/time/calendars/nullcalendar.hpp>
+#include <ql/time/calendars/switzerland.hpp>
+#include <ql/time/calendars/weekendsonly.hpp>
 #include "boost_to_catch.h"
 
 using namespace QuantLib;

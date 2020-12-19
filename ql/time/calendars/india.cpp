@@ -23,19 +23,19 @@ namespace QuantLib {
 
     India::India(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new India::NseImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new India::NseImpl);
         impl_ = impl;
     }
 
-    bool India::NseImpl::isBusinessDay(const Date& date) const {
+    bool India::NseImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
         Day dd = date.dayOfYear();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // Republic Day
             || (d == 26 && m == January)
             // Good Friday

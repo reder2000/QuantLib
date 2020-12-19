@@ -25,9 +25,9 @@ namespace QuantLib {
 
     Israel::Israel(Israel::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> SettlementImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> SettlementImpl(
                                         new Israel::TelAvivImpl);
-        static ext::shared_ptr<Calendar::Impl> TelAvivImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> TelAvivImpl(
                                         new Israel::TelAvivImpl);
         switch (market) {
         case Settlement:
@@ -45,13 +45,13 @@ namespace QuantLib {
         return w == Friday || w == Saturday;
     }
 
-    bool Israel::TelAvivImpl::isBusinessDay(const Date& date) const {
+    bool Israel::TelAvivImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             //Purim
             || (d == 24 && m == February && y == 2013)
             || (d == 16 && m == March    && y == 2014)

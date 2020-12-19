@@ -24,7 +24,7 @@ namespace QuantLib {
 
     Taiwan::Taiwan(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Taiwan::TsecImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Taiwan::TsecImpl);
         impl_ = impl;
     }
 
@@ -32,13 +32,13 @@ namespace QuantLib {
         return w == Saturday || w == Sunday;
     }
 
-    bool Taiwan::TsecImpl::isBusinessDay(const Date& date) const {
+    bool Taiwan::TsecImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Peace Memorial Day

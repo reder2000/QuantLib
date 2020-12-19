@@ -24,7 +24,7 @@ namespace QuantLib {
 
     Indonesia::Indonesia(Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> bejImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> bejImpl(
                                                       new Indonesia::BejImpl);
         switch (market) {
           case BEJ:
@@ -37,15 +37,15 @@ namespace QuantLib {
         }
     }
 
-    bool Indonesia::BejImpl::isBusinessDay(const Date& date) const {
+    bool Indonesia::BejImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
         Year y = date.year();
         Day dd = date.dayOfYear();
-        Day em = easterMonday(y);
+        Day em = this->easterMonday(y);
 
-        if (isWeekend(w)
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday

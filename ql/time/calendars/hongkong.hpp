@@ -19,17 +19,17 @@
 */
 
 /*! \file hongkong.hpp
-    \brief Hong Kong calendars
+    \brief Hong Kong Calendar<ExtDate>s
 */
+#pragma once
+#ifndef quantlib_hongkong_Calendar_hpp
+#define quantlib_hongkong_Calendar_hpp
 
-#ifndef quantlib_hongkong_calendar_hpp
-#define quantlib_hongkong_calendar_hpp
-
-#include <ql/time/calendar.hpp>
+#include <ql/time/Calendar.hpp>
 
 namespace QuantLib {
 
-    //! Hong Kong calendars
+    //! Hong Kong Calendar<ExtDate>s
     /*! Holidays:
         <ul>
         <li>Saturdays</li>
@@ -58,14 +58,14 @@ namespace QuantLib {
 
         Data from <http://www.hkex.com.hk>
 
-        \ingroup calendars
-    */
-    class HongKong : public Calendar {
+        \ingroup Calendar<ExtDate>s
+    */template <class ExtDate=Date>
+    class HongKong : public Calendar<ExtDate> {
       private:
-        class HkexImpl : public Calendar::WesternImpl {
+        class HkexImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Hong Kong stock exchange"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { HKEx    //!< Hong Kong stock exchange
@@ -74,6 +74,6 @@ namespace QuantLib {
     };
 
 }
-
+#include "hongkong.cpp"
 
 #endif

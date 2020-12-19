@@ -72,7 +72,7 @@ namespace QuantLib {
             std::string name() const {
                 return "National Stock Exchange of India";
             }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { NSE    //!< National Stock Exchange

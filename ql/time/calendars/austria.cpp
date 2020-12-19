@@ -25,9 +25,9 @@ namespace QuantLib {
     Austria::Austria(Austria::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static ext::shared_ptr<Calendar::Impl> settlementImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
                                                    new Austria::SettlementImpl);
-        static ext::shared_ptr<Calendar::Impl> exchangeImpl(
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
                                                    new Austria::ExchangeImpl);
         switch (market) {
           case Settlement:
@@ -42,13 +42,13 @@ namespace QuantLib {
     }
 
 
-    bool Austria::SettlementImpl::isBusinessDay(const Date& date) const {
+    bool Austria::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Epiphany
@@ -82,13 +82,13 @@ namespace QuantLib {
     }
 
 
-    bool Austria::ExchangeImpl::isBusinessDay(const Date& date) const {
+    bool Austria::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Good Friday

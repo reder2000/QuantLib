@@ -23,17 +23,17 @@ namespace QuantLib {
 
     Slovakia::Slovakia(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Slovakia::BsseImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Slovakia::BsseImpl);
         impl_ = impl;
     }
 
-    bool Slovakia::BsseImpl::isBusinessDay(const Date& date) const {
+    bool Slovakia::BsseImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Epiphany

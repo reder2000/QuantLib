@@ -23,17 +23,17 @@ namespace QuantLib {
 
     Mexico::Mexico(Market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new Mexico::BmvImpl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Mexico::BmvImpl);
         impl_ = impl;
     }
 
-    bool Mexico::BmvImpl::isBusinessDay(const Date& date) const {
+    bool Mexico::BmvImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day
             || (d == 1 && m == January)
             // Constitution Day

@@ -23,17 +23,17 @@ namespace QuantLib {
 
     NewZealand::NewZealand() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar::Impl> impl(new NewZealand::Impl);
+        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new NewZealand::Impl);
         impl_ = impl;
     }
 
-    bool NewZealand::Impl::isBusinessDay(const Date& date) const {
+    bool NewZealand::Impl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
         Year y = date.year();
-        Day em = easterMonday(y);
-        if (isWeekend(w)
+        Day em = this->easterMonday(y);
+        if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday or Tuesday)
             || ((d == 1 || (d == 3 && (w == Monday || w == Tuesday))) &&
                 m == January)

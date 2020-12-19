@@ -54,11 +54,11 @@ namespace QuantLib {
     */
     class Taiwan : public Calendar {
       private:
-        class TsecImpl : public Calendar::Impl {
+        class TsecImpl : public Calendar<ExtDate>::Impl {
           public:
             std::string name() const { return "Taiwan stock exchange"; }
             bool isWeekend(Weekday) const;
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         enum Market { TSEC    //!< Taiwan stock exchange

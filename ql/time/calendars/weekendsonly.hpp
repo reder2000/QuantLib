@@ -35,18 +35,19 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    class WeekendsOnly : public Calendar {
+    template <class ExtDate = Date>
+    class WeekendsOnly : public Calendar<ExtDate> {
       private:
-        class Impl : public Calendar::WesternImpl {
+        class Impl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "weekends only"; }
-            bool isBusinessDay(const Date&) const;
+            bool isBusinessDay(const ExtDate&) const;
         };
       public:
         WeekendsOnly();
     };
 
 }
-
+#include "weekendsonly.cpp"
 
 #endif

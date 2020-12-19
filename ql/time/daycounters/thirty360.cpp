@@ -22,27 +22,26 @@
 #include <algorithm>
 
 namespace QuantLib {
-
-    ext::shared_ptr<DayCounter::Impl>
-    Thirty360::implementation(Thirty360::Convention c, bool isLastPeriod) {
+    template <class ExtDate> inline std::shared_ptr<typename DayCounter<ExtDate>::Impl>
+    Thirty360<ExtDate>::implementation(Thirty360<ExtDate>::Convention c, bool isLastPeriod) {
         switch (c) {
           case USA:
           case BondBasis:
-            return ext::shared_ptr<DayCounter::Impl>(new US_Impl);
+            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new US_Impl);
           case European:
           case EurobondBasis:
-            return ext::shared_ptr<DayCounter::Impl>(new EU_Impl);
+              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new EU_Impl);
           case Italian:
-            return ext::shared_ptr<DayCounter::Impl>(new IT_Impl);
+              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new IT_Impl);
           case German:
-            return ext::shared_ptr<DayCounter::Impl>(
+              return std::shared_ptr<DayCounter<ExtDate>::Impl>(
                 new GER_Impl(isLastPeriod));
           default:
             QL_FAIL("unknown 30/360 convention");
         }
     }
-
-    Date::serial_type Thirty360::US_Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Thirty360<ExtDate>::US_Impl::dayCount(const Date& d1,
                                                    const Date& d2) const {
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Integer mm1 = d1.month(), mm2 = d2.month();
@@ -53,8 +52,8 @@ namespace QuantLib {
         return 360*(yy2-yy1) + 30*(mm2-mm1-1) +
             std::max(Integer(0),30-dd1) + std::min(Integer(30),dd2);
     }
-
-    Date::serial_type Thirty360::EU_Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Thirty360<ExtDate>::EU_Impl::dayCount(const Date& d1,
                                                    const Date& d2) const {
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Month mm1 = d1.month(), mm2 = d2.month();
@@ -63,8 +62,8 @@ namespace QuantLib {
         return 360*(yy2-yy1) + 30*(mm2-mm1-1) +
             std::max(Integer(0),30-dd1) + std::min(Integer(30),dd2);
     }
-
-    Date::serial_type Thirty360::IT_Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Thirty360<ExtDate>::IT_Impl::dayCount(const Date& d1,
                                                    const Date& d2) const {
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Month mm1 = d1.month(), mm2 = d2.month();
@@ -76,8 +75,8 @@ namespace QuantLib {
         return 360*(yy2-yy1) + 30*(mm2-mm1-1) +
             std::max(Integer(0),30-dd1) + std::min(Integer(30),dd2);
     }
-
-    Date::serial_type Thirty360::GER_Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Thirty360<ExtDate>::GER_Impl::dayCount(const Date& d1,
                                                     const Date& d2) const {
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Month mm1 = d1.month(), mm2 = d2.month();

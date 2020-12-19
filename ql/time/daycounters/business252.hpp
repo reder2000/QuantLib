@@ -21,7 +21,7 @@
 /*! \file business252.hpp
     \brief business/252 day counter
 */
-
+#pragma once
 #ifndef quantlib_business252_day_counter_hpp
 #define quantlib_business252_day_counter_hpp
 
@@ -29,31 +29,32 @@
 #include <ql/time/calendars/brazil.hpp>
 #include <ql/time/daycounter.hpp>
 #include <utility>
-
+#pragma once
 namespace QuantLib {
 
     //! Business/252 day count convention
     /*! \ingroup daycounters */
-    class Business252 : public DayCounter {
+    template <class ExtDate = Date>
+    class Business252 : public DayCounter<ExtDate> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<ExtDate>::Impl {
           private:
-            Calendar calendar_;
+            Calendar<Date> calendar_;
           public:
             std::string name() const;
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const;
-            explicit Impl(const Calendar& c) : calendar_(c) {}
+            explicit Impl(const Calendar<Date>& c) : calendar_(c) {}
         };
       public:
-        Business252(const Calendar& c = Brazil())
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(new Business252::Impl(c))) {}
+        Business252(const Calendar<Date>& c = Brazil())
+        : DayCounter<ExtDate>(std::shared_ptr<DayCounter<ExtDate>::Impl>(new Business252::Impl(c))) {}
     };
 
 }
-
+#include "business252.cpp"
 #endif

@@ -23,7 +23,7 @@
 /*! \file dataparsers.hpp
     \brief Classes used to parse data for input
 */
-
+#pragma once
 #ifndef quantlib_data_parsers_hpp
 #define quantlib_data_parsers_hpp
 

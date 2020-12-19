@@ -22,22 +22,22 @@
 #include <cmath>
 
 namespace QuantLib {
-
-    ext::shared_ptr<DayCounter::Impl>
-    Actual365Fixed::implementation(Actual365Fixed::Convention c) {
+    template <class ExtDate> inline
+    std::shared_ptr<typename DayCounter<ExtDate>::Impl>
+    Actual365Fixed<ExtDate>::implementation(Actual365Fixed<ExtDate>::Convention c) {
         switch (c) {
           case Standard:
-            return ext::shared_ptr<DayCounter::Impl>(new Impl);
+            return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new Impl);
           case Canadian:
-            return ext::shared_ptr<DayCounter::Impl>(new CA_Impl);
+            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new CA_Impl);
           case NoLeap:
-            return ext::shared_ptr<DayCounter::Impl>(new NL_Impl);
+            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new NL_Impl);
           default:
             QL_FAIL("unknown Actual/365 (Fixed) convention");
         }
     }
-
-    Time Actual365Fixed::CA_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time Actual365Fixed<ExtDate>::CA_Impl::yearFraction(const Date& d1,
                                                const Date& d2,
                                                const Date& refPeriodStart,
                                                const Date& refPeriodEnd) const {
@@ -62,8 +62,8 @@ namespace QuantLib {
         return 1./frequency - (dcc-dcs)/365.0;
 
     }
-
-    Date::serial_type Actual365Fixed::NL_Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Actual365Fixed<ExtDate>::NL_Impl::dayCount(const Date& d1,
                                                         const Date& d2) const {
 
         static const Integer MonthOffset[] = {
@@ -71,9 +71,9 @@ namespace QuantLib {
             181, 212, 243, 273, 304, 334   // Jun - Dec
         };
 
-        Date::serial_type s1 = d1.dayOfMonth()
+        serial_type s1 = d1.dayOfMonth()
                              + MonthOffset[d1.month()-1] + (d1.year() * 365);
-        Date::serial_type s2 = d2.dayOfMonth()
+        serial_type s2 = d2.dayOfMonth()
                              + MonthOffset[d2.month()-1] + (d2.year() * 365);
 
         if (d1.month() == Feb && d1.dayOfMonth() == 29) {
@@ -86,8 +86,8 @@ namespace QuantLib {
 
         return s2 - s1;
     }
-
-    Time Actual365Fixed::NL_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time Actual365Fixed<ExtDate>::NL_Impl::yearFraction(const Date& d1,
                                                const Date& d2,
                                                const Date& d3,
                                                const Date& d4) const {

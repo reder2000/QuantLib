@@ -56,18 +56,18 @@ namespace QuantLib {
         Also known as "30E/360 ISDA"
 
         \ingroup daycounters
-    */
-    class Thirty360 : public DayCounter {
+    */template <class ExtDate=Date>
+    class Thirty360 : public DayCounter<ExtDate> {
       public:
         enum Convention { USA, BondBasis,
                           European, EurobondBasis,
                           Italian,
                           German };
       private:
-        class US_Impl : public DayCounter::Impl {
+        class US_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("30/360 (Bond Basis)");}
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
@@ -75,10 +75,10 @@ namespace QuantLib {
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class EU_Impl : public DayCounter::Impl {
+        class EU_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("30E/360 (Eurobond Basis)");}
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
@@ -86,21 +86,21 @@ namespace QuantLib {
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class IT_Impl : public DayCounter::Impl {
+        class IT_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("30/360 (Italian)");}
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const;
+            serial_type dayCount(const Date& d1, const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
                               const Date&) const {
                 return dayCount(d1,d2)/360.0; }
         };
-        class GER_Impl : public DayCounter::Impl {
+        class GER_Impl : public DayCounter<ExtDate>::Impl {
           public:
             explicit GER_Impl(bool isLastPeriod) : isLastPeriod_(isLastPeriod) {}
             std::string name() const { return std::string("30/360 (German)");}
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const;
+            serial_type dayCount(const Date& d1, const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date&,
@@ -109,13 +109,13 @@ namespace QuantLib {
         private:
             bool isLastPeriod_;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(
+        static std::shared_ptr<DayCounter<ExtDate>::Impl> implementation(
             Convention c, bool isLastPeriod);
       public:
-        Thirty360(Convention c = Thirty360::BondBasis, bool isLastPeriod = false)
-        : DayCounter(implementation(c, isLastPeriod)) {}
+        Thirty360(Convention c = Thirty360<ExtDate>::BondBasis, bool isLastPeriod = false)
+        : DayCounter<ExtDate>(implementation(c, isLastPeriod)) {}
     };
 
 }
-
+#include "thirty360.cpp"
 #endif

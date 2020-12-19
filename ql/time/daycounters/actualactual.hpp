@@ -20,7 +20,7 @@
 /*! \file actualactual.hpp
     \brief act/act day counters
 */
-
+#pragma once
 #ifndef quantlib_actualactual_day_counter_h
 #define quantlib_actualactual_day_counter_h
 
@@ -46,14 +46,14 @@ namespace QuantLib {
 
         \test the correctness of the results is checked against known
               good values.
-    */
-    class ActualActual : public DayCounter {
+    */template <class ExtDate=Date>
+    class ActualActual : public DayCounter<ExtDate> {
       public:
         enum Convention { ISMA, Bond,
                           ISDA, Historical, Actual365,
                           AFB, Euro };
       private:
-        class ISMA_Impl : public DayCounter::Impl {
+        class ISMA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             explicit ISMA_Impl(const Schedule& schedule)
             : schedule_(schedule) {}
@@ -68,7 +68,7 @@ namespace QuantLib {
           private:
             Schedule schedule_;
         };
-        class Old_ISMA_Impl : public DayCounter::Impl {
+        class Old_ISMA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISMA)");
@@ -78,7 +78,7 @@ namespace QuantLib {
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        class ISDA_Impl : public DayCounter::Impl {
+        class ISDA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISDA)");
@@ -88,7 +88,7 @@ namespace QuantLib {
                               const Date&,
                               const Date&) const;
         };
-        class AFB_Impl : public DayCounter::Impl {
+        class AFB_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (AFB)");
@@ -98,15 +98,15 @@ namespace QuantLib {
                               const Date&,
                               const Date&) const;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(
+        static std::shared_ptr<DayCounter<ExtDate>::Impl> implementation(
                                                                Convention c, 
                                                                const Schedule& schedule);
       public:
         ActualActual(Convention c = ActualActual::ISDA, 
                      const Schedule& schedule = Schedule())
-        : DayCounter(implementation(c, schedule)) {}
+        : DayCounter<ExtDate>(implementation(c, schedule)) {}
     };
 
 }
-
+#include "actualactual.cpp"
 #endif

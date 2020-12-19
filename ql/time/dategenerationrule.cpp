@@ -19,8 +19,8 @@
 */
 
 #include <ql/time/dategenerationrule.hpp>
-#include <ql/types.hpp>
-#include <ql/errors.hpp>
+#include "ql_types.hpp"
+#include "ql_errors.hpp"
 
 namespace QuantLib {
 
@@ -45,7 +45,7 @@ namespace QuantLib {
           case DateGeneration::CDS2015:
             return out << "CDS2015";
           default:
-            QL_FAIL("unknown DateGeneration::Rule (" << Integer(r) << ")");
+              QL_FAIL("unknown DateGeneration::Rule ({})", Integer(r));
         }
     }
 

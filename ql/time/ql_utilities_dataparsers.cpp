@@ -47,7 +47,7 @@
 namespace QuantLib {
 
     namespace io {
-
+        inline
         Integer to_integer(const std::string& str) {
         //#if !defined(x64) && !defined(QL_PATCH_SOLARIS)
         //    return boost::lexical_cast<Integer>(str.c_str());
@@ -57,7 +57,7 @@ namespace QuantLib {
         }
 
     }
-
+    inline
     Period PeriodParser::parse(const std::string& str) {
         QL_REQUIRE(str.length()>1, "period string length must be at least 2");
 
@@ -80,7 +80,7 @@ namespace QuantLib {
             result += parseOnePeriod(subStrings[i]);
         return result;
     }
-
+    inline
     Period PeriodParser::parseOnePeriod(const std::string& str) {
         QL_REQUIRE(str.length()>1, "single period require a string of at "
                    "least 2 characters");

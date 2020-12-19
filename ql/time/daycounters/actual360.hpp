@@ -33,10 +33,10 @@ namespace QuantLib {
     /*! Actual/360 day count convention, also known as "Act/360", or "A/360".
 
         \ingroup daycounters
-    */
-    class Actual360 : public DayCounter {
+    */template <class ExtDate=Date>
+    class Actual360 : public DayCounter<ExtDate> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<ExtDate>::Impl {
           private:
               bool includeLastDay_;
           public:
@@ -47,7 +47,7 @@ namespace QuantLib {
                     std::string("Actual/360 (inc)")
                     : std::string("Actual/360");
             }
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const {
                 return (d2-d1) + (includeLastDay_ ? 1 : 0);
             }
@@ -61,7 +61,7 @@ namespace QuantLib {
         };
       public:
         explicit Actual360(const bool includeLastDay = false)
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter(std::shared_ptr<DayCounter::Impl>(
             new Actual360::Impl(includeLastDay))) {}
     };
 

@@ -79,7 +79,7 @@ namespace QuantLib {
                                             const Date& d3, const Date& d4) {
             QL_REQUIRE(d1 <= d2,
                        "This function is only correct if d1 <= d2\n"
-                       "d1: " << d1 << " d2: " << d2);
+                       "d1: {} d2: {}"  , d1, d2);
 
             Real referenceDayCount = Real(impl.dayCount(d3, d4));
             //guess how many coupon periods per year:
@@ -95,31 +95,31 @@ namespace QuantLib {
         }
 
     }
-
-    ext::shared_ptr<DayCounter::Impl>
-    ActualActual::implementation(ActualActual::Convention c,
+    template <class ExtDate> inline
+    std::shared_ptr<typename DayCounter<ExtDate>::Impl>
+    ActualActual<ExtDate>::implementation(ActualActual<ExtDate>::Convention c,
                                  const Schedule& schedule) {
         switch (c) {
           case ISMA:
           case Bond:
             if (!schedule.empty())
-                return ext::shared_ptr<DayCounter::Impl>(new ISMA_Impl(schedule));
+                  return std::shared_ptr<DayCounter<ExtDate>::Impl>(new ISMA_Impl(schedule));
             else
-                return ext::shared_ptr<DayCounter::Impl>(new Old_ISMA_Impl);
+                return std::shared_ptr<DayCounter<ExtDate>::Impl>(new Old_ISMA_Impl);
           case ISDA:
           case Historical:
           case Actual365:
-            return ext::shared_ptr<DayCounter::Impl>(new ISDA_Impl);
+              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new ISDA_Impl);
           case AFB:
           case Euro:
-            return ext::shared_ptr<DayCounter::Impl>(new AFB_Impl);
+              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new AFB_Impl);
           default:
             QL_FAIL("unknown act/act convention");
         }
     }
 
-
-    Time ActualActual::ISMA_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time ActualActual<ExtDate>::ISMA_Impl::yearFraction(const Date& d1,
                                                const Date& d2,
                                                const Date& d3,
                                                const Date& d4) const {
@@ -148,8 +148,8 @@ namespace QuantLib {
         return yearFractionSum;
     }
 
-
-    Time ActualActual::Old_ISMA_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time ActualActual<ExtDate>::Old_ISMA_Impl::yearFraction(const Date& d1,
                                                    const Date& d2,
                                                    const Date& d3,
                                                    const Date& d4) const {
@@ -165,11 +165,10 @@ namespace QuantLib {
         Date refPeriodEnd = (d4 != Date() ? d4 : d2);
 
         QL_REQUIRE(refPeriodEnd > refPeriodStart && refPeriodEnd > d1,
-                   "invalid reference period: "
-                   << "date 1: " << d1
-                   << ", date 2: " << d2
-                   << ", reference period start: " << refPeriodStart
-                   << ", reference period end: " << refPeriodEnd);
+                   "invalid reference period: date 1: {}, date 2: {}"
+                   ", reference period start: {}" 
+                   ", reference period end: {}",
+                   d1, d2, refPeriodStart , refPeriodEnd);
 
         // estimate roughly the length in months of a period
         Integer months =
@@ -247,8 +246,8 @@ namespace QuantLib {
         }
     }
 
-
-    Time ActualActual::ISDA_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time ActualActual<ExtDate>::ISDA_Impl::yearFraction(const Date& d1,
                                                const Date& d2,
                                                const Date&,
                                                const Date&) const {
@@ -269,8 +268,8 @@ namespace QuantLib {
         return sum;
     }
 
-
-    Time ActualActual::AFB_Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time ActualActual<ExtDate>::AFB_Impl::yearFraction(const Date& d1,
                                               const Date& d2,
                                               const Date&,
                                               const Date&) const {

@@ -68,15 +68,15 @@ namespace QuantLib {
         </ul>
 
         \ingroup calendars
-    */
-    class Canada : public Calendar {
+    */template <class ExtDate=Date>
+    class Canada : public Calendar<ExtDate> {
       private:
-        class SettlementImpl : public Calendar::WesternImpl {
+        class SettlementImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Canada"; }
             bool isBusinessDay(const ExtDate&) const;
         };
-        class TsxImpl : public Calendar::WesternImpl {
+        class TsxImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "TSX"; }
             bool isBusinessDay(const ExtDate&) const;
@@ -89,6 +89,6 @@ namespace QuantLib {
     };
 
 }
-
+#include "canada.cpp"
 
 #endif

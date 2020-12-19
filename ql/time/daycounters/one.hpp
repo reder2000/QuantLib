@@ -30,12 +30,13 @@ namespace QuantLib {
 
     //! 1/1 day count convention
     /*! \ingroup daycounters */
-    class OneDayCounter : public DayCounter {
+    template <class ExtDate = Date>
+    class OneDayCounter : public DayCounter<ExtDate> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("1/1"); }
-            Date::serial_type dayCount(const Date& d1, const Date& d2) const {
+            serial_type dayCount(const Date& d1, const Date& d2) const {
                 // the sign is all we need
                 return (d2 >= d1 ? 1 : -1);
             };
@@ -48,7 +49,7 @@ namespace QuantLib {
         };
       public:
         OneDayCounter()
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter<ExtDate>(std::shared_ptr<DayCounter<ExtDate>::Impl>(
                                         new OneDayCounter::Impl)) {}
     };
 

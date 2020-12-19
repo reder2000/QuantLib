@@ -25,8 +25,8 @@ namespace QuantLib {
 
     namespace {
 
-        typedef std::map<Year, std::map<Month, Date::serial_type> > Cache;
-        typedef std::map<Year, Date::serial_type> OuterCache;
+        typedef std::map<Year, std::map<Month, serial_type> > Cache;
+        typedef std::map<Year, serial_type> OuterCache;
         
         std::map<std::string, Cache> monthlyFigures_;
         std::map<std::string, OuterCache> yearlyFigures_;
@@ -38,9 +38,9 @@ namespace QuantLib {
         bool sameMonth(const Date& d1, const Date& d2) {
             return d1.year() == d2.year() && d1.month() == d2.month();
         }
-
-        Date::serial_type businessDays(Cache& cache,
-                                       const Calendar& calendar,
+        template <class ExtDate> inline
+        serial_type businessDays(Cache& cache,
+                                       const Calendar<ExtDate>& calendar,
                                        Month month, Year year) {
             if (cache[year][month] == 0) {
                 // calculate and store.
@@ -50,14 +50,14 @@ namespace QuantLib {
             }
             return cache[year][month];
         }
-
-        Date::serial_type businessDays(OuterCache& outerCache,
+        template <class ExtDate> inline
+        serial_type businessDays(OuterCache& outerCache,
                                        Cache& cache,
-                                       const Calendar& calendar,
+                                       const Calendar<ExtDate>& calendar,
                                        Year year) {
             if (outerCache[year] == 0) {
                 // calculate and store.
-                Date::serial_type total = 0;
+                serial_type total = 0;
                 for (Integer i=1; i<=12; ++i) {
                     total += businessDays(cache,calendar,
                                           Month(i), year);
@@ -68,14 +68,14 @@ namespace QuantLib {
         }
 
     }
-
-    std::string Business252::Impl::name() const {
+    template <class ExtDate> inline
+    std::string Business252<ExtDate>::Impl::name() const {
         std::ostringstream out;
         out << "Business/252(" << calendar_.name() << ")";
         return out.str();
     }
-
-    Date::serial_type Business252::Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Business252<ExtDate>::Impl::dayCount(const Date& d1,
                                                   const Date& d2) const {
         if (sameMonth(d1,d2) || d1 >= d2) {
             // we treat the case of d1 > d2 here, since we'd need a
@@ -85,7 +85,7 @@ namespace QuantLib {
             return calendar_.businessDaysBetween(d1, d2);
         } else if (sameYear(d1,d2)) {
             Cache& cache = monthlyFigures_[calendar_.name()];
-            Date::serial_type total = 0;
+            serial_type total = 0;
             Date d;
             // first, we get to the beginning of next month.
             d = Date(1,d1.month(),d1.year()) + 1*Months;
@@ -103,7 +103,7 @@ namespace QuantLib {
         } else {
             Cache& cache = monthlyFigures_[calendar_.name()];
             OuterCache& outerCache = yearlyFigures_[calendar_.name()];
-            Date::serial_type total = 0;
+            serial_type total = 0;
             Date d;
             // first, we get to the beginning of next year.
             // The first bit gets us to the end of this month...
@@ -133,8 +133,8 @@ namespace QuantLib {
             return total;
         }
     }
-
-    Time Business252::Impl::yearFraction(const Date& d1,
+    template <class ExtDate> inline
+    Time Business252<ExtDate>::Impl::yearFraction(const Date& d1,
                                          const Date& d2,
                                          const Date&,
                                          const Date&) const {

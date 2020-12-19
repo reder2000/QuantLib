@@ -22,7 +22,7 @@
 /*! \file actual365fixed.hpp
     \brief Actual/365 (Fixed) day counter
 */
-
+#pragma once
 #ifndef quantlib_actual365fixed_day_counter_h
 #define quantlib_actual365fixed_day_counter_h
 
@@ -41,15 +41,15 @@ namespace QuantLib {
                  you might want to double-check its meaning.
 
         \ingroup daycounters
-    */
-    class Actual365Fixed : public DayCounter {
+    */template <class ExtDate=Date>
+    class Actual365Fixed : public DayCounter<ExtDate> {
       public:
         enum Convention { Standard, Canadian, NoLeap };
         explicit Actual365Fixed(Convention c = Actual365Fixed::Standard)
-        : DayCounter(implementation(c)) {}
+        : DayCounter<ExtDate>(implementation(c)) {}
 
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("Actual/365 (Fixed)"); }
             Time yearFraction(const Date& d1,
@@ -59,7 +59,7 @@ namespace QuantLib {
                 return daysBetween(d1,d2)/365.0;
             }
         };
-        class CA_Impl : public DayCounter::Impl {
+        class CA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/365 (Fixed) Canadian Bond");
@@ -69,21 +69,21 @@ namespace QuantLib {
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        class NL_Impl : public DayCounter::Impl {
+        class NL_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/365 (No Leap)");
             }
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        static ext::shared_ptr<DayCounter::Impl> implementation(Convention);
+        static std::shared_ptr<DayCounter<ExtDate>::Impl> implementation(Convention);
     };
 
 }
-
+#include "actual365fixed.cpp"
 #endif

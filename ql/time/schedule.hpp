@@ -30,8 +30,8 @@
 #include <ql/utilities/null.hpp>
 #include <ql/time/period.hpp>
 #include <ql/time/dategenerationrule.hpp>
-#include <ql/errors.hpp>
-#include <boost/optional.hpp>
+#include "ql_errors.hpp"
+#include <optional>
 
 namespace QuantLib {
 
@@ -45,18 +45,18 @@ namespace QuantLib {
             checked for plausibility in any sense. */
         Schedule(
             const std::vector<Date>&,
-            const Calendar& calendar = NullCalendar(),
+            const Calendar<Date>& calendar = NullCalendar(),
             BusinessDayConvention convention = Unadjusted,
-            const boost::optional<BusinessDayConvention>& terminationDateConvention = boost::none,
-            const boost::optional<Period>& tenor = boost::none,
-            const boost::optional<DateGeneration::Rule>& rule = boost::none,
-            const boost::optional<bool>& endOfMonth = boost::none,
+            const std::optional<BusinessDayConvention>& terminationDateConvention = std::nullopt,
+            const std::optional<Period>& tenor = std::nullopt,
+            const std::optional<DateGeneration::Rule>& rule = std::nullopt,
+            const std::optional<bool>& endOfMonth = std::nullopt,
             const std::vector<bool>& isRegular = std::vector<bool>(0));
         /*! rule based constructor */
         Schedule(Date effectiveDate,
                  const Date& terminationDate,
                  const Period& tenor,
-                 const Calendar& calendar,
+                 const Calendar<Date>& calendar,
                  BusinessDayConvention convention,
                  BusinessDayConvention terminationDateConvention,
                  DateGeneration::Rule rule,
@@ -80,7 +80,7 @@ namespace QuantLib {
         //! \name Other inspectors
         //@{
         bool empty() const { return dates_.empty(); }
-        const Calendar& calendar() const;
+        const Calendar<Date>& calendar() const;
         const Date& startDate() const;
         const Date& endDate() const;
         bool hasTenor() const;
@@ -107,12 +107,12 @@ namespace QuantLib {
         Schedule until(const Date& truncationDate) const;
         //@}
       private:
-        boost::optional<Period> tenor_;
-        Calendar calendar_;
+        std::optional<Period> tenor_;
+        Calendar<Date> calendar_;
         BusinessDayConvention convention_;
-        boost::optional<BusinessDayConvention> terminationDateConvention_;
-        boost::optional<DateGeneration::Rule> rule_;
-        boost::optional<bool> endOfMonth_;
+        std::optional<BusinessDayConvention> terminationDateConvention_;
+        std::optional<DateGeneration::Rule> rule_;
+        std::optional<bool> endOfMonth_;
         Date firstDate_, nextToLastDate_;
         std::vector<Date> dates_;
         std::vector<bool> isRegular_;
@@ -130,7 +130,7 @@ namespace QuantLib {
         MakeSchedule& to(const Date& terminationDate);
         MakeSchedule& withTenor(const Period&);
         MakeSchedule& withFrequency(Frequency);
-        MakeSchedule& withCalendar(const Calendar&);
+        MakeSchedule& withCalendar(const Calendar<Date>&);
         MakeSchedule& withConvention(BusinessDayConvention);
         MakeSchedule& withTerminationDateConvention(BusinessDayConvention);
         MakeSchedule& withRule(DateGeneration::Rule);
@@ -141,11 +141,11 @@ namespace QuantLib {
         MakeSchedule& withNextToLastDate(const Date& d);
         operator Schedule() const;
       private:
-        Calendar calendar_;
+        Calendar<Date> calendar_;
         Date effectiveDate_, terminationDate_;
-        boost::optional<Period> tenor_;
-        boost::optional<BusinessDayConvention> convention_;
-        boost::optional<BusinessDayConvention> terminationDateConvention_;
+        std::optional<Period> tenor_;
+        std::optional<BusinessDayConvention> convention_;
+        std::optional<BusinessDayConvention> terminationDateConvention_;
         DateGeneration::Rule rule_;
         bool endOfMonth_;
         Date firstDate_, nextToLastDate_;
@@ -174,7 +174,7 @@ namespace QuantLib {
         return dates_.at(i);
     }
 
-    inline const Calendar& Schedule::calendar() const {
+    inline const Calendar<Date>& Schedule::calendar() const {
         return calendar_;
     }
 
@@ -185,7 +185,7 @@ namespace QuantLib {
     inline const Date &Schedule::endDate() const { return dates_.back(); }
 
     inline bool Schedule::hasTenor() const {
-        return tenor_ != boost::none;
+        return tenor_ != std::nullopt;
     }
 
     inline const Period& Schedule::tenor() const {
@@ -200,7 +200,7 @@ namespace QuantLib {
 
     inline bool
     Schedule::hasTerminationDateBusinessDayConvention() const {
-        return terminationDateConvention_ != boost::none;
+        return terminationDateConvention_ != std::nullopt;
     }
 
     inline BusinessDayConvention
@@ -211,7 +211,7 @@ namespace QuantLib {
     }
 
     inline bool Schedule::hasRule() const {
-        return rule_ != boost::none;
+        return rule_ != std::nullopt;
     }
 
     inline DateGeneration::Rule Schedule::rule() const {
@@ -220,7 +220,7 @@ namespace QuantLib {
     }
 
     inline bool Schedule::hasEndOfMonth() const {
-        return endOfMonth_ != boost::none;
+        return endOfMonth_ != std::nullopt;
     }
 
     inline bool Schedule::endOfMonth() const {
@@ -230,5 +230,5 @@ namespace QuantLib {
     }
 
 }
-
+#include "schedule.cpp"
 #endif

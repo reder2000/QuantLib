@@ -21,11 +21,11 @@
 /*! \file dategenerationrule.hpp
     \brief date generation rule
 */
-
+#pragma once
 #ifndef quantlib_date_generation_rule_hpp
 #define quantlib_date_generation_rule_hpp
 
-#include <ql/qldefines.hpp>
+#include "ql_qldefines.hpp"
 #include <iosfwd>
 
 namespace QuantLib {
@@ -70,6 +70,18 @@ namespace QuantLib {
     std::ostream& operator<<(std::ostream&,
                              DateGeneration::Rule);
 
+
 }
 
+    template <>
+struct fmt::formatter<QuantLib::DateGeneration::Rule> : formatter<std::string> {
+    // parse is inherited from formatter<string_view>.
+    template <typename FormatContext>
+    auto format(QuantLib::DateGeneration::Rule c, FormatContext& ctx) {
+        std::stringstream ss;
+        ss << c;
+        return formatter<std::string>::format(ss.str(), ctx);
+    }
+};
+#include "dategenerationrule.cpp"
 #endif

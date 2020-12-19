@@ -46,6 +46,7 @@
 #include <ql/time/calendars/nullcalendar.hpp>
 #include <ql/time/calendars/switzerland.hpp>
 #include <ql/time/calendars/weekendsonly.hpp>
+#include <ql/time/calendars/canada.hpp>
 #include "boost_to_catch.h"
 
 using namespace QuantLib;

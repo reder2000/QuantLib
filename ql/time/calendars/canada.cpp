@@ -19,28 +19,28 @@
 */
 
 #include <ql/time/calendars/canada.hpp>
-#include <ql/errors.hpp>
+#include "../ql_errors.hpp"
 
 namespace QuantLib {
-
-    Canada::Canada(Canada::Market market) {
+    template <class ExtDate> inline
+    Canada<ExtDate>::Canada(Canada<ExtDate>::Market market) {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
-                                                  new Canada::SettlementImpl);
-        static ext::shared_ptr<Calendar<ExtDate>::Impl> tsxImpl(new Canada::TsxImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+                                                  new Canada<ExtDate>::SettlementImpl);
+        static std::shared_ptr<Calendar<ExtDate>::Impl> tsxImpl(new Canada<ExtDate>::TsxImpl);
         switch (market) {
           case Settlement:
-            impl_ = settlementImpl;
+            this->impl_ = settlementImpl;
             break;
           case TSX:
-            impl_ = tsxImpl;
+            this->impl_ = tsxImpl;
             break;
           default:
             QL_FAIL("unknown market");
         }
     }
-
-    bool Canada::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    template <class ExtDate> inline
+    bool Canada<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -77,8 +77,8 @@ namespace QuantLib {
             return false; // NOLINT(readability-simplify-boolean-expr)
         return true;
     }
-
-    bool Canada::TsxImpl::isBusinessDay(const ExtDate& date) const {
+    template <class ExtDate> inline
+    bool Canada<ExtDate>::TsxImpl::isBusinessDay(const ExtDate& date) const {
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();

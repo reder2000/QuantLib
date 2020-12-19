@@ -20,7 +20,7 @@
 /*! \file simpledaycounter.hpp
      \brief Simple day counter for reproducing theoretical calculations
 */
-
+#pragma once
 #ifndef quantlib_simple_day_counter_hpp
 #define quantlib_simple_day_counter_hpp
 
@@ -43,12 +43,13 @@ namespace QuantLib {
         \test the correctness of the results is checked against known
               good values.
     */
-    class SimpleDayCounter : public DayCounter {
+    template <class ExtDate = Date>
+    class SimpleDayCounter : public DayCounter<ExtDate> {
       private:
-        class Impl : public DayCounter::Impl {
+        class Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return "Simple"; }
-            Date::serial_type dayCount(const Date& d1,
+            serial_type dayCount(const Date& d1,
                                        const Date& d2) const;
             Time yearFraction(const Date& d1,
                               const Date& d2,
@@ -57,10 +58,10 @@ namespace QuantLib {
         };
       public:
         SimpleDayCounter()
-        : DayCounter(ext::shared_ptr<DayCounter::Impl>(
+        : DayCounter<ExtDate>(std::shared_ptr<DayCounter<ExtDate>::Impl>(
                                              new SimpleDayCounter::Impl())) {}
     };
 
 }
-
+#include "simpledaycounter.cpp"
 #endif

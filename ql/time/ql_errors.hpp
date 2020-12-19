@@ -6,5 +6,7 @@
 
 #define QL_REQUIRE MREQUIRE
 
+#define QL_ASSERT MREQUIRE
+
 #define QL_ENSURE(condition, ...) \
     QL_REQUIRE((condition),__VA_ARGS__)

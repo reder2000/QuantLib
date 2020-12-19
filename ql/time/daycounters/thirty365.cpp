@@ -20,8 +20,8 @@
 #include <ql/time/daycounters/thirty365.hpp>
 
 namespace QuantLib {
-
-    Date::serial_type Thirty365::Impl::dayCount(const Date& d1,
+    template <class ExtDate> inline
+    serial_type Thirty365<ExtDate>::Impl::dayCount(const Date& d1,
                                                 const Date& d2) const {
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Integer mm1 = d1.month(), mm2 = d2.month();
@@ -29,8 +29,8 @@ namespace QuantLib {
 
         return 360*(yy2-yy1) + 30*(mm2-mm1) + (dd2-dd1);
     }
-
-    Thirty365::Thirty365()
-    : DayCounter(ext::shared_ptr<DayCounter::Impl>(new Thirty365::Impl)) {}
+    template <class ExtDate> inline
+    Thirty365<ExtDate>::Thirty365()
+    : DayCounter<ExtDate>(std::shared_ptr<DayCounter<ExtDate>::Impl>(new Thirty365::Impl)) {}
 
 }

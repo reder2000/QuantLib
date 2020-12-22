@@ -37,8 +37,9 @@
 //using std::string;
 
 namespace QuantLib {
-    inline
-    bool ASX::isASXdate(const Date& date, bool mainCycle) {
+    template <class ExtDate> inline
+    bool ASX<ExtDate>::isASXdate(const ExtDate& dat, bool mainCycle) {
+        auto date = to_DateLike(dat);
         if (date.weekday()!=Friday)
             return false;
 
@@ -58,8 +59,8 @@ namespace QuantLib {
             return false;
         }
     }
-    inline
-    bool ASX::isASXcode(const std::string& in, bool mainCycle) {
+    template <class ExtDate> inline
+    bool ASX<ExtDate>::isASXcode(const std::string& in, bool mainCycle) {
         if (in.length() != 2)
             return false;
 
@@ -73,14 +74,14 @@ namespace QuantLib {
         loc = str1.find(in.substr(0,1), 0);
         return loc != std::string::npos;
     }
-    inline
-    std::string ASX::code(const Date& date) {
+    template <class ExtDate> inline
+    std::string ASX<ExtDate>::code(const ExtDate& date) {
         QL_REQUIRE(isASXdate(date, false),
                    "{} is not an ASX date",date);
 
         std::ostringstream ASXcode;
-        unsigned int y = date.year() % 10;
-        switch(date.month()) {
+        unsigned int y = to_DateLike(date).year() % 10;
+        switch(to_DateLike(date).month()) {
           case January:
             ASXcode << 'F' << y;
             break;
@@ -127,14 +128,15 @@ namespace QuantLib {
         #endif
         return ASXcode.str();
     }
-    inline
-    Date ASX::date(const std::string& asxCode,
-                   const Date& refDate) {
+    template <class ExtDate> inline
+    ExtDate ASX<ExtDate>::date(const std::string& asxCode,
+                   const ExtDate& refExtDate) {
         QL_REQUIRE(isASXcode(asxCode, false), "{} is not a valid ASX code", asxCode );
 
-        Date referenceDate = (refDate != Date() ?
-                              refDate :
-                              Date(Settings::instance().evaluationDate()));
+        DateLike<ExtDate> referenceExtDate{
+            (to_DateLike(refExtDate) != ExtDate() ?
+                 refExtDate :
+                 ExtDate(Settings<ExtDate>::instance().evaluationDate()))};
         auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
         std::string code = to_upper_copy(asxCode);
         std::string ms = code.substr(0,1);
@@ -158,26 +160,26 @@ namespace QuantLib {
         Year y= io::to_integer(code.substr(1,1));
         /* year<1900 are not valid QuantLib years: to avoid a run-time
            exception few lines below we need to add 10 years right away */
-        if (y==0 && referenceDate.year()<=1909) y+=10;
-        Year referenceYear = (referenceDate.year() % 10);
-        y += referenceDate.year() - referenceYear;
-        Date result = ASX::nextDate(Date(1, m, y), false);
-        if (result<referenceDate)
-            return ASX::nextDate(Date(1, m, y+10), false);
+        if (y==0 && referenceExtDate.year()<=1909) y+=10;
+        Year referenceYear = (referenceExtDate.year() % 10);
+        y += referenceExtDate.year() - referenceYear;
+        ExtDate result = ASX<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y), false);
+        if (result<referenceExtDate)
+            return ASX<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y + 10), false);
 
         return result;
     }
-    inline
-    Date ASX::nextDate(const Date& date, bool mainCycle) {
-        Date refDate = (date == Date() ?
-                        Date(Settings::instance().evaluationDate()) :
-                        date);
-        Year y = refDate.year();
-        QuantLib::Month m = refDate.month();
+    template <class ExtDate> inline
+    ExtDate ASX<ExtDate>::nextDate(const ExtDate& date, bool mainCycle) {
+        DateLike<ExtDate> refExtDate{(to_DateLike(date) == ExtDate() ?
+                                          ExtDate(Settings<ExtDate>::instance().evaluationDate()) :
+                                          date)};
+        Year y = refExtDate.year();
+        QuantLib::Month m = refExtDate.month();
 
         Size offset = mainCycle ? 3 : 1;
         Size skipMonths = offset-(m%offset);
-        if (skipMonths != offset || refDate.dayOfMonth() > 14) {
+        if (skipMonths != offset || refExtDate.dayOfMonth() > 14) {
             skipMonths += Size(m);
             if (skipMonths<=12) {
                 m = QuantLib::Month(skipMonths);
@@ -187,29 +189,29 @@ namespace QuantLib {
             }
         }
 
-        Date result = Date::nthWeekday(2, Friday, m, y);
-        if (result<=refDate)
-            result = nextDate(Date(15, m, y), mainCycle);
+        ExtDate result = DateLike<ExtDate>::nthWeekday(2, Friday, m, y);
+        if (result<=refExtDate)
+            result = nextDate(DateAdaptor<ExtDate>::Date(15, m, y), mainCycle);
         return result;
     }
-    inline
-    Date ASX::nextDate(const std::string& ASXcode,
+    template <class ExtDate> inline
+    ExtDate ASX<ExtDate>::nextDate(const std::string& ASXcode,
                        bool mainCycle,
-                       const Date& referenceDate)  {
-        Date asxDate = date(ASXcode, referenceDate);
-        return nextDate(asxDate+1, mainCycle);
+                       const ExtDate& referenceExtDate)  {
+        ExtDate asxExtDate = date(ASXcode, referenceExtDate);
+        return nextDate(asxExtDate+1, mainCycle);
     }
-    inline
-    std::string ASX::nextCode(const Date& d,
+    template <class ExtDate> inline
+    std::string ASX<ExtDate>::nextCode(const ExtDate& d,
                               bool mainCycle) {
-        Date date = nextDate(d, mainCycle);
+        ExtDate date = nextDate(d, mainCycle);
         return code(date);
     }
-    inline
-    std::string ASX::nextCode(const std::string& asxCode,
+    template <class ExtDate> inline
+    std::string ASX<ExtDate>::nextCode(const std::string& asxCode,
                               bool mainCycle,
-                              const Date& referenceDate) {
-        Date date = nextDate(asxCode, mainCycle, referenceDate);
+                              const ExtDate& referenceExtDate) {
+        ExtDate date = nextDate(asxCode, mainCycle, referenceExtDate);
         return code(date);
     }
 

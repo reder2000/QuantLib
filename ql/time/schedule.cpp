@@ -21,7 +21,7 @@
 
 #include <ql/time/schedule.hpp>
 #include <ql/time/imm.hpp>
-#include <ql/settings.hpp>
+#include "ql_settings.hpp"
 
 namespace QuantLib {
 
@@ -97,7 +97,7 @@ namespace QuantLib {
         // really necessary. In these cases a decent placeholder is enough
         if (effectiveDate==Date() && first==Date()
                                   && rule==DateGeneration::Backward) {
-            Date evalDate = Settings::instance().evaluationDate();
+            Date evalDate = Settings<Date>::instance().evaluationDate();
             QL_REQUIRE(evalDate < terminationDate, "null effective date");
             Natural y;
             if (nextToLast != Date()) {
@@ -428,7 +428,7 @@ namespace QuantLib {
                   *endOfMonth_);
 
     }
-
+    inline
     Schedule Schedule::after(const Date& truncationDate) const {
         Schedule result = *this;
 
@@ -501,7 +501,7 @@ namespace QuantLib {
     std::vector<Date>::const_iterator
     Schedule::lower_bound(const Date& refDate) const {
         Date d = (refDate==Date() ?
-                  Settings::instance().evaluationDate() :
+                  Settings<Date>::instance().evaluationDate() :
                   refDate);
         return std::lower_bound(dates_.begin(), dates_.end(), d);
     }
@@ -595,7 +595,7 @@ namespace QuantLib {
         endOfMonth_ = flag;
         return *this;
     }
-
+    inline
     MakeSchedule& MakeSchedule::withFirstDate(const Date& d) {
         firstDate_ = d;
         return *this;

@@ -73,7 +73,7 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    template <class ExtDate>
+    template <class ExtDate=Date>
     class SouthKorea : public Calendar<ExtDate> {
       private:
         class SettlementImpl : public Calendar<ExtDate>::Impl {

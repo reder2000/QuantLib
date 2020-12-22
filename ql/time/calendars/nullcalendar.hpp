@@ -46,7 +46,7 @@ namespace QuantLib {
         };
       public:
         NullCalendar() {
-            this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(new NullCalendar::Impl);
+            this->impl_ = std::shared_ptr<typename Calendar<ExtDate>::Impl>(new NullCalendar::Impl);
         }
     };
 

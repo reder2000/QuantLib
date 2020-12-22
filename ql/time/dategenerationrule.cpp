@@ -23,7 +23,7 @@
 #include "ql_errors.hpp"
 
 namespace QuantLib {
-
+    inline
     std::ostream& operator<<(std::ostream& out, DateGeneration::Rule r) {
         switch (r) {
           case DateGeneration::Backward:

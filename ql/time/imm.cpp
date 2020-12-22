@@ -37,7 +37,8 @@
 
 namespace QuantLib {
     template <class ExtDate> inline
-    bool IMM<ExtDate>::isIMMdate(const ExtDate& date, bool mainCycle) {
+    bool IMM<ExtDate>::isIMMdate(const ExtDate& dat, bool mainCycle) {
+        auto date = to_DateLike(dat);
         if (date.weekday()!=Wednesday)
             return false;
 
@@ -78,8 +79,8 @@ namespace QuantLib {
                    "{} is not an IMM date",date);
 
         std::ostringstream IMMcode;
-        unsigned int y = date.year() % 10;
-        switch(date.month()) {
+        unsigned int y = to_DateLike(date).year() % 10;
+        switch(to_DateLike(date).month()) {
           case January:
             IMMcode << 'F' << y;
             break;
@@ -131,9 +132,10 @@ namespace QuantLib {
         QL_REQUIRE(isIMMcode(immCode, false), "{} is not a valid IMM code"
             , immCode);
 
-        ExtDate referenceDate =
-            (refDate != ExtDate() ?
-                              refDate : ExtDate(Settings::instance().evaluationDate()));
+        DateLike<ExtDate> referenceDate{
+            to_DateLike(refDate) != ExtDate() ?
+                to_DateLike(refDate) :
+                DateLike<ExtDate>{Settings<ExtDate>::instance().evaluationDate()}};
         auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
         std::string code = to_upper_copy(immCode);
         std::string ms = code.substr(0,1);
@@ -160,17 +162,17 @@ namespace QuantLib {
         if (y==0 && referenceDate.year()<=1909) y+=10;
         Year referenceYear = (referenceDate.year() % 10);
         y += referenceDate.year() - referenceYear;
-        Date result = IMM<ExtDate>::nextDate(Date(1, m, y), false);
+        ExtDate result = IMM<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y), false);
         if (result<referenceDate)
-            return IMM<ExtDate>::nextDate(Date(1, m, y+10), false);
+            return IMM<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y + 10), false);
 
         return result;
     }
     template <class ExtDate>    inline
     ExtDate IMM<ExtDate>::nextDate(const ExtDate& date, bool mainCycle) {
-        Date refDate = (date == Date() ?
-                        Date(Settings::instance().evaluationDate()) :
-                        date);
+        DateLike<ExtDate> refDate{(to_DateLike(date) == ExtDate() ?
+                                       ExtDate(Settings<ExtDate>::instance().evaluationDate()) :
+                                       date)};
         Year y = refDate.year();
         QuantLib::Month m = refDate.month();
 
@@ -186,16 +188,16 @@ namespace QuantLib {
             }
         }
 
-        Date result = Date::nthWeekday(3, Wednesday, m, y);
+        ExtDate result = DateLike<ExtDate>::nthWeekday(3, Wednesday, m, y);
         if (result<=refDate)
-            result = nextDate(Date(22, m, y), mainCycle);
+            result = nextDate(DateAdaptor<ExtDate>::Date(22, m, y), mainCycle);
         return result;
     }
     template <class ExtDate>    inline
     ExtDate IMM<ExtDate>::nextDate(const std::string& IMMcode,
                        bool mainCycle,
                        const ExtDate& referenceDate)  {
-        Date immDate = date(IMMcode, referenceDate);
+        ExtDate immDate = date(IMMcode, referenceDate);
         return nextDate(immDate+1, mainCycle);
     }
     template <class ExtDate>    inline

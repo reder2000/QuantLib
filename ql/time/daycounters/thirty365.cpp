@@ -31,6 +31,7 @@ namespace QuantLib {
     }
     template <class ExtDate> inline
     Thirty365<ExtDate>::Thirty365()
-    : DayCounter<ExtDate>(std::shared_ptr<DayCounter<ExtDate>::Impl>(new Thirty365::Impl)) {}
+    : DayCounter<ExtDate>(
+          std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new Thirty365::Impl)) {}
 
 }

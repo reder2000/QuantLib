@@ -88,17 +88,17 @@ namespace QuantLib {
     UnitedStates<ExtDate>::UnitedStates(UnitedStates<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> settlementImpl(
                                         new UnitedStates<ExtDate>::SettlementImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> liborImpactImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> liborImpactImpl(
                                         new UnitedStates<ExtDate>::LiborImpactImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> nyseImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> nyseImpl(
                                         new UnitedStates<ExtDate>::NyseImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> governmentImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> governmentImpl(
                                         new UnitedStates<ExtDate>::GovernmentBondImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> nercImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> nercImpl(
                                         new UnitedStates<ExtDate>::NercImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> federalReserveImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> federalReserveImpl(
                                         new UnitedStates<ExtDate>::FederalReserveImpl);
         switch (market) {
           case Settlement:

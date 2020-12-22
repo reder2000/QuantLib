@@ -481,3 +481,7 @@ struct DateAdaptor<QuantLib::Date> {
     }
     static std::int_fast32_t serialNumber(const QuantLib::Date& d) { return d.serialNumber(); }
 };
+
+
+
+#include "date_like.hpp"

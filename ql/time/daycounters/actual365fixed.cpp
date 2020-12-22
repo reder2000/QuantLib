@@ -28,9 +28,9 @@ namespace QuantLib {
           case Standard:
             return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new Impl);
           case Canadian:
-            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new CA_Impl);
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new CA_Impl);
           case NoLeap:
-            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new NL_Impl);
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new NL_Impl);
           default:
             QL_FAIL("unknown Actual/365 (Fixed) convention");
         }

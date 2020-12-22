@@ -2127,7 +2127,7 @@ TEST_CASE("testDayLists", "[CalendarTest][hide]")  {
 
     BOOST_TEST_MESSAGE("Testing holidayList and businessDaysList...");
     Calendar germany = Germany<Date>();
-    Date firstDate = Settings::instance().evaluationDate(), endDate = firstDate + 1 * Years;
+    Date firstDate = Settings<Date>::instance().evaluationDate(), endDate = firstDate + 1 * Years;
 
     std::vector<Date> holidays = germany.holidayList(firstDate, endDate, true);
     std::vector<Date> businessDays = germany.businessDayList(firstDate, endDate);

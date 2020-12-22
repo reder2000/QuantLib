@@ -34,32 +34,33 @@
 namespace QuantLib {
 
     //! global repository for run-time library settings
-    class Settings : public Singleton<Settings> {
-        friend class Singleton<Settings>;
+    template <class ExtDate=Date>
+    class Settings : public Singleton<Settings<ExtDate>> {
+        friend class Singleton<Settings<ExtDate>>;
       private:
         Settings();
-        class DateProxy : public ObservableValue<Date> {
+        class DateProxy : public ObservableValue<ExtDate> {
           public:
             DateProxy();
-            DateProxy& operator=(const Date&);
-            operator Date() const;
+            DateProxy& operator=(const ExtDate&);
+            operator ExtDate() const;
         };
         friend std::ostream& operator<<(std::ostream&, const DateProxy&);
       public:
         //! the date at which pricing is to be performed.
         /*! Client code can inspect the evaluation date, as in:
             \code
-            Date d = Settings::instance().evaluationDate();
+            ExtDate d = Settings<ExtDate>::instance().evaluationDate();
             \endcode
             where today's date is returned if the evaluation date is
             set to the null date (its default value;) can set it to a
             new value, as in:
             \code
-            Settings::instance().evaluationDate() = d;
+            Settings<ExtDate>::instance().evaluationDate() = d;
             \endcode
             and can register with it, as in:
             \code
-            registerWith(Settings::instance().evaluationDate());
+            registerWith(Settings<ExtDate>::instance().evaluationDate());
             \endcode
             to be notified when it is set to a new value.
             \warning a notification is not sent when the evaluation
@@ -75,13 +76,13 @@ namespace QuantLib {
             midnight (and, incidentally, to gain quite a bit of
             performance.)  If no evaluation date was previously set,
             it is equivalent to setting the evaluation date to
-            Date::todaysDate(); if an evaluation date other than
-            Date() was already set, it has no effect.
+            ExtDate::todaysDate(); if an evaluation date other than
+            ExtDate() was already set, it has no effect.
         */
         void anchorEvaluationDate();
         /*! Call this to reset the evaluation date to
-            Date::todaysDate() and allow it to change at midnight.  It
-            is equivalent to setting the evaluation date to Date().
+            ExtDate::todaysDate() and allow it to change at midnight.  It
+            is equivalent to setting the evaluation date to ExtDate().
             This comes at the price of losing some performance, since
             the evaluation date is re-evaluated each time it is read.
         */
@@ -116,12 +117,13 @@ namespace QuantLib {
 
 
     // helper class to temporarily and safely change the settings
+    template <class ExtDate=Date>
     class SavedSettings {
       public:
         SavedSettings();
         ~SavedSettings();
       private:
-        Date evaluationDate_;
+        ExtDate evaluationDate_;
         bool includeReferenceDateEvents_;
         std::optional<bool> includeTodaysCashFlows_;
         bool enforcesTodaysHistoricFixings_;
@@ -129,48 +131,48 @@ namespace QuantLib {
 
 
     // inline
-
-    inline Settings::DateProxy::operator Date() const {
-        if (value() == Date())
-            return Date::todaysDate();
+    template <class ExtDate>
+    inline Settings<ExtDate>::DateProxy::operator ExtDate() const {
+        if (to_DateLike(this->value()) == ExtDate())
+            return DateLike<ExtDate>::todaysDate();
         else
-            return value();
+            return this->value();
     }
-
-    inline Settings::DateProxy& Settings::DateProxy::operator=(const Date& d) {
-        ObservableValue<Date>::operator=(d);
+    template <class ExtDate>
+    inline typename Settings<ExtDate>::DateProxy& Settings<ExtDate>::DateProxy::operator=(const ExtDate& d) {
+        ObservableValue<ExtDate>::operator=(d);
         return *this;
     }
-
-    inline Settings::DateProxy& Settings::evaluationDate() {
+    template <class ExtDate>
+    inline typename Settings<ExtDate>::DateProxy& Settings<ExtDate>::evaluationDate() {
         return evaluationDate_;
     }
-
-    inline const Settings::DateProxy& Settings::evaluationDate() const {
+    template <class ExtDate>
+    inline const typename Settings<ExtDate>::DateProxy& Settings<ExtDate>::evaluationDate() const {
         return evaluationDate_;
     }
-
-    inline bool& Settings::includeReferenceDateEvents() {
+    template <class ExtDate>
+    inline bool& Settings<ExtDate>::includeReferenceDateEvents() {
         return includeReferenceDateEvents_;
     }
-
-    inline bool Settings::includeReferenceDateEvents() const {
+    template <class ExtDate>
+    inline bool Settings<ExtDate>::includeReferenceDateEvents() const {
         return includeReferenceDateEvents_;
     }
-
-    inline std::optional<bool>& Settings::includeTodaysCashFlows() {
+    template <class ExtDate>
+    inline std::optional<bool>& Settings<ExtDate>::includeTodaysCashFlows() {
         return includeTodaysCashFlows_;
     }
-
-    inline std::optional<bool> Settings::includeTodaysCashFlows() const {
+    template <class ExtDate>
+    inline std::optional<bool> Settings<ExtDate>::includeTodaysCashFlows() const {
         return includeTodaysCashFlows_;
     }
-
-    inline bool& Settings::enforcesTodaysHistoricFixings() {
+    template <class ExtDate>
+    inline bool& Settings<ExtDate>::enforcesTodaysHistoricFixings() {
         return enforcesTodaysHistoricFixings_;
     }
-
-    inline bool Settings::enforcesTodaysHistoricFixings() const {
+    template <class ExtDate>
+    inline bool Settings<ExtDate>::enforcesTodaysHistoricFixings() const {
         return enforcesTodaysHistoricFixings_;
     }
 

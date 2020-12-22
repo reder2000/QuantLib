@@ -29,17 +29,19 @@
 #include <vector>
 
 namespace QuantLib {
+    template <class ExtDate>
+    using setExtDate = std::set<ExtDate, Less<ExtDate> >;
 
     //! European Central Bank reserve maintenance dates
+    template <class ExtDate>
     struct ECB {
-
-        static const std::set<Date>& knownDates();
-        static void addDate(const Date& d);
-        static void removeDate(const Date& d);
+        static const setExtDate<ExtDate>& knownDates();
+        static void addDate(const ExtDate& d);
+        static void removeDate(const ExtDate& d);
 
         //! maintenance period start date in the given month/year
-        static Date date(Month m,
-                         Year y) { return nextDate(Date(1, m, y) - 1); }
+        static ExtDate date(Month m,
+                         Year y) { return nextDate(ExtDate(1, m, y) - 1); }
 
         /*! returns the ECB date for the given ECB code
             (e.g. March xxth, 2013 for MAR10).
@@ -47,8 +49,8 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      string is not an ECB code
         */
-        static Date date(const std::string& ecbCode,
-                         const Date& referenceDate = Date());
+        static ExtDate date(const std::string& ecbCode,
+                         const ExtDate& referenceDate = ExtDate());
 
         /*! returns the ECB code for the given date
             (e.g. MAR10 for March xxth, 2010).
@@ -56,38 +58,38 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      date is not an ECB date
         */
-        static std::string code(const Date& ecbDate);
+        static std::string code(const ExtDate& ecbDate);
 
         //! next maintenance period start date following the given date
-        static Date nextDate(const Date& d = Date());
+        static ExtDate nextDate(const ExtDate& d = ExtDate());
 
         //! next maintenance period start date following the given ECB code
-        static Date nextDate(const std::string& ecbCode,
-                             const Date& referenceDate = Date()) {
+        static ExtDate nextDate(const std::string& ecbCode,
+                             const ExtDate& referenceDate = ExtDate()) {
             return nextDate(date(ecbCode, referenceDate));
         }
 
         //! next maintenance period start dates following the given date
-        static std::vector<Date> nextDates(const Date& d = Date());
+        static std::vector<ExtDate> nextDates(const ExtDate& d = ExtDate());
 
         //! next maintenance period start dates following the given code
-        static std::vector<Date> nextDates(const std::string& ecbCode,
-                                           const Date& referenceDate = Date()) {
+        static std::vector<ExtDate> nextDates(const std::string& ecbCode,
+                                           const ExtDate& referenceDate = ExtDate()) {
             return nextDates(date(ecbCode, referenceDate));
         }
 
         /*! returns whether or not the given date is
             a maintenance period start date */
-        static bool isECBdate(const Date& d) {
-            Date date = nextDate(d-1);
-            return d==date;
+        static bool isECBdate(const ExtDate& d) {
+            ExtDate date = nextDate(to_DateLike<ExtDate>(d)-1);
+            return to_DateLike<ExtDate>(d)==to_DateLike<ExtDate>(date);
         }
 
         //! returns whether or not the given string is an ECB code
         static bool isECBcode(const std::string& in);
 
         //! next ECB code following the given date
-        static std::string nextCode(const Date& d = Date()) {
+        static std::string nextCode(const ExtDate& d = ExtDate()) {
             return code(nextDate(d));
         }
 

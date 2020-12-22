@@ -27,14 +27,14 @@ namespace QuantLib {
         switch (c) {
           case USA:
           case BondBasis:
-            return std::shared_ptr<DayCounter<ExtDate>::Impl>(new US_Impl);
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new US_Impl);
           case European:
           case EurobondBasis:
-              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new EU_Impl);
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new EU_Impl);
           case Italian:
-              return std::shared_ptr<DayCounter<ExtDate>::Impl>(new IT_Impl);
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new IT_Impl);
           case German:
-              return std::shared_ptr<DayCounter<ExtDate>::Impl>(
+              return std::shared_ptr<typename DayCounter<ExtDate>::Impl>(
                 new GER_Impl(isLastPeriod));
           default:
             QL_FAIL("unknown 30/360 convention");

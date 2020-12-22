@@ -33,6 +33,7 @@
 namespace QuantLib {
 
     //! Main cycle of the Australian Securities Exchange (a.k.a. ASX) months
+    template <class ExtDate>
     struct ASX {
         enum Month { F =  1, G =  2, H =  3,
                      J =  4, K =  5, M =  6,
@@ -40,7 +41,7 @@ namespace QuantLib {
                      V = 10, X = 11, Z = 12 };
 
         //! returns whether or not the given date is an ASX date
-        static bool isASXdate(const Date& d,
+        static bool isASXdate(const ExtDate& d,
                               bool mainCycle = true);
 
         //! returns whether or not the given string is an ASX code
@@ -53,7 +54,7 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      date is not an ASX date
         */
-        static std::string code(const Date& asxDate);
+        static std::string code(const ExtDate& asxExtDate);
 
         /*! returns the ASX date for the given ASX code
             (e.g. June 12th, 2015 for M5).
@@ -61,29 +62,29 @@ namespace QuantLib {
             \warning It raises an exception if the input
                      string is not an ASX code
         */
-        static Date date(const std::string& asxCode,
-                         const Date& referenceDate = Date());
+        static ExtDate date(const std::string& asxCode,
+                         const ExtDate& referenceExtDate = ExtDate());
 
         //! next ASX date following the given date
         /*! returns the 1st delivery date for next contract listed in the
             Australian Securities Exchange.
         */
-        static Date nextDate(const Date& d = Date(),
+        static ExtDate nextDate(const ExtDate& d = ExtDate(),
                              bool mainCycle = true);
 
         //! next ASX date following the given ASX code
         /*! returns the 1st delivery date for next contract listed in the
             Australian Securities Exchange
         */
-        static Date nextDate(const std::string& asxCode,
+        static ExtDate nextDate(const std::string& asxCode,
                              bool mainCycle = true,
-                             const Date& referenceDate = Date());
+                             const ExtDate& referenceExtDate = ExtDate());
 
         //! next ASX code following the given date
         /*! returns the ASX code for next contract listed in the
             Australian Securities Exchange
         */
-        static std::string nextCode(const Date& d = Date(),
+        static std::string nextCode(const ExtDate& d = ExtDate(),
                                     bool mainCycle = true);
 
         //! next ASX code following the given code
@@ -92,7 +93,7 @@ namespace QuantLib {
         */
         static std::string nextCode(const std::string& asxCode,
                                     bool mainCycle = true,
-                                    const Date& referenceDate = Date());
+                                    const ExtDate& referenceExtDate = ExtDate());
     };
 
 }

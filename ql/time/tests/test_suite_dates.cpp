@@ -35,9 +35,12 @@
 #include <unordered_set>
 //#include <boost/functional/hash.hpp>
 #include <sstream>
+#include "pseudo_dates.h"
 
 using namespace QuantLib;
 //using namespace boost::unit_test_framework;
+
+using eDate = QuantLibDate;
 
 #define BOOST_TEST_MESSAGE INFO
 #define BOOST_FAIL(...) 
@@ -47,45 +50,45 @@ TEST_CASE("ecbDates", "[DateTest][hide]") {
 //void DateTest::ecbDates() {
     BOOST_TEST_MESSAGE("Testing ECB dates...");
 
-    std::set<Date> knownDates = ECB::knownDates();
+    auto knownDates = ECB<eDate>::knownDates();
     IF (knownDates.empty())
         BOOST_FAIL("\nempty EBC date vector");
 
-    Size n = ECB::nextDates(Date::minDate()).size();
+    Size n = ECB<eDate>::nextDates(DateLike<eDate>::minDate()).size();
     IF (n != knownDates.size())
         BOOST_FAIL("\nnextDates(minDate) returns "  << n <<
                    " instead of " << knownDates.size() << " dates");
 
-    std::set<Date>::const_iterator i;
-    Date previousEcbDate = Date::minDate(),
+    std::set<eDate>::const_iterator i;
+        eDate previousEcbDate = DateLike<eDate>::minDate(),
          currentEcbDate, ecbDateMinusOne;
     for (i=knownDates.begin(); i!=knownDates.end(); ++i) {
 
         currentEcbDate = *i;
-        IF (!ECB::isECBdate(currentEcbDate))
+        IF (!ECB<eDate>::isECBdate(currentEcbDate))
             BOOST_FAIL("\n" << currentEcbDate << " fails isECBdate check");
 
-        ecbDateMinusOne = currentEcbDate-1;
-        IF (ECB::isECBdate(ecbDateMinusOne))
+        ecbDateMinusOne = to_DateLike(currentEcbDate)-1;
+        IF (ECB<eDate>::isECBdate(ecbDateMinusOne))
             BOOST_FAIL("\n" << ecbDateMinusOne << " fails isECBdate check");
 
-        IF (ECB::nextDate(ecbDateMinusOne)!=currentEcbDate)
+        IF(to_DateLike(ECB<eDate>::nextDate(ecbDateMinusOne)) != currentEcbDate)
             BOOST_FAIL("\n next EBC date following " << ecbDateMinusOne <<
                        " must be " << currentEcbDate);
 
-        IF (ECB::nextDate(previousEcbDate)!=currentEcbDate)
+        IF (to_DateLike(ECB<eDate>::nextDate(previousEcbDate))!=currentEcbDate)
             BOOST_FAIL("\n next EBC date following " << previousEcbDate <<
                        " must be " << currentEcbDate);
 
         previousEcbDate = currentEcbDate;
     }
 
-    Date knownDate = *knownDates.begin();
-    ECB::removeDate(knownDate);
-    IF (ECB::isECBdate(knownDate))
+    eDate knownDate = *knownDates.begin();
+    ECB<eDate>::removeDate(knownDate);
+    IF (ECB<eDate>::isECBdate(knownDate))
         BOOST_FAIL("\neunable to remove an EBC date");
-    ECB::addDate(knownDate);
-    IF (!ECB::isECBdate(knownDate))
+    ECB<eDate>::addDate(knownDate);
+    IF (!ECB<eDate>::isECBdate(knownDate))
         BOOST_FAIL("\neunable to add an EBC date");
 
 }
@@ -106,59 +109,59 @@ TEST_CASE("immDates", "[DateTest][hide]") {
         "F9", "G9", "H9", "J9", "K9", "M9", "N9", "Q9", "U9", "V9", "X9", "Z9"
     };
 
-    Date counter = Date::minDate();
-    // 10 years of futures must not exceed Date::maxDate
-    Date last = Date::maxDate() - 121*Months;
-    Date imm;
+    eDate counter = DateLike<eDate>::minDate();
+    // 10 years of futures must not exceed eDate::maxDate
+    eDate last = DateLike<eDate>::maxDate() - 121*Months;
+    eDate imm;
 
-    while (counter<=last) {
-        imm = IMM<Date>::nextDate(counter, false);
+    while (to_DateLike(counter)<=last) {
+        imm = IMM<eDate>::nextDate(counter, false);
 
         // check that imm is greater than counter
-        IF (imm<=counter)
+        IF (to_DateLike(imm)<=counter)
             BOOST_FAIL("\n  "
                        << imm.weekday() << " " << imm
                        << " is not greater than "
                        << counter.weekday() << " " << counter);
 
         // check that imm is an IMM date
-        IF (!IMM<Date>::isIMMdate(imm, false))
+        IF (!IMM<eDate>::isIMMdate(imm, false))
             BOOST_FAIL("\n  "
                        << imm.weekday() << " " << imm
                        << " is not an IMM date (calculated from "
                        << counter.weekday() << " " << counter << ")");
 
         // check that imm is <= to the next IMM date in the main cycle
-        IF (imm>IMM<Date>::nextDate(counter, true))
+        IF (to_DateLike(imm)>IMM<eDate>::nextDate(counter, true))
             BOOST_FAIL("\n  "
                        << imm.weekday() << " " << imm
                        << " is not less than or equal to the next future in the main cycle "
-                       << IMM<Date>::nextDate(counter, true));
+                       << IMM<eDate>::nextDate(counter, true));
 
         //// check that IF counter is an IMM date, then imm==counter
-        //IF (IMM<Date>::isIMMdate(counter, false) && (imm!=counter))
+        //IF (IMM<eDate>::isIMMdate(counter, false) && (imm!=counter))
         //    BOOST_FAIL("\n  "
         //               << counter.weekday() << " " << counter
         //               << " is already an IMM date, while nextIMM() returns "
         //               << imm.weekday() << " " << imm);
 
         // check that for every date IMMdate is the inverse of IMMcode
-        IF (IMM<Date>::date(IMM<Date>::code(imm), counter) != imm)
+        IF (IMM<eDate>::date(IMM<eDate>::code(imm), counter) != to_DateLike(imm))
             BOOST_FAIL("\n  "
-                       << IMM<Date>::code(imm)
+                       << IMM<eDate>::code(imm)
                        << " at calendar day " << counter
                        << " is not the IMM code matching " << imm);
 
         // check that for every date the 120 IMM codes refer to future dates
         for (int i=0; i<40; ++i) {
-            IF (IMM<Date>::date(IMMcodes[i], counter)<counter)
+            IF (IMM<eDate>::date(IMMcodes[i], counter)<to_DateLike(counter))
                 BOOST_FAIL("\n  "
-                       << IMM<Date>::date(IMMcodes[i], counter)
+                       << IMM<eDate>::date(IMMcodes[i], counter)
                        << " is wrong for " << IMMcodes[i]
                        << " at reference date " << counter);
         }
 
-        counter = counter + 1;
+        counter = to_DateLike(counter) + 1;
     }
 }
 
@@ -179,59 +182,59 @@ TEST_CASE("asxDates", "[DateTest][hide]") {
         "F9", "G9", "H9", "J9", "K9", "M9", "N9", "Q9", "U9", "V9", "X9", "Z9"
     };
 
-    Date counter = Date::minDate();
-    // 10 years of futures must not exceed Date::maxDate
-    Date last = Date::maxDate() - 121 * Months;
-    Date asx;
+    eDate counter = DateLike<eDate>::minDate();
+    // 10 years of futures must not exceed eDate::maxDate
+    eDate last = DateLike<eDate>::maxDate() - 121 * Months;
+    eDate asx;
 
-    while (counter <= last) {
-        asx = ASX::nextDate(counter, false);
+    while (to_DateLike(counter) <= last) {
+        asx = ASX<eDate>::nextDate(counter, false);
 
         // check that asx is greater than counter
-        IF (asx <= counter)
+        IF (to_DateLike(asx) <= counter)
             BOOST_FAIL("\n  "
             << asx.weekday() << " " << asx
             << " is not greater than "
             << counter.weekday() << " " << counter);
 
         // check that asx is an ASX date
-        IF (!ASX::isASXdate(asx, false))
+        IF (!ASX<eDate>::isASXdate(asx, false))
             BOOST_FAIL("\n  "
             << asx.weekday() << " " << asx
             << " is not an ASX date (calculated from "
             << counter.weekday() << " " << counter << ")");
 
         // check that asx is <= to the next ASX date in the main cycle
-        IF (asx>ASX::nextDate(counter, true))
+        IF (to_DateLike(asx)>ASX<eDate>::nextDate(counter, true))
             BOOST_FAIL("\n  "
             << asx.weekday() << " " << asx
             << " is not less than or equal to the next future in the main cycle "
-            << ASX::nextDate(counter, true));
+            << ASX<eDate>::nextDate(counter, true));
 
         //// check that IF counter is an ASX date, then asx==counter
-        //IF (ASX::isASXdate(counter, false) && (asx!=counter))
+        //IF (ASX<eDate>::isASXdate(counter, false) && (asx!=counter))
         //    BOOST_FAIL("\n  "
         //               << counter.weekday() << " " << counter
         //               << " is already an ASX date, while nextASX() returns "
         //               << asx.weekday() << " " << asx);
 
         // check that for every date ASXdate is the inverse of ASXcode
-        IF (ASX::date(ASX::code(asx), counter) != asx)
+        IF (to_DateLike(ASX<eDate>::date(ASX<eDate>::code(asx), counter)) != to_DateLike(asx))
             BOOST_FAIL("\n  "
-            << ASX::code(asx)
+            << ASX<eDate>::code(asx)
             << " at calendar day " << counter
             << " is not the ASX code matching " << asx);
 
         // check that for every date the 120 ASX codes refer to future dates
         for (int i = 0; i<120; ++i) {
-            IF (ASX::date(ASXcodes[i], counter)<counter)
+            IF (ASX<eDate>::date(ASXcodes[i], counter)<to_DateLike(counter))
                 BOOST_FAIL("\n  "
-                << ASX::date(ASXcodes[i], counter)
+                << ASX<eDate>::date(ASXcodes[i], counter)
                 << " is wrong for " << ASXcodes[i]
                 << " at reference date " << counter);
         }
 
-        counter = counter + 1;
+        counter = to_DateLike(counter) + 1;
     }
 }
 
@@ -240,17 +243,17 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing dates...");
 
-    serial_type minDate = Date::minDate().serialNumber()+1,
-                      maxDate = Date::maxDate().serialNumber();
-
-    serial_type dyold = Date(minDate-1).dayOfYear(),
-                      dold  = Date(minDate-1).dayOfMonth(),
-                      mold  = Date(minDate-1).month(),
-                      yold  = Date(minDate-1).year(),
-                      wdold = Date(minDate-1).weekday();
+    serial_type minDate = DateLike<eDate>::minDate().serialNumber()+1,
+                      maxDate = DateLike<eDate>::maxDate().serialNumber();
+    DateLike<eDate> minDate_minus_1{DateAdaptor<eDate>::Date(minDate - 1)};
+    serial_type dyold = minDate_minus_1.dayOfYear(),
+                      dold  = minDate_minus_1.dayOfMonth(),
+                      mold  = minDate_minus_1.month(),
+                      yold  = minDate_minus_1.year(),
+                      wdold = minDate_minus_1.weekday();
 
     for (serial_type i=minDate; i<=maxDate; i++) {
-        Date t(i);
+        DateLike<eDate> t {DateAdaptor<eDate>::Date(i)};
         serial_type serial = t.serialNumber();
 
         // check serial number consistency
@@ -268,8 +271,8 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
 
         // check IF skipping any date
         IF (!((dy == dyold+1) ||
-              (dy == 1 && dyold == 365 && !Date::isLeap(yold)) ||
-              (dy == 1 && dyold == 366 && Date::isLeap(yold))))
+              (dy == 1 && dyold == 365 && !DateLike<eDate>::isLeap(yold)) ||
+             (dy == 1 && dyold == 366 && DateLike<eDate>::isLeap(yold))))
             BOOST_FAIL("wrong day of year increment: \n"
                        << "    date: " << t << "\n"
                        << "    day of year: " << dy << "\n"
@@ -300,7 +303,7 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
                        << "    day: " << d);
         IF (!((m == 1  && d <= 31) ||
               (m == 2  && d <= 28) ||
-              (m == 2  && d == 29 && Date::isLeap(y)) ||
+                 (m == 2 && d == 29 && DateLike<eDate>::isLeap(y)) ||
               (m == 3  && d <= 31) ||
               (m == 4  && d <= 30) ||
               (m == 5  && d <= 31) ||
@@ -325,7 +328,7 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
         wdold = wd;
 
         // create the same date with a different constructor
-        Date s(d,Month(m),y);
+        DateLike<eDate> s{DateAdaptor<eDate>::Date(d, Month(m), y)};
         // check serial number consistency
         serial = s.serialNumber();
         IF (serial != i)
@@ -341,7 +344,7 @@ TEST_CASE("isoDates", "[DateTest][hide]") {
     //void DateTest::isoDates() {
     BOOST_TEST_MESSAGE("Testing ISO dates...");
     std::string input_date("2006-01-15");
-    Date d = DateParser<Date>::parseISO(input_date);
+    DateLike<eDate> d{DateParser<eDate>::parseISO(input_date)};
     IF ((d.dayOfMonth() != 15 ||
         d.month() != January ||
         d.year() != 2006))
@@ -357,30 +360,30 @@ TEST_CASE("parseDates", "[DateTest][hide]") {
     BOOST_TEST_MESSAGE("Testing parsing of dates...");
 
     std::string input_date("2006-01-15");
-    Date d = DateParser<Date>::parseFormatted(input_date, "%Y-%m-%d");
-    IF (d != Date(15, January, 2006)) 
+    DateLike<eDate> d{DateParser<eDate>::parseFormatted(input_date, "%Y-%m-%d")};
+    IF(d != DateAdaptor<eDate>::Date(15, January, 2006)) 
         BOOST_FAIL("date parsing failed\n"
                    << " input date:  " << input_date << "\n"
                    << " parsed date: " << d);
     
 
     input_date = "12/02/2012";
-    d = DateParser<Date>::parseFormatted(input_date, "%m/%d/%Y");
-    IF (d != Date(2, December, 2012)) 
+        d = DateLike<eDate>{DateParser<eDate>::parseFormatted(input_date, "%m/%d/%Y")};
+    IF(d != DateAdaptor<eDate>::Date(2, December, 2012)) 
         BOOST_FAIL("date parsing failed\n"
                    << " input date:  " << input_date << "\n"
                    << " parsed date: " << d);
     
-    d = DateParser<Date>::parseFormatted(input_date, "%d/%m/%Y");
-    IF (d != Date(12, February, 2012)) 
+    d = DateLike<eDate>{DateParser<eDate>::parseFormatted(input_date, "%d/%m/%Y")};
+        IF(d != DateAdaptor<eDate>::Date(12, February, 2012)) 
         BOOST_FAIL("date parsing failed\n"
                    << " input date:  " << input_date << "\n"
                    << " parsed date: " << d);
     
 
     input_date = "20011002";
-    d = DateParser<Date>::parseFormatted(input_date, "%Y%m%d");
-    IF (d != Date(2, October, 2001)) 
+        d = DateLike<eDate>{DateParser<eDate>::parseFormatted(input_date, "%Y%m%d")};
+    IF(d != DateAdaptor<eDate>::Date(2, October, 2001)) 
         BOOST_FAIL("date parsing failed\n"
                    << " input date:  " << input_date << "\n"
                    << " parsed date: " << d);
@@ -392,7 +395,7 @@ TEST_CASE("intraday", "[DateTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing intraday information of dates...");
 
-    const Date d1 = Date(12, February, 2015, 10, 45, 12, 1234, 76253);
+    const eDate d1 = eDate(12, February, 2015, 10, 45, 12, 1234, 76253);
 
     BOOST_CHECK_MESSAGE(d1.year() == 2015, "failed to reproduce year");
     BOOST_CHECK_MESSAGE(d1.month() == February, "failed to reproduce month");
@@ -403,22 +406,22 @@ TEST_CASE("intraday", "[DateTest][hide]") {
     BOOST_CHECK_MESSAGE(d1.seconds() == 13,
         "failed to reproduce second of minute");
 
-    IF (Date::ticksPerSecond() == 1000)
+    IF (eDate::ticksPerSecond() == 1000)
         BOOST_CHECK_MESSAGE(d1.fractionOfSecond() == 0.234,
             "failed to reproduce fraction of second");
-    else IF (Date::ticksPerSecond() >= 1000000)
+    else IF (eDate::ticksPerSecond() >= 1000000)
         BOOST_CHECK_MESSAGE(d1.fractionOfSecond() == (234000 + 76253)/1000000.0,
         "failed to reproduce fraction of second");
 
-    IF (Date::ticksPerSecond() >= 1000)
+    IF (eDate::ticksPerSecond() >= 1000)
         BOOST_CHECK_MESSAGE(d1.milliseconds() == 234 + 76,
             "failed to reproduce number of milliseconds");
 
-    IF (Date::ticksPerSecond() >= 1000000)
+    IF (eDate::ticksPerSecond() >= 1000000)
         BOOST_CHECK_MESSAGE(d1.microseconds() == 253,
             "failed to reproduce number of microseconds");
 
-    const Date d2 = Date(28, February, 2015, 50, 165, 476, 1234, 253);
+    const eDate d2 = eDate(28, February, 2015, 50, 165, 476, 1234, 253);
     BOOST_CHECK_MESSAGE(d2.year() == 2015, "failed to reproduce year");
     BOOST_CHECK_MESSAGE(d2.month() == March, "failed to reproduce month");
     BOOST_CHECK_MESSAGE(d2.dayOfMonth() == 2, "failed to reproduce day");
@@ -428,15 +431,15 @@ TEST_CASE("intraday", "[DateTest][hide]") {
     BOOST_CHECK_MESSAGE(d2.seconds() == 57,
         "failed to reproduce second of minute");
 
-    IF (Date::ticksPerSecond() >= 1000)
+    IF (eDate::ticksPerSecond() >= 1000)
         BOOST_CHECK_MESSAGE(d2.milliseconds() == 234,
             "failed to reproduce number of milliseconds");
-    IF (Date::ticksPerSecond() >= 1000000)
+    IF (eDate::ticksPerSecond() >= 1000000)
         BOOST_CHECK_MESSAGE(d2.microseconds() == 253,
             "failed to reproduce number of microseconds");
 
     std::ostringstream s;
-    s << io::iso_datetime(Date(7, February, 2015, 1, 4, 2, 3, 4));
+    s << io::iso_datetime(eDate(7, February, 2015, 1, 4, 2, 3, 4));
 
     BOOST_CHECK_MESSAGE(s.str() == std::string("2015-02-07T01:04:02,003004"),
         "datetime to string failed to reproduce expected result");
@@ -448,16 +451,16 @@ TEST_CASE("canHash", "[DateTest][hide]") {
 //    void DateTest::canHash() {
     BOOST_TEST_MESSAGE("Testing hashing of dates...");
 
-    Date start_date = Date(1, Jan, 2020);
+    eDate start_date = eDate(1, Jan, 2020);
     int nb_tests = 500;
 
-        hash<Date> hasher;
+        hash<eDate> hasher;
 
     // Check hash values
     for (int i = 0; i < nb_tests; ++i) {
         for (int j = 0; j < nb_tests; ++j) {
-            Date lhs = start_date + i;
-            Date rhs = start_date + j;
+            eDate lhs = start_date + i;
+            eDate rhs = start_date + j;
 
             IF (lhs == rhs && hasher(lhs) != hasher(rhs)) {
                 BOOST_FAIL("Equal dates are expected to have same hash value\n"
@@ -477,8 +480,8 @@ TEST_CASE("canHash", "[DateTest][hide]") {
         }
     }
 
-    // Check IF Date can be used as unordered_set key
-    boost::unordered_set<Date> set;
+    // Check IF eDate can be used as unordered_set key
+    boost::unordered_set<eDate> set;
     set.insert(start_date);
 
     IF (set.count(start_date) == 0) {
@@ -487,7 +490,7 @@ TEST_CASE("canHash", "[DateTest][hide]") {
 }
 */
 //test_suite* DateTest::suite(SpeedLevel speed) {
-//    test_suite* suite = BOOST_TEST_SUITE("Date tests");
+//    test_suite* suite = BOOST_TEST_SUITE("eDate tests");
 //
 //    suite->add(QUANTLIB_TEST_CASE(&DateTest::testConsistency));
 //    suite->add(QUANTLIB_TEST_CASE(&DateTest::ecbDates));

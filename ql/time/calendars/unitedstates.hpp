@@ -128,7 +128,7 @@ namespace QuantLib {
         \test the correctness of the returned results is tested
               against a list of known holidays.
     */
-    template <class ExtDate>
+    template <class ExtDate=Date>
     class UnitedStates : public Calendar<ExtDate> {
       private:
         class SettlementImpl : public Calendar<ExtDate>::WesternImpl {

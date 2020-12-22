@@ -26,11 +26,11 @@ namespace QuantLib {
     UnitedKingdom<ExtDate>::UnitedKingdom(UnitedKingdom<ExtDate>::Market market) {
         // all calendar instances on the same market share the same
         // implementation instance
-        static std::shared_ptr<Calendar<ExtDate>::Impl> settlementImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> settlementImpl(
                                            new UnitedKingdom<ExtDate>::SettlementImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> exchangeImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> exchangeImpl(
                                            new UnitedKingdom<ExtDate>::ExchangeImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> metalsImpl(
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> metalsImpl(
                                            new UnitedKingdom<ExtDate>::MetalsImpl);
         switch (market) {
           case Settlement:
@@ -47,7 +47,8 @@ namespace QuantLib {
         }
     }
     template <class ExtDate> inline
-    bool UnitedKingdom<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedKingdom<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& edate) const {
+        auto& date = to_DateLike(edate);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -90,7 +91,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool UnitedKingdom<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedKingdom<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& edate) const {
+        auto& date = to_DateLike(edate);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -133,7 +135,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool UnitedKingdom<ExtDate>::MetalsImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedKingdom<ExtDate>::MetalsImpl::isBusinessDay(const ExtDate& edate) const {
+        auto& date = to_DateLike(edate);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();

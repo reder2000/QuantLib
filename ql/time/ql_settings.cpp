@@ -22,47 +22,47 @@
 #include "ql_settings.hpp"
 
 namespace QuantLib {
-    inline
-    Settings::DateProxy::DateProxy()
-    : ObservableValue<Date>(Date()) {}
-    inline
+    template <class ExtDate> inline
+    Settings<ExtDate>::DateProxy::DateProxy()
+    : ObservableValue<ExtDate>(ExtDate()) {}
+    template <class ExtDate> inline
     std::ostream& operator<<(std::ostream& out,
-                             const Settings::DateProxy& p) {
-        return out << Date(p);
+                             const typename Settings<ExtDate>::DateProxy& p) {
+        return out << ExtDate(p);
     }
-    inline
-    Settings::Settings()
+    template <class ExtDate> inline
+    Settings<ExtDate>::Settings()
     : includeReferenceDateEvents_(false),
       enforcesTodaysHistoricFixings_(false) {}
-    inline
-    void Settings::anchorEvaluationDate() {
+    template <class ExtDate> inline
+    void Settings<ExtDate>::anchorEvaluationDate() {
         // set to today's date if not already set.
-        if (evaluationDate_.value() == Date())
-            evaluationDate_ = Date::todaysDate();
+        if (evaluationDate_.value() == ExtDate())
+            evaluationDate_ = ExtDate::todaysDate();
         // If set, no-op since the date is already anchored.
     }
-    inline
-    void Settings::resetEvaluationDate() {
-        evaluationDate_ = Date();
+    template <class ExtDate> inline
+    void Settings<ExtDate>::resetEvaluationDate() {
+        evaluationDate_ = ExtDate();
     }
-    inline
-    SavedSettings::SavedSettings()
-    : evaluationDate_(Settings::instance().evaluationDate()),
+    template <class ExtDate> inline
+    SavedSettings<ExtDate>::SavedSettings()
+    : evaluationDate_(Settings<ExtDate>::instance().evaluationDate()),
       includeReferenceDateEvents_(
-                        Settings::instance().includeReferenceDateEvents()),
-      includeTodaysCashFlows_(Settings::instance().includeTodaysCashFlows()),
+                        Settings<ExtDate>::instance().includeReferenceDateEvents()),
+      includeTodaysCashFlows_(Settings<ExtDate>::instance().includeTodaysCashFlows()),
       enforcesTodaysHistoricFixings_(
-                        Settings::instance().enforcesTodaysHistoricFixings()) {}
-    inline
-    SavedSettings::~SavedSettings() {
+                        Settings<ExtDate>::instance().enforcesTodaysHistoricFixings()) {}
+    template <class ExtDate> inline
+    SavedSettings<ExtDate>::~SavedSettings() {
         try {
-            if (Settings::instance().evaluationDate() != evaluationDate_)
-                Settings::instance().evaluationDate() = evaluationDate_;
-            Settings::instance().includeReferenceDateEvents() =
+            if (Settings<ExtDate>::instance().evaluationDate() != evaluationDate_)
+                Settings<ExtDate>::instance().evaluationDate() = evaluationDate_;
+            Settings<ExtDate>::instance().includeReferenceDateEvents() =
                 includeReferenceDateEvents_;
-            Settings::instance().includeTodaysCashFlows() =
+            Settings<ExtDate>::instance().includeTodaysCashFlows() =
                 includeTodaysCashFlows_;
-            Settings::instance().enforcesTodaysHistoricFixings() =
+            Settings<ExtDate>::instance().enforcesTodaysHistoricFixings() =
                 enforcesTodaysHistoricFixings_;
         } catch (...) {
             // nothing we can do except bailing out.

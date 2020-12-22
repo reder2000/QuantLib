@@ -36,9 +36,15 @@
 
 namespace QuantLib {
 
-    static std::set<Date> knownDateSet;
-    inline
-    const std::set<Date>& ECB::knownDates() {
+    template <class ExtDate>
+    struct knownDateSet {
+        static setExtDate<ExtDate>& get() {
+            static setExtDate<ExtDate> res;
+            return res;
+        }
+    };
+    template <class ExtDate> inline 
+    const setExtDate<ExtDate>& ECB<ExtDate>::knownDates() {
 
         // one-off inizialization
         static const serial_type knownDatesArray[] = {
@@ -61,27 +67,27 @@ namespace QuantLib {
             // https://www.ecb.europa.eu/press/calendars/reserve/html/index.en.html
             , 42760, 42809, 42858, 42900, 42942, 42991, 43040, 43089 //2017
         };
-        if (knownDateSet.empty()) {
+        if (knownDateSet<ExtDate>::get().empty()) {
             Size n = sizeof(knownDatesArray)/sizeof(serial_type);
             for (Size i=0; i<n; ++i)
-                knownDateSet.insert(Date(knownDatesArray[i]));
+                knownDateSet<ExtDate>::get().insert(DateAdaptor<ExtDate>::Date(knownDatesArray[i]));
         }
 
-        return knownDateSet;
+        return knownDateSet<ExtDate>::get();
     }
-    inline
-    void ECB::addDate(const Date& d) {
+    template <class ExtDate> inline
+    void ECB<ExtDate>::addDate(const ExtDate& d) {
         knownDates(); // just to ensure inizialization
-        knownDateSet.insert(d);
+        knownDateSet<ExtDate>::get().insert(d);
     }
-    inline
-    void ECB::removeDate(const Date& d) {
+    template <class ExtDate> inline
+    void ECB<ExtDate>::removeDate(const ExtDate& d) {
         knownDates(); // just to ensure inizialization
-        knownDateSet.erase(d);
+        knownDateSet<ExtDate>::get().erase(d);
     }
-    inline
-    Date ECB::date(const std::string& ecbCode,
-                   const Date& refDate) {
+    template <class ExtDate> inline
+    ExtDate ECB<ExtDate>::date(const std::string& ecbCode,
+                   const ExtDate& refDate) {
 
         QL_REQUIRE(isECBcode(ecbCode), "{} is not a valid ECB code", ecbCode );
         auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
@@ -106,17 +112,17 @@ namespace QuantLib {
         //Year y = boost::lexical_cast<Year>(code.substr(3, 2));
 
         Year y = io::to_integer(code.substr(3, 2));
-        Date referenceDate = (refDate != Date() ?
+        ExtDate referenceDate = (refDate != ExtDate() ?
                               refDate :
-                              Date(Settings::instance().evaluationDate()));
+                              ExtDate(Settings<ExtDate>::instance().evaluationDate()));
         Year referenceYear = (referenceDate.year() % 100);
         y += referenceDate.year() - referenceYear;
-        if (y<Date::minDate().year())
-            return ECB::nextDate(Date::minDate());
+        if (y<ExtDate::minDate().year())
+            return ECB<ExtDate>::nextDate(ExtDate::minDate());
 
-        return ECB::nextDate(Date(1, m, y) - 1);
+        return ECB<ExtDate>::nextDate(ExtDate(1, m, y) - 1);
     }
-    inline std::string ECB::code(const Date& ecbDate) {
+    template <class ExtDate> inline std::string ECB<ExtDate>::code(const ExtDate& ecbDate) {
 
         QL_REQUIRE(isECBdate(ecbDate), "{} is not a valid ECB date", ecbDate );
 
@@ -174,35 +180,35 @@ namespace QuantLib {
     }
 
 
-    inline
-    Date ECB::nextDate(const Date& date) {
-        Date d = (date == Date() ?
-                  Settings::instance().evaluationDate() :
+    template <class ExtDate> inline
+    ExtDate ECB<ExtDate>::nextDate(const ExtDate& date) {
+        ExtDate d = (to_DateLike<ExtDate>(date) == ExtDate() ?
+                  Settings<ExtDate>::instance().evaluationDate() :
                   date);
 
-        std::set<Date>::const_iterator i =
-            std::upper_bound(knownDates().begin(), knownDates().end(), d);
+        typename setExtDate<ExtDate>::const_iterator i =
+            std::upper_bound(knownDates().begin(), knownDates().end(), d, QuantLib::Less<ExtDate>());
 
         QL_REQUIRE(i!=knownDates().end(), "ECB dates after {} are unknown",
-                   *(--knownDates().end()) );
-        return Date(*i);
+                   *(--knownDates().end()) ) ;
+        return ExtDate(*i);
     }
-    inline
-    std::vector<Date> ECB::nextDates(const Date& date) {
-        Date d = (date == Date() ?
-                  Settings::instance().evaluationDate() :
+    template <class ExtDate> inline
+    std::vector<ExtDate> ECB<ExtDate>::nextDates(const ExtDate& date) {
+        ExtDate d = (to_DateLike<ExtDate>(date) == ExtDate() ?
+                  Settings<ExtDate>::instance().evaluationDate() :
                   date);
 
-        std::set<Date>::const_iterator i =
-            std::upper_bound(knownDates().begin(), knownDates().end(), d);
+        typename setExtDate<ExtDate>::const_iterator i = std::upper_bound(
+            knownDates().begin(), knownDates().end(), d, QuantLib::Less<ExtDate>());
 
         QL_REQUIRE(i!=knownDates().end(), "ECB dates after {} are unknown",
                     *knownDates().end());
-        return std::vector<Date>(i, knownDates().end());
+        return std::vector<ExtDate>(i, knownDates().end());
     }
 
-    inline
-    bool ECB::isECBcode(const std::string& ecbCode) {
+    template <class ExtDate> inline
+    bool ECB<ExtDate>::isECBcode(const std::string& ecbCode) {
 
         if (ecbCode.length() != 5)
             return false;
@@ -232,7 +238,7 @@ namespace QuantLib {
         else if (monthString=="DEC") return true;
         else return false;
     }
-    inline std::string ECB::nextCode(const std::string& ecbCode) {
+    template <class ExtDate> inline std::string ECB<ExtDate>::nextCode(const std::string& ecbCode) {
         QL_REQUIRE(isECBcode(ecbCode), "{} is not a valid ECB code", ecbCode );
         auto to_upper_copy = [](const std::string& s) { std::string res; for (auto i:s) res.push_back(std::toupper(i)); return res;};
         std::string code = to_upper_copy(ecbCode);

@@ -109,7 +109,8 @@ namespace QuantLib {
         private:
             bool isLastPeriod_;
         };
-        static std::shared_ptr<DayCounter<ExtDate>::Impl> implementation(
+        static std::shared_ptr<typename DayCounter<ExtDate>::Impl>
+        implementation(
             Convention c, bool isLastPeriod);
       public:
         Thirty360(Convention c = Thirty360<ExtDate>::BondBasis, bool isLastPeriod = false)

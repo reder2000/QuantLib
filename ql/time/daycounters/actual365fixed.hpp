@@ -81,7 +81,7 @@ namespace QuantLib {
                               const Date& refPeriodStart,
                               const Date& refPeriodEnd) const;
         };
-        static std::shared_ptr<DayCounter<ExtDate>::Impl> implementation(Convention);
+        static std::shared_ptr<typename DayCounter<ExtDate>::Impl> implementation(Convention);
     };
 
 }

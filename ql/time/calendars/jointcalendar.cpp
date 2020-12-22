@@ -125,7 +125,7 @@ namespace QuantLib {
     JointCalendar<ExtDate>::JointCalendar(const Calendar<ExtDate>& c1,
                                  const Calendar<ExtDate>& c2,
                                  JointCalendarRule r) {
-        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+        this->impl_ = std::shared_ptr<typename Calendar<ExtDate>::Impl>(
                                             new JointCalendar<ExtDate>::Impl(c1,c2,r));
     }
     template <class ExtDate> inline
@@ -133,7 +133,7 @@ namespace QuantLib {
                                  const Calendar<ExtDate>& c2,
                                  const Calendar<ExtDate>& c3,
                                  JointCalendarRule r) {
-        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+        this->impl_ = std::shared_ptr<typename Calendar<ExtDate>::Impl>(
                                          new JointCalendar<ExtDate>::Impl(c1,c2,c3,r));
     }
     template <class ExtDate> inline
@@ -142,13 +142,13 @@ namespace QuantLib {
                                  const Calendar<ExtDate>& c3,
                                  const Calendar<ExtDate>& c4,
                                  JointCalendarRule r) {
-        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+        this->impl_ = std::shared_ptr<typename Calendar<ExtDate>::Impl>(
                                       new JointCalendar<ExtDate>::Impl(c1,c2,c3,c4,r));
     }
     template <class ExtDate> inline
     JointCalendar<ExtDate>::JointCalendar(const std::vector<Calendar<ExtDate>> &cv,
                                  JointCalendarRule r) {
-        this->impl_ = std::shared_ptr<Calendar<ExtDate>::Impl>(
+        this->impl_ = std::shared_ptr<typename Calendar<ExtDate>::Impl>(
                                       new JointCalendar<ExtDate>::Impl(cv,r));
     }
 

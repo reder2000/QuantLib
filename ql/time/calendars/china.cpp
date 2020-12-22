@@ -26,8 +26,9 @@ namespace QuantLib {
     template <class ExtDate> inline
     China<ExtDate>::China(Market m) {
         // all calendar instances share the same implementation instance
-        static std::shared_ptr<Calendar<ExtDate>::Impl> sseImpl(new China<ExtDate>::SseImpl);
-        static std::shared_ptr<Calendar<ExtDate>::Impl> IBImpl(new China<ExtDate>::IbImpl);
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> sseImpl(
+            new typename China<ExtDate>::SseImpl);
+        static std::shared_ptr<typename Calendar<ExtDate>::Impl> IBImpl(new China<ExtDate>::IbImpl);
         switch (m) {
           case SSE:
             this->impl_ = sseImpl;

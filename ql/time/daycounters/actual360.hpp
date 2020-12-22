@@ -61,7 +61,7 @@ namespace QuantLib {
         };
       public:
         explicit Actual360(const bool includeLastDay = false)
-        : DayCounter(std::shared_ptr<DayCounter::Impl>(
+        : DayCounter<ExtDate>(typename std::shared_ptr<typename DayCounter<ExtDate>::Impl>(
             new Actual360::Impl(includeLastDay))) {}
     };
 

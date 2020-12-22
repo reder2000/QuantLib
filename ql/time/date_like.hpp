@@ -132,6 +132,7 @@ namespace QuantLib {
 template <class ExtDate>
     class DateLike : public ExtDate {
       public:
+          using T = DateLike<ExtDate>;
         //! serial number type
         using serial_type = std::int_fast32_t ;
         //! \name constructors
@@ -162,6 +163,14 @@ template <class ExtDate>
         Month month() const;
         Year year() const;
         serial_type serialNumber() const;
+
+        auto operator<=>(const DateLike<ExtDate>& d) const {
+            return this->serialNumber() <=> d.serialNumber();
+        }
+        //auto operator<=>(const ExtDate& d) const {
+        //    return this->serialNumber() <=>
+        //           static_cast<const DateLike<ExtDate>&>(d).serialNumber();
+        //}
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         Hour hours() const;
@@ -430,17 +439,17 @@ template <class ExtDate>
 
     template <class ExtDate>
     inline typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::serialNumber() const {
-        return serialNumber();
+        return DateAdaptor<ExtDate>::serialNumber(static_cast<const ExtDate&>(*this));
     }
 
     template <class ExtDate>
     inline DateLike<ExtDate> DateLike<ExtDate>::operator+(serial_type days) const {
-        return Date(serialNumber()+days);
+        return to_DateLike(DateAdaptor<ExtDate>::Date(serialNumber()+days));
     }
 
     template <class ExtDate>
     inline DateLike<ExtDate> DateLike<ExtDate>::operator-(serial_type days) const {
-        return Date(serialNumber()-days);
+        return to_DateLike(DateAdaptor<ExtDate>::Date(serialNumber()-days));
     }
 
     template <class ExtDate>
@@ -476,36 +485,74 @@ template <class ExtDate>
     }
 
     template <class ExtDate>
-    inline bool operator==(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
+    inline bool operator==(const DateLike<ExtDate>& d1, const ExtDate& d2) {
+        return (d1.serialNumber() == static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
+    }
+    template <class ExtDate>
+    inline bool operator==(const DateLike<ExtDate>& d1, const DateLike <ExtDate> & d2) {
         return (d1.serialNumber() == d2.serialNumber());
     }
-
+    
+    template <class ExtDate>
+    inline bool operator!=(const ExtDate& d1, const DateLike<ExtDate> & d2) {
+        return d2.serialNumber() != static_cast<const DateLike<ExtDate>&>(d1).serialNumber();
+    }
+    template <class ExtDate>
+    inline bool operator!=(const DateLike<ExtDate>& d2, const ExtDate& d1) {
+        return d2.serialNumber() != static_cast<const DateLike<ExtDate>&>(d1).serialNumber();
+    }
     template <class ExtDate>
     inline bool operator!=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
-        return (d1.serialNumber() != d2.serialNumber());
+        return d1.serialNumber() != d2.serialNumber();
     }
-
+    
     template <class ExtDate>
     inline bool operator<(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() < d2.serialNumber());
     }
-
+    
     template <class ExtDate>
-    inline bool operator<=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
-        return (d1.serialNumber() <= d2.serialNumber());
+    inline bool operator<=(const DateLike<ExtDate>& d1, const ExtDate& d2) {
+        return (d1.serialNumber() <= static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
     }
-
     template <class ExtDate>
-    inline bool operator>(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
-        return (d1.serialNumber() > d2.serialNumber());
+    inline bool operator<(const DateLike<ExtDate>& d1, const ExtDate& d2) {
+        return (d1.serialNumber() < static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
     }
-
+    template <class ExtDate>
+    inline bool operator<(const ExtDate& d1, const DateLike<ExtDate>& d2) {
+        return (static_cast<const DateLike<ExtDate>&>(d1).serialNumber() < d2.serialNumber());
+    }
+    template <class ExtDate>
+    inline bool operator<=(const ExtDate& d1 , const DateLike<ExtDate>& d2 ) {
+        return (static_cast<const DateLike<ExtDate>&>(d1).serialNumber() <= d2.serialNumber());
+    }
+    template <class ExtDate>
+    inline bool operator>(const DateLike<ExtDate>& d1, const ExtDate& d2) {
+        return (d1.serialNumber() > static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
+    }
+    /*
     template <class ExtDate>
     inline bool operator>=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
         return (d1.serialNumber() >= d2.serialNumber());
-    }
+    }*/
 #endif
+    template <class ExtDate>
+    struct Less {
+        bool operator()(const ExtDate& d1, const ExtDate& d2) const {
+            return to_DateLike(d1) < to_DateLike(d2);
+        }
+    };
 }
 
 #include "date_like.cpp"
 #endif
+
+template <class ExtDate>
+QuantLib::DateLike<ExtDate>& to_DateLike(ExtDate&e) {
+    return static_cast<QuantLib::DateLike<ExtDate>&>(e);
+}
+template <class ExtDate>
+const QuantLib::DateLike<ExtDate>& to_DateLike(const ExtDate& e) {
+    return static_cast<const QuantLib::DateLike<ExtDate>&>(e);
+}

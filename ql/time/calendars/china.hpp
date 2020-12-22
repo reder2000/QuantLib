@@ -55,7 +55,7 @@ namespace QuantLib {
 
         \ingroup calendars
     */
-    template <class ExtDate>
+    template <class ExtDate=Date>
     class China : public Calendar<ExtDate> {
       private:
         class SseImpl : public Calendar<ExtDate>::Impl {
@@ -72,7 +72,7 @@ namespace QuantLib {
             bool isWeekend(Weekday) const;
             bool isBusinessDay(const ExtDate&) const;
           private:
-            std::shared_ptr<Calendar<ExtDate>::Impl> sseImpl;
+            std::shared_ptr<typename Calendar<ExtDate>::Impl> sseImpl;
         };
       public:
         enum Market { SSE,    //!< Shanghai stock exchange

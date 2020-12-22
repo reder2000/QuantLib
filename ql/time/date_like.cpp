@@ -39,6 +39,7 @@
 #endif
 #include <iomanip>
 #include <ctime>
+#include <compare>
 
 #if defined(BOOST_NO_STDC_NAMESPACE)
     namespace std { using ::time; using ::time_t; using ::tm;
@@ -155,28 +156,26 @@ namespace QuantLib {
             }
 
             QL_ENSURE(y >= 1900 && y <= 2199,
-                      "year " << y << " out of bounds. "
-                      << "It must be in [1901,2199]");
+                      "year {} out of bounds. It must be in [1901,2199]",y);
 
             Integer length = monthLength(Month(m), isLeap(y));
             if (d > length)
                 d = length;
 
-            return Date(d, Month(m), y);
+            return to_DateLike(DateAdaptor<ExtDate>::Date(d, Month(m), y));
           }
           case Years: {
               Day d = date.dayOfMonth();
               Month m = date.month();
               Year y = date.year()+n;
 
-              QL_ENSURE(y >= 1900 && y <= 2199,
-                        "year " << y << " out of bounds. "
-                        << "It must be in [1901,2199]");
+            QL_ENSURE(y >= 1900 && y <= 2199,
+                      "year {} out of bounds. It must be in [1901,2199]",y);
 
               if (d == 29 && m == February && !isLeap(y))
                   d = 28;
 
-              return Date(d,m,y);
+              return to_DateLike(DateAdaptor<ExtDate>::Date(d,m,y));
           }
           default:
             QL_FAIL("undefined time units");
@@ -279,7 +278,7 @@ namespace QuantLib {
         return (leapYear? MonthLeapOffset[m-1] : MonthOffset[m-1]);
     }
     template <class ExtDate>    inline
-    typename typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::yearOffset(Year y) {
+    typename DateLike<ExtDate>::serial_type DateLike<ExtDate>::yearOffset(Year y) {
         // the list of all December 31st in the preceding year
         // e.g. for 1901 yearOffset[1] is 366, that is, December 31 1900
         static const typename DateLike<ExtDate>::serial_type YearOffset[] = {
@@ -748,12 +747,12 @@ namespace QuantLib {
     }
     template <class ExtDate>    inline
     DateLike<ExtDate> DateLike<ExtDate>::minDate() {
-        static const DateLike<ExtDate> minimumDate(minimumSerialNumber());
+        static const DateLike<ExtDate> minimumDate(to_DateLike(DateAdaptor<ExtDate>::Date(minimumSerialNumber())));
         return minimumDate;
     }
     template <class ExtDate>    inline
     DateLike<ExtDate> DateLike<ExtDate>::maxDate() {
-        static const DateLike<ExtDate> maximumDate(maximumSerialNumber());
+        static const DateLike<ExtDate> maximumDate( to_DateLike(DateAdaptor<ExtDate>::Date(maximumSerialNumber())));
         return maximumDate;
     }
     template <class ExtDate>    inline
@@ -775,9 +774,10 @@ namespace QuantLib {
         if (std::time(&t) == std::time_t(-1)) // -1 means time() didn't work
             return DateLike<ExtDate>();
         std::tm *lt = std::localtime(&t);
-        return DateAdaptor<ExtDate>::Date(Day(lt->tm_mday),
+        ExtDate res(DateAdaptor<ExtDate>::Date(Day(lt->tm_mday),
                         Month(lt->tm_mon+1),
-                        Year(lt->tm_year+1900));
+                        Year(lt->tm_year+1900)));
+        return *static_cast<T*>(&res);
     }
     template <class ExtDate>    inline
     DateLike<ExtDate> DateLike<ExtDate>::nextWeekday(const DateLike<ExtDate>& d, Weekday dayOfWeek) {
@@ -791,9 +791,9 @@ namespace QuantLib {
                    "zeroth day of week in a given (month, year) is undefined");
         QL_REQUIRE(nth<6,
                    "no more than 5 weekday in a given (month, year)");
-        Weekday first = DateAdaptor<ExtDate>::Date(1, m, y).weekday();
+        Weekday first = to_DateLike(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
-        return Date((1 + dayOfWeek + skip*7) - first, m, y);
+        return to_DateLike(DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip*7) - first, m, y));
     }
 #if defined(QL_SETTINGS_ARE_REMOVED)
     // month formatting
@@ -845,7 +845,7 @@ namespace QuantLib {
     // date formatting
     template <class ExtDate>    inline
     std::ostream& operator<<(std::ostream& out, const DateLike<ExtDate>& d) {
-        return out << io::long_date(d);
+        return out << io::long_date(Date(d.serialNumber()));
     }
 
     namespace ext_detail {

@@ -640,7 +640,7 @@ namespace QuantLib {
         // if no calendar was set...
         if (calendar.empty()) {
             // ...we use a null one.
-            calendar = NullCalendar<eDate>();
+            calendar = NullCalendar<ExtDate>();
         }
 
         return Schedule<ExtDate>(effectiveDate_, terminationDate_, *tenor_, calendar,

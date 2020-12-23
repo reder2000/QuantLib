@@ -52,11 +52,11 @@ namespace QuantLib {
         class Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("Actual/365 (Fixed)"); }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
-                return daysBetween(d1,d2)/365.0;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const {
+                return daysBetween(to_DateLike(d1),to_DateLike(d2))/365.0;
             }
         };
         class CA_Impl : public DayCounter<ExtDate>::Impl {
@@ -64,22 +64,22 @@ namespace QuantLib {
             std::string name() const {
                 return std::string("Actual/365 (Fixed) Canadian Bond");
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date& refPeriodStart,
-                              const Date& refPeriodEnd) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate& refPeriodStart,
+                              const ExtDate& refPeriodEnd) const;
         };
         class NL_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/365 (No Leap)");
             }
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date& refPeriodStart,
-                              const Date& refPeriodEnd) const;
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate& refPeriodStart,
+                              const ExtDate& refPeriodEnd) const;
         };
         static std::shared_ptr<typename DayCounter<ExtDate>::Impl> implementation(Convention);
     };

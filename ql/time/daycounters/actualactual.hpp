@@ -55,55 +55,55 @@ namespace QuantLib {
       private:
         class ISMA_Impl : public DayCounter<ExtDate>::Impl {
           public:
-            explicit ISMA_Impl(const Schedule& schedule)
+            explicit ISMA_Impl(const Schedule<ExtDate>& schedule)
             : schedule_(schedule) {}
 
             std::string name() const {
                 return std::string("Actual/Actual (ISMA)");
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date& refPeriodStart,
-                              const Date& refPeriodEnd) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate& refPeriodStart,
+                              const ExtDate& refPeriodEnd) const;
           private:
-            Schedule schedule_;
+            Schedule<ExtDate> schedule_;
         };
         class Old_ISMA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISMA)");
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date& refPeriodStart,
-                              const Date& refPeriodEnd) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate& refPeriodStart,
+                              const ExtDate& refPeriodEnd) const;
         };
         class ISDA_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (ISDA)");
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const;
         };
         class AFB_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const {
                 return std::string("Actual/Actual (AFB)");
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const;
         };
         static std::shared_ptr<typename DayCounter<ExtDate>::Impl> implementation(
                                                                Convention c, 
-                                                               const Schedule& schedule);
+                                                               const Schedule<ExtDate>& schedule);
       public:
         ActualActual(Convention c = ActualActual::ISDA, 
-                     const Schedule& schedule = Schedule())
+                     const Schedule<ExtDate>& schedule = Schedule<ExtDate>())
         : DayCounter<ExtDate>(implementation(c, schedule)) {}
     };
 

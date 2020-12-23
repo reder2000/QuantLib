@@ -30,13 +30,13 @@ namespace QuantLib {
         
         std::map<std::string, Cache> monthlyFigures_;
         std::map<std::string, OuterCache> yearlyFigures_;
-
-        bool sameYear(const Date& d1, const Date& d2) {
+        template <class ExtDate> inline
+        bool sameYear(const ExtDate& d1, const ExtDate& d2) {
             return d1.year() == d2.year();
         }
-
-        bool sameMonth(const Date& d1, const Date& d2) {
-            return d1.year() == d2.year() && d1.month() == d2.month();
+        template <class ExtDate> inline
+        bool sameMonth(const ExtDate& d1, const ExtDate& d2) {
+            return to_DateLike(d1).year() == to_DateLike(d2).year() && to_DateLike(d1).month() == to_DateLike(d2).month();
         }
         template <class ExtDate> inline
         serial_type businessDays(Cache& cache,
@@ -44,8 +44,8 @@ namespace QuantLib {
                                        Month month, Year year) {
             if (cache[year][month] == 0) {
                 // calculate and store.
-                Date d1 = Date(1,month,year);
-                Date d2 = d1 + 1*Months;
+                ExtDate d1 = DateAdaptor<ExtDate>::Date(1,month,year);
+                ExtDate d2 = to_DateLike(d1) + 1*Months;
                 cache[year][month] = calendar.businessDaysBetween(d1, d2);
             }
             return cache[year][month];
@@ -75,9 +75,11 @@ namespace QuantLib {
         return out.str();
     }
     template <class ExtDate> inline
-    serial_type Business252<ExtDate>::Impl::dayCount(const Date& d1,
-                                                  const Date& d2) const {
-        if (sameMonth(d1,d2) || d1 >= d2) {
+    serial_type Business252<ExtDate>::Impl::dayCount(const ExtDate& dd1,
+                                                  const ExtDate& dd2) const {
+        auto d1 = to_DateLike(dd1);
+        auto d2 = to_DateLike(dd2);
+        if (sameMonth(d1.asExtDate(), d2.asExtDate()) || d1 >= d2) {
             // we treat the case of d1 > d2 here, since we'd need a
             // second cache to get it right (our cached figures are
             // for first included, last excluded and might have to be
@@ -86,13 +88,12 @@ namespace QuantLib {
         } else if (sameYear(d1,d2)) {
             Cache& cache = monthlyFigures_[calendar_.name()];
             serial_type total = 0;
-            Date d;
             // first, we get to the beginning of next month.
-            d = Date(1,d1.month(),d1.year()) + 1*Months;
+            auto d = to_DateLike(DateAdaptor<ExtDate>::Date(1,d1.month(),d1.year())) + 1*Months;
             total += calendar_.businessDaysBetween(d1, d);
             // then, we add any whole months (whose figures might be
             // cached already) in the middle of our period.
-            while (!sameMonth(d,d2)) {
+            while (!sameMonth(d.asExtDate(), d2.asExtDate())) {
                 total += businessDays(cache, calendar_,
                                       d.month(), d.year());
                 d += 1*Months;
@@ -104,10 +105,9 @@ namespace QuantLib {
             Cache& cache = monthlyFigures_[calendar_.name()];
             OuterCache& outerCache = yearlyFigures_[calendar_.name()];
             serial_type total = 0;
-            Date d;
             // first, we get to the beginning of next year.
             // The first bit gets us to the end of this month...
-            d = Date(1,d1.month(),d1.year()) + 1*Months;
+            auto d = to_DateLike(DateAdaptor<ExtDate>::Date(1, d1.month(), d1.year())) + 1 * Months;
             total += calendar_.businessDaysBetween(d1, d);
             // ...then we add any remaining months, possibly cached
             for (Integer m = Integer(d1.month())+1; m <= 12; ++m) {
@@ -115,7 +115,7 @@ namespace QuantLib {
                                       Month(m), d.year());
             }
             // then, we add any whole year in the middle of our period.
-            d = Date(1,January,d1.year()+1);
+            d = to_DateLike(DateAdaptor<ExtDate>::Date(1, January, d1.year() + 1));
             while (!sameYear(d,d2)) {
                 total += businessDays(outerCache, cache,
                                       calendar_, d.year());
@@ -128,16 +128,16 @@ namespace QuantLib {
                                       Month(m), d2.year());
             }
             // ...then the last bit.
-            d = Date(1,d2.month(),d2.year());
+            d = to_DateLike(DateAdaptor<ExtDate>::Date(1, d2.month(), d2.year()));
             total += calendar_.businessDaysBetween(d, d2);
             return total;
         }
     }
     template <class ExtDate> inline
-    Time Business252<ExtDate>::Impl::yearFraction(const Date& d1,
-                                         const Date& d2,
-                                         const Date&,
-                                         const Date&) const {
+    Time Business252<ExtDate>::Impl::yearFraction(const ExtDate& d1,
+                                         const ExtDate& d2,
+                                         const ExtDate&,
+                                         const ExtDate&) const {
         return dayCount(d1, d2)/252.0;
     }
 

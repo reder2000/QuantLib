@@ -21,8 +21,10 @@
 
 namespace QuantLib {
     template <class ExtDate> inline
-    serial_type Thirty365<ExtDate>::Impl::dayCount(const Date& d1,
-                                                const Date& d2) const {
+    serial_type Thirty365<ExtDate>::Impl::dayCount(const ExtDate& ed1,
+                                                const ExtDate& ed2) const {
+        auto d1 = to_DateLike(ed1);
+        auto d2 = to_DateLike(ed2);
         Day dd1 = d1.dayOfMonth(), dd2 = d2.dayOfMonth();
         Integer mm1 = d1.month(), mm2 = d2.month();
         Year yy1 = d1.year(), yy2 = d2.year();

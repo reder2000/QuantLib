@@ -35,13 +35,13 @@ namespace QuantLib {
       private:
         class Impl : public DayCounter<ExtDate>::Impl {
           public:
-            std::string name() const { return std::string("30/365"); }
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&, 
-                              const Date&) const {
+            std::string name() const override { return std::string("30/365"); }
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const override;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&, 
+                              const ExtDate&) const override {
                 return dayCount(d1,d2)/365.0; }
         };
       public:

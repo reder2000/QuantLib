@@ -36,19 +36,19 @@ namespace QuantLib {
         }
     }
     template <class ExtDate> inline
-    Time Actual365Fixed<ExtDate>::CA_Impl::yearFraction(const Date& d1,
-                                               const Date& d2,
-                                               const Date& refPeriodStart,
-                                               const Date& refPeriodEnd) const {
-        if (d1 == d2)
+    Time Actual365Fixed<ExtDate>::CA_Impl::yearFraction(const ExtDate& d1,
+                                               const ExtDate& d2,
+                                               const ExtDate& refPeriodStart,
+                                               const ExtDate& refPeriodEnd) const {
+        if (to_DateLike(d1) == d2)
             return 0.0;
 
         // We need the period to calculate the frequency
-        QL_REQUIRE(refPeriodStart != Date(), "invalid refPeriodStart");
-        QL_REQUIRE(refPeriodEnd != Date(), "invalid refPeriodEnd");
+        QL_REQUIRE(to_DateLike(refPeriodStart) != ExtDate(), "invalid refPeriodStart");
+        QL_REQUIRE(to_DateLike(refPeriodEnd) != ExtDate(), "invalid refPeriodEnd");
 
-        Time dcs = daysBetween(d1,d2);
-        Time dcc = daysBetween(refPeriodStart,refPeriodEnd);
+        Time dcs = daysBetween(to_DateLike(d1),to_DateLike(d2));
+        Time dcc = daysBetween(to_DateLike(refPeriodStart),to_DateLike(refPeriodEnd));
         Integer months = Integer(0.5+12*dcc/365);
         QL_REQUIRE(months != 0,
                    "invalid reference period for Act/365 Canadian; "
@@ -62,9 +62,10 @@ namespace QuantLib {
 
     }
     template <class ExtDate> inline
-    serial_type Actual365Fixed<ExtDate>::NL_Impl::dayCount(const Date& d1,
-                                                        const Date& d2) const {
-
+    serial_type Actual365Fixed<ExtDate>::NL_Impl::dayCount(const ExtDate& dd1,
+                                                        const ExtDate& dd2) const {
+        auto d1 = to_DateLike(dd1);
+        auto d2 = to_DateLike(dd2);
         static const Integer MonthOffset[] = {
             0,  31,  59,  90, 120, 151,  // Jan - Jun
             181, 212, 243, 273, 304, 334   // Jun - Dec
@@ -86,10 +87,10 @@ namespace QuantLib {
         return s2 - s1;
     }
     template <class ExtDate> inline
-    Time Actual365Fixed<ExtDate>::NL_Impl::yearFraction(const Date& d1,
-                                               const Date& d2,
-                                               const Date& d3,
-                                               const Date& d4) const {
+    Time Actual365Fixed<ExtDate>::NL_Impl::yearFraction(const ExtDate& d1,
+                                               const ExtDate& d2,
+                                               const ExtDate& d3,
+                                               const ExtDate& d4) const {
         return dayCount(d1, d2)/365.0;
     }
 

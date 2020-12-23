@@ -26,9 +26,9 @@
 namespace QuantLib {
 
     namespace {
-        inline
-        Date nextTwentieth(const Date& d, DateGeneration::Rule rule) {
-            Date result = Date(20, d.month(), d.year());
+        template <class ExtDate> inline
+        ExtDate nextTwentieth(const ExtDate& d, DateGeneration::Rule rule) {
+            DateLike<ExtDate> result{DateAdaptor<ExtDate>::Date(20, to_DateLike(d).month(), to_DateLike(d).year())};
             if (result < d)
                 result += 1*Months;
             if (rule == DateGeneration::TwentiethIMM ||
@@ -51,9 +51,9 @@ namespace QuantLib {
 
     }
 
-    inline
-    Schedule::Schedule(const std::vector<Date>& dates,
-                       const Calendar<Date>& calendar,
+    template <class ExtDate> inline
+    Schedule<ExtDate>::Schedule(const std::vector<ExtDate>& dates,
+                       const Calendar<ExtDate>& calendar,
                        BusinessDayConvention convention,
                        const std::optional<BusinessDayConvention>& terminationDateConvention,
                        const std::optional<Period>& tenor,
@@ -73,44 +73,44 @@ namespace QuantLib {
                    "isRegular size ({}) must be zero or equal to the number of dates minus 1 ({})"
             , isRegular_.size() , dates.size() - 1 );
     }
-    inline
-    Schedule::Schedule(Date effectiveDate,
-                       const Date& terminationDate,
+    template <class ExtDate> inline
+    Schedule<ExtDate>::Schedule(ExtDate effectiveDate,
+                       const ExtDate& terminationDate,
                        const Period& tenor,
-                       const Calendar<Date>& cal,
+                       const Calendar<ExtDate>& cal,
                        BusinessDayConvention convention,
                        BusinessDayConvention terminationDateConvention,
                        DateGeneration::Rule rule,
                        bool endOfMonth,
-                       const Date& first,
-                       const Date& nextToLast)
+                       const ExtDate& first,
+                       const ExtDate& nextToLast)
     : tenor_(tenor), calendar_(cal), convention_(convention),
       terminationDateConvention_(terminationDateConvention), rule_(rule),
       endOfMonth_(allowsEndOfMonth(tenor) ? endOfMonth : false),
-      firstDate_(first==effectiveDate ? Date() : first),
-      nextToLastDate_(nextToLast==terminationDate ? Date() : nextToLast)
+      firstDate_(to_DateLike(first)==effectiveDate ? ExtDate() : first),
+      nextToLastDate_(to_DateLike(nextToLast)==terminationDate ? ExtDate() : nextToLast)
     {
         // sanity checks
-        QL_REQUIRE(terminationDate != Date(), "null termination date");
+        QL_REQUIRE(to_DateLike(terminationDate) != ExtDate(), "null termination date");
 
         // in many cases (e.g. non-expired bonds) the effective date is not
         // really necessary. In these cases a decent placeholder is enough
-        if (effectiveDate==Date() && first==Date()
+        if (to_DateLike(effectiveDate)==ExtDate() && to_DateLike(first)==ExtDate()
                                   && rule==DateGeneration::Backward) {
-            Date evalDate = Settings<Date>::instance().evaluationDate();
-            QL_REQUIRE(evalDate < terminationDate, "null effective date");
+            ExtDate evalDate = Settings<ExtDate>::instance().evaluationDate();
+            QL_REQUIRE(to_DateLike(evalDate) < terminationDate, "null effective date");
             Natural y;
-            if (nextToLast != Date()) {
-                y = (nextToLast - evalDate)/366 + 1;
-                effectiveDate = nextToLast - y*Years;
+            if (to_DateLike(nextToLast) != ExtDate()) {
+                y = (to_DateLike(nextToLast) - to_DateLike(evalDate))/366 + 1;
+                effectiveDate = to_DateLike(nextToLast) - y*Years;
             } else {
-                y = (terminationDate - evalDate)/366 + 1;
-                effectiveDate = terminationDate - y*Years;
+                y = (to_DateLike(terminationDate) - to_DateLike(evalDate))/366 + 1;
+                effectiveDate = to_DateLike(terminationDate) - y*Years;
             }
         } else
-            QL_REQUIRE(effectiveDate != Date(), "null effective date");
+            QL_REQUIRE(to_DateLike(effectiveDate) != ExtDate(), "null effective date");
 
-        QL_REQUIRE(effectiveDate < terminationDate,
+        QL_REQUIRE(to_DateLike(effectiveDate) < terminationDate,
                    "effective date ({}) later than or equal to termination date ({})" , effectiveDate , terminationDate );
 
         if (tenor.length()==0)
@@ -119,18 +119,18 @@ namespace QuantLib {
             QL_REQUIRE(tenor.length()>0,
                        "non positive tenor ({}) not allowed", tenor);
 
-        if (firstDate_ != Date()) {
+        if (to_DateLike(firstDate_) != ExtDate()) {
             switch (*rule_) {
               case DateGeneration::Backward:
               case DateGeneration::Forward:
-                QL_REQUIRE(firstDate_ > effectiveDate &&
-                           firstDate_ <= terminationDate,
+                QL_REQUIRE(to_DateLike(firstDate_) > effectiveDate &&
+                           to_DateLike(firstDate_) <= terminationDate,
                            "first date () out of effective-termination date range [{},{}]" , firstDate_ , effectiveDate , terminationDate );
                 // we should ensure that the above condition is still
                 // verified after adjustment
                 break;
               case DateGeneration::ThirdWednesday:
-                  QL_REQUIRE(IMM<Date>::isIMMdate(firstDate_, false),
+                  QL_REQUIRE(IMM<ExtDate>::isIMMdate(firstDate_, false),
                              "first date ({}) is not an IMM date", firstDate_ );
                 break;
               case DateGeneration::Zero:
@@ -144,18 +144,18 @@ namespace QuantLib {
                 QL_FAIL("unknown rule ({})",*rule_);
             }
         }
-        if (nextToLastDate_ != Date()) {
+        if (to_DateLike(nextToLastDate_) != ExtDate()) {
             switch (*rule_) {
               case DateGeneration::Backward:
               case DateGeneration::Forward:
-                QL_REQUIRE(nextToLastDate_ >= effectiveDate &&
-                           nextToLastDate_ < terminationDate,
+                QL_REQUIRE(to_DateLike(nextToLastDate_) >= effectiveDate &&
+                           to_DateLike(nextToLastDate_) < terminationDate,
                            "next to last date ({}) out of effective-termination date range [{},{}]" , nextToLastDate_ , effectiveDate , terminationDate );
                 // we should ensure that the above condition is still
                 // verified after adjustment
                 break;
               case DateGeneration::ThirdWednesday:
-                QL_REQUIRE(IMM<Date>::isIMMdate(nextToLastDate_, false),
+                QL_REQUIRE(IMM<ExtDate>::isIMMdate(nextToLastDate_, false),
                            "next-to-last date ({}) is not an IMM date", nextToLastDate_ );
                 break;
               case DateGeneration::Zero:
@@ -172,9 +172,9 @@ namespace QuantLib {
 
 
         // calendar needed for endOfMonth adjustment
-        Calendar nullCalendar = NullCalendar();
+        Calendar<ExtDate> nullCalendar = NullCalendar<ExtDate>();
         Integer periods = 1;
-        Date seed, exitDate;
+        ExtDate seed, exitDate;
         switch (*rule_) {
 
           case DateGeneration::Zero:
@@ -189,11 +189,11 @@ namespace QuantLib {
             dates_.push_back(terminationDate);
 
             seed = terminationDate;
-            if (nextToLastDate_ != Date()) {
+            if (to_DateLike(nextToLastDate_) != ExtDate()) {
                 dates_.insert(dates_.begin(), nextToLastDate_);
-                Date temp = nullCalendar.advance(seed,
+                ExtDate temp = nullCalendar.advance(seed,
                     -periods*(*tenor_), convention, *endOfMonth_);
-                if (temp!=nextToLastDate_)
+                if (to_DateLike(temp)!=nextToLastDate_)
                     isRegular_.insert(isRegular_.begin(), false);
                 else
                     isRegular_.insert(isRegular_.begin(), true);
@@ -201,15 +201,15 @@ namespace QuantLib {
             }
 
             exitDate = effectiveDate;
-            if (firstDate_ != Date())
+            if (to_DateLike(firstDate_) != ExtDate())
                 exitDate = firstDate_;
 
             for (;;) {
-                Date temp = nullCalendar.advance(seed,
+                ExtDate temp = nullCalendar.advance(seed,
                     -periods*(*tenor_), convention, *endOfMonth_);
-                if (temp < exitDate) {
-                    if (firstDate_ != Date() &&
-                        (calendar_.adjust(dates_.front(),convention)!=
+                if (to_DateLike(temp) < exitDate) {
+                    if (to_DateLike(firstDate_) != ExtDate() &&
+                        (to_DateLike(calendar_.adjust(dates_.front(),convention))!=
                          calendar_.adjust(firstDate_,convention))) {
                         dates_.insert(dates_.begin(), firstDate_);
                         isRegular_.insert(isRegular_.begin(), false);
@@ -218,7 +218,7 @@ namespace QuantLib {
                 } else {
                     // skip dates that would result in duplicates
                     // after adjustment
-                    if (calendar_.adjust(dates_.front(),convention)!=
+                    if (to_DateLike(calendar_.adjust(dates_.front(),convention))!=
                         calendar_.adjust(temp,convention)) {
                         dates_.insert(dates_.begin(), temp);
                         isRegular_.insert(isRegular_.begin(), true);
@@ -227,7 +227,7 @@ namespace QuantLib {
                 }
             }
 
-            if (calendar_.adjust(dates_.front(),convention)!=
+            if (to_DateLike(calendar_.adjust(dates_.front(),convention))!=
                 calendar_.adjust(effectiveDate,convention)) {
                 dates_.insert(dates_.begin(), effectiveDate);
                 isRegular_.insert(isRegular_.begin(), false);
@@ -246,9 +246,9 @@ namespace QuantLib {
           case DateGeneration::Forward:
 
             if (*rule_ == DateGeneration::CDS || *rule_ == DateGeneration::CDS2015) {
-                Date prev20th = previousTwentieth(effectiveDate, *rule_);
-                if (calendar_.adjust(prev20th, convention) > effectiveDate) {
-                    dates_.push_back(prev20th - 3 * Months);
+                ExtDate prev20th = previousTwentieth(effectiveDate, *rule_);
+                if (to_DateLike(calendar_.adjust(prev20th, convention)) > effectiveDate) {
+                    dates_.push_back(to_DateLike(prev20th) - 3 * Months);
                     isRegular_.push_back(true);
                 }
                 dates_.push_back(prev20th);
@@ -258,11 +258,11 @@ namespace QuantLib {
 
             seed = dates_.back();
 
-            if (firstDate_!=Date()) {
+            if (to_DateLike(firstDate_)!=ExtDate()) {
                 dates_.push_back(firstDate_);
-                Date temp = nullCalendar.advance(seed, periods*(*tenor_),
+                ExtDate temp = nullCalendar.advance(seed, periods*(*tenor_),
                                                  convention, *endOfMonth_);
-                if (temp!=firstDate_)
+                if (to_DateLike(temp)!=firstDate_)
                     isRegular_.push_back(false);
                 else
                     isRegular_.push_back(true);
@@ -272,16 +272,16 @@ namespace QuantLib {
                        *rule_ == DateGeneration::OldCDS ||
                        *rule_ == DateGeneration::CDS ||
                        *rule_ == DateGeneration::CDS2015) {
-                Date next20th = nextTwentieth(effectiveDate, *rule_);
+                ExtDate next20th = nextTwentieth(effectiveDate, *rule_);
                 if (*rule_ == DateGeneration::OldCDS) {
                     // distance rule inforced in natural days
                     static const serial_type stubDays = 30;
-                    if (next20th - effectiveDate < stubDays) {
+                    if (to_DateLike(next20th) - to_DateLike(effectiveDate) < stubDays) {
                         // +1 will skip this one and get the next
-                        next20th = nextTwentieth(next20th + 1, *rule_);
+                        next20th = nextTwentieth((to_DateLike(next20th) + 1).asExtDate(), *rule_);
                     }
                 }
-                if (next20th != effectiveDate) {
+                if (to_DateLike(next20th) != effectiveDate) {
                     dates_.push_back(next20th);
                     isRegular_.push_back(*rule_ == DateGeneration::CDS || *rule_ == DateGeneration::CDS2015);
                     seed = next20th;
@@ -289,14 +289,14 @@ namespace QuantLib {
             }
 
             exitDate = terminationDate;
-            if (nextToLastDate_ != Date())
+            if (to_DateLike(nextToLastDate_) != ExtDate())
                 exitDate = nextToLastDate_;
             for (;;) {
-                Date temp = nullCalendar.advance(seed, periods*(*tenor_),
+                ExtDate temp = nullCalendar.advance(seed, periods*(*tenor_),
                                                  convention, *endOfMonth_);
-                if (temp > exitDate) {
-                    if (nextToLastDate_ != Date() &&
-                        (calendar_.adjust(dates_.back(),convention)!=
+                if (to_DateLike(temp) > exitDate) {
+                    if (to_DateLike(nextToLastDate_) != ExtDate() &&
+                        (to_DateLike(calendar_.adjust(dates_.back(),convention))!=
                          calendar_.adjust(nextToLastDate_,convention))) {
                         dates_.push_back(nextToLastDate_);
                         isRegular_.push_back(false);
@@ -305,7 +305,7 @@ namespace QuantLib {
                 } else {
                     // skip dates that would result in duplicates
                     // after adjustment
-                    if (calendar_.adjust(dates_.back(),convention)!=
+                    if (to_DateLike(calendar_.adjust(dates_.back(),convention))!=
                         calendar_.adjust(temp,convention)) {
                         dates_.push_back(temp);
                         isRegular_.push_back(true);
@@ -314,7 +314,7 @@ namespace QuantLib {
                 }
             }
 
-            if (calendar_.adjust(dates_.back(),terminationDateConvention)!=
+            if (to_DateLike(calendar_.adjust(dates_.back(),terminationDateConvention))!=
                 calendar_.adjust(terminationDate,terminationDateConvention)) {
                 if (*rule_ == DateGeneration::Twentieth ||
                     *rule_ == DateGeneration::TwentiethIMM ||
@@ -338,20 +338,20 @@ namespace QuantLib {
         // adjustments
         if (*rule_==DateGeneration::ThirdWednesday)
             for (Size i=1; i<dates_.size()-1; ++i)
-                dates_[i] = Date::nthWeekday(3, Wednesday,
-                                             dates_[i].month(),
-                                             dates_[i].year());
+                dates_[i] = DateLike<ExtDate>::nthWeekday(3, Wednesday,
+                                             to_DateLike(dates_[i]).month(),
+                                             to_DateLike(dates_[i]).year());
 
         if (*endOfMonth_ && calendar_.isEndOfMonth(seed)) {
             // adjust to end of month
             if (convention == Unadjusted) {
                 for (Size i=1; i<dates_.size()-1; ++i)
-                    dates_[i] = Date::endOfMonth(dates_[i]);
+                    dates_[i] = DateLike<ExtDate>::endOfMonth(to_DateLike(dates_[i]));
             } else {
                 for (Size i=1; i<dates_.size()-1; ++i)
                     dates_[i] = calendar_.endOfMonth(dates_[i]);
             }
-            Date d1 = dates_.front(), d2 = dates_.back();
+            ExtDate d1 = dates_.front(), d2 = dates_.back();
             if (terminationDateConvention != Unadjusted) {
                 d1 = calendar_.endOfMonth(dates_.front());
                 d2 = calendar_.endOfMonth(dates_.back());
@@ -359,13 +359,13 @@ namespace QuantLib {
                 // the termination date is the first if going backwards,
                 // the last otherwise.
                 if (*rule_ == DateGeneration::Backward)
-                    d2 = Date::endOfMonth(dates_.back());
+                    d2 = DateLike<ExtDate>::endOfMonth(to_DateLike(dates_.back()));
                 else
-                    d1 = Date::endOfMonth(dates_.front());
+                    d1 = DateLike<ExtDate>::endOfMonth(to_DateLike(dates_.front()));
             }
             // if the eom adjustment leads to a single date schedule
             // we do not apply it
-            if(d1 != d2) {
+            if(to_DateLike(d1) != d2) {
                 dates_.front() = d1;
                 dates_.back() = d2;
             }
@@ -392,19 +392,19 @@ namespace QuantLib {
         // necessary.  It can happen to be equal or later than the end
         // date due to EOM adjustments (see the Schedule test suite
         // for an example).
-        if (dates_.size() >= 2 && dates_[dates_.size()-2] >= dates_.back()) {
+        if (dates_.size() >= 2 && to_DateLike(dates_[dates_.size()-2]) >= dates_.back()) {
             // there might be two dates only, then isRegular_ has size one
             if (isRegular_.size() >= 2) {
                 isRegular_[isRegular_.size() - 2] =
-                    (dates_[dates_.size() - 2] == dates_.back());
+                    (to_DateLike(dates_[dates_.size() - 2]) == dates_.back());
             }
             dates_[dates_.size() - 2] = dates_.back();
             dates_.pop_back();
             isRegular_.pop_back();
         }
-        if (dates_.size() >= 2 && dates_[1] <= dates_.front()) {
+        if (dates_.size() >= 2 && to_DateLike(dates_[1]) <= dates_.front()) {
             isRegular_[1] =
-                (dates_[1] == dates_.front());
+                (to_DateLike(dates_[1]) == dates_.front());
             dates_[1] = dates_.front();
             dates_.erase(dates_.begin());
             isRegular_.erase(isRegular_.begin());
@@ -428,8 +428,8 @@ namespace QuantLib {
                   *endOfMonth_);
 
     }
-    inline
-    Schedule Schedule::after(const Date& truncationDate) const {
+    template <class ExtDate> inline
+    Schedule<ExtDate> Schedule<ExtDate>::after(const ExtDate& truncationDate) const {
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate < result.dates_.back(),
@@ -457,15 +457,15 @@ namespace QuantLib {
             }
 
             if (result.nextToLastDate_ <= truncationDate)
-                result.nextToLastDate_ = Date();
+                result.nextToLastDate_ = ExtDate();
             if (result.firstDate_ <= truncationDate)
-                result.firstDate_ = Date();
+                result.firstDate_ = ExtDate();
         }
 
         return result;
     }
-    inline
-    Schedule Schedule::until(const Date& truncationDate) const {
+    template <class ExtDate> inline
+    Schedule<ExtDate> Schedule<ExtDate>::until(const ExtDate& truncationDate) const {
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate>result.dates_[0],
@@ -490,126 +490,126 @@ namespace QuantLib {
             }
 
             if (result.nextToLastDate_>=truncationDate)
-                result.nextToLastDate_ = Date();
+                result.nextToLastDate_ = ExtDate();
             if (result.firstDate_>=truncationDate)
-                result.firstDate_ = Date();
+                result.firstDate_ = ExtDate();
         }
 
         return result;
     }
-    inline
-    std::vector<Date>::const_iterator
-    Schedule::lower_bound(const Date& refDate) const {
-        Date d = (refDate==Date() ?
-                  Settings<Date>::instance().evaluationDate() :
+    template <class ExtDate> inline
+    typename std::vector<ExtDate>::const_iterator
+    Schedule<ExtDate>::lower_bound(const ExtDate& refDate) const {
+        ExtDate d = (refDate==ExtDate() ?
+                  Settings<ExtDate>::instance().evaluationDate() :
                   refDate);
         return std::lower_bound(dates_.begin(), dates_.end(), d);
     }
-    inline
-    Date Schedule::nextDate(const Date& refDate) const {
-        std::vector<Date>::const_iterator res = lower_bound(refDate);
+    template <class ExtDate> inline
+    ExtDate Schedule<ExtDate>::nextDate(const ExtDate& refDate) const {
+        auto res = lower_bound(refDate);
         if (res!=dates_.end())
             return *res;
         else
-            return Date();
+            return ExtDate();
     }
-    inline
-    Date Schedule::previousDate(const Date& refDate) const {
-        std::vector<Date>::const_iterator res = lower_bound(refDate);
+    template <class ExtDate> inline
+    ExtDate Schedule<ExtDate>::previousDate(const ExtDate& refDate) const {
+        auto res = lower_bound(refDate);
         if (res!=dates_.begin())
             return *(--res);
         else
-            return Date();
+            return ExtDate();
     }
-    inline
-    bool Schedule::hasIsRegular() const { return !isRegular_.empty(); }
-    inline
-    bool Schedule::isRegular(Size i) const {
+    template <class ExtDate> inline
+    bool Schedule<ExtDate>::hasIsRegular() const { return !isRegular_.empty(); }
+    template <class ExtDate> inline
+    bool Schedule<ExtDate>::isRegular(Size i) const {
         QL_REQUIRE(hasIsRegular(),
                    "full interface (isRegular) not available");
         QL_REQUIRE(i<=isRegular_.size() && i>0,
                    "index ({}) must be in [1,{}]" , i , isRegular_.size() );
         return isRegular_[i-1];
     }
-    inline
-    const std::vector<bool>& Schedule::isRegular() const {
+    template <class ExtDate> inline
+    const std::vector<bool>& Schedule<ExtDate>::isRegular() const {
         QL_REQUIRE(!isRegular_.empty(), "full interface (isRegular) not available");
         return isRegular_;
     }
-    inline
-    MakeSchedule::MakeSchedule()
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>::MakeSchedule()
     : rule_(DateGeneration::Backward), endOfMonth_(false) {}
-    inline
-    MakeSchedule& MakeSchedule::from(const Date& effectiveDate) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::from(const ExtDate& effectiveDate) {
         effectiveDate_ = effectiveDate;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::to(const Date& terminationDate) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::to(const ExtDate& terminationDate) {
         terminationDate_ = terminationDate;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withTenor(const Period& tenor) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withTenor(const Period& tenor) {
         tenor_ = tenor;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withFrequency(Frequency frequency) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withFrequency(Frequency frequency) {
         tenor_ = Period(frequency);
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withCalendar(const Calendar<Date>& calendar) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withCalendar(const Calendar<ExtDate>& calendar) {
         calendar_ = calendar;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withConvention(BusinessDayConvention conv) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withConvention(BusinessDayConvention conv) {
         convention_ = conv;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withTerminationDateConvention(
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withTerminationDateConvention(
                                                 BusinessDayConvention conv) {
         terminationDateConvention_ = conv;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withRule(DateGeneration::Rule r) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withRule(DateGeneration::Rule r) {
         rule_ = r;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::forwards() {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::forwards() {
         rule_ = DateGeneration::Forward;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::backwards() {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::backwards() {
         rule_ = DateGeneration::Backward;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::endOfMonth(bool flag) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::endOfMonth(bool flag) {
         endOfMonth_ = flag;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withFirstDate(const Date& d) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withFirstDate(const ExtDate& d) {
         firstDate_ = d;
         return *this;
     }
-    inline
-    MakeSchedule& MakeSchedule::withNextToLastDate(const Date& d) {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>& MakeSchedule<ExtDate>::withNextToLastDate(const ExtDate& d) {
         nextToLastDate_ = d;
         return *this;
     }
-    inline
-    MakeSchedule::operator Schedule() const {
+    template <class ExtDate> inline
+    MakeSchedule<ExtDate>::operator Schedule<ExtDate>() const {
         // check for mandatory arguments
-        QL_REQUIRE(effectiveDate_ != Date(), "effective date not provided");
-        QL_REQUIRE(terminationDate_ != Date(), "termination date not provided");
+        QL_REQUIRE(to_DateLike(effectiveDate_) != ExtDate(), "effective date not provided");
+        QL_REQUIRE(to_DateLike(terminationDate_) != ExtDate(), "termination date not provided");
         QL_REQUIRE(tenor_, "tenor/frequency not provided");
 
         // set dynamic defaults:
@@ -636,20 +636,20 @@ namespace QuantLib {
             terminationDateConvention = convention;
         }
 
-        Calendar calendar = calendar_;
+        Calendar<ExtDate> calendar = calendar_;
         // if no calendar was set...
         if (calendar.empty()) {
             // ...we use a null one.
-            calendar = NullCalendar();
+            calendar = NullCalendar<eDate>();
         }
 
-        return Schedule(effectiveDate_, terminationDate_, *tenor_, calendar,
+        return Schedule<ExtDate>(effectiveDate_, terminationDate_, *tenor_, calendar,
                         convention, terminationDateConvention,
                         rule_, endOfMonth_, firstDate_, nextToLastDate_);
     }
-    inline
-    Date previousTwentieth(const Date& d, DateGeneration::Rule rule) {
-        Date result = Date(20, d.month(), d.year());
+    template <class ExtDate> inline
+    ExtDate previousTwentieth(const ExtDate& d, DateGeneration::Rule rule) {
+        DateLike<ExtDate> result{DateAdaptor<ExtDate>::Date(20, to_DateLike(d).month(), to_DateLike(d).year())};
         if (result > d)
             result -= 1 * Months;
         if (rule == DateGeneration::TwentiethIMM ||

@@ -218,7 +218,7 @@ TEST_CASE("testUSSettlement", "[CalendarTest][hide]") { // TEST_CASE("testUSSett
     expectedHol.push_back(eDate(24, November, 2005));
     expectedHol.push_back(eDate(26, December, 2005));
 
-    Calendar<eDate> c = UnitedStates(UnitedStates<eDate>::Settlement);
+    Calendar<eDate> c = UnitedStates<eDate>(UnitedStates<eDate>::Settlement);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2005));
     IF (hol.size() != expectedHol.size())
         BOOST_FAIL("there were " << expectedHol.size() << " expected holidays, while there are "
@@ -268,7 +268,7 @@ TEST_CASE("testUSGovernmentBondMarket", "[CalendarTest][hide]") { // TEST_CASE("
     expectedHol.push_back(eDate(25, November, 2004));
     expectedHol.push_back(eDate(24, December, 2004));
 
-    Calendar<eDate> c = UnitedStates(UnitedStates<eDate>::GovernmentBond);
+    Calendar<eDate> c = UnitedStates<eDate>(UnitedStates<eDate>::GovernmentBond);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2004));
 
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
@@ -315,7 +315,7 @@ TEST_CASE("testUSNewYorkStockExchange", "[CalendarTest][hide]") { // TEST_CASE("
     expectedHol.push_back(eDate(23, November, 2006));
     expectedHol.push_back(eDate(25, December, 2006));
 
-    Calendar<eDate> c = UnitedStates(UnitedStates<eDate>::NYSE);
+    Calendar<eDate> c = UnitedStates<eDate>(UnitedStates<eDate>::NYSE);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2006));
 
     Size i;
@@ -489,7 +489,7 @@ TEST_CASE("testGermanyEurex", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(24, December, 2004));
     expectedHol.push_back(eDate(31,December,2004));
 
-    Calendar<eDate> c = Germany(Germany<eDate>::Eurex);
+    Calendar<eDate> c = Germany<eDate>(Germany<eDate>::Eurex);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2003), eDate(31, December, 2004));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -519,7 +519,7 @@ TEST_CASE("testGermanyXetra", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(12, April, 2004));
     expectedHol.push_back(eDate(24, December, 2004));
 
-    Calendar<eDate> c = Germany(Germany<eDate>::Xetra);
+    Calendar<eDate> c = Germany<eDate>(Germany<eDate>::Xetra);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2003), eDate(31, December, 2004));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -572,7 +572,7 @@ TEST_CASE("testUKSettlement", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(25, December, 2007));
     expectedHol.push_back(eDate(26, December, 2007));
 
-    Calendar<eDate> c = UnitedKingdom(UnitedKingdom<eDate>::Settlement);
+    Calendar<eDate> c = UnitedKingdom<eDate>(UnitedKingdom<eDate>::Settlement);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2007));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -625,7 +625,7 @@ TEST_CASE("testUKExchange", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(25, December, 2007));
     expectedHol.push_back(eDate(26, December, 2007));
 
-    Calendar<eDate> c = UnitedKingdom(UnitedKingdom<eDate>::Exchange);
+    Calendar<eDate> c = UnitedKingdom<eDate>(UnitedKingdom<eDate>::Exchange);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2007));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -678,7 +678,7 @@ TEST_CASE("testUKMetals", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(25, December, 2007));
     expectedHol.push_back(eDate(26, December, 2007));
 
-    Calendar<eDate> c = UnitedKingdom(UnitedKingdom<eDate>::Metals);
+    Calendar<eDate> c = UnitedKingdom<eDate>(UnitedKingdom<eDate>::Metals);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2004), eDate(31, December, 2007));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -721,7 +721,7 @@ TEST_CASE("testItalyExchange", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(24, December, 2004));
     expectedHol.push_back(eDate(31, December, 2004));
 
-    Calendar<eDate> c = Italy(Italy<eDate>::Exchange);
+    Calendar<eDate> c = Italy<eDate>(Italy<eDate>::Exchange);
     std::vector<eDate> hol = c.holidayList(eDate(1, January, 2002), eDate(31, December, 2004));
     for (Size i = 0; i < std::min<Size>(hol.size(), expectedHol.size()); i++) {
         IF (to_DateLike(hol[i]) != expectedHol[i])
@@ -1317,7 +1317,7 @@ TEST_CASE("testRussia", "[CalendarTest][hide]")  {
     expectedHol.push_back(eDate(30, December, 2016));
     expectedHol.push_back(eDate(31, December, 2016));
 
-    Calendar<eDate> c = Russia(Russia<eDate>::MOEX);
+    Calendar<eDate> c = Russia<eDate>(Russia<eDate>::MOEX);
 
 
     std::vector<eDate> hol =

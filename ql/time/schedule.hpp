@@ -37,6 +37,7 @@ namespace QuantLib {
 
     //! Payment schedule
     /*! \ingroup datetime */
+    template <class ExtDate=Date>
     class Schedule {
       public:
         /*! constructor that takes any list of dates, and optionally
@@ -44,8 +45,8 @@ namespace QuantLib {
             that neither the list of dates nor the meta information is
             checked for plausibility in any sense. */
         Schedule(
-            const std::vector<Date>&,
-            const Calendar<Date>& calendar = NullCalendar(),
+            const std::vector<ExtDate>&,
+            const Calendar<ExtDate>& calendar = NullCalendar(),
             BusinessDayConvention convention = Unadjusted,
             const std::optional<BusinessDayConvention>& terminationDateConvention = std::nullopt,
             const std::optional<Period>& tenor = std::nullopt,
@@ -53,26 +54,26 @@ namespace QuantLib {
             const std::optional<bool>& endOfMonth = std::nullopt,
             const std::vector<bool>& isRegular = std::vector<bool>(0));
         /*! rule based constructor */
-        Schedule(Date effectiveDate,
-                 const Date& terminationDate,
+        Schedule(ExtDate effectiveDate,
+                 const ExtDate& terminationDate,
                  const Period& tenor,
-                 const Calendar<Date>& calendar,
+                 const Calendar<ExtDate>& calendar,
                  BusinessDayConvention convention,
                  BusinessDayConvention terminationDateConvention,
                  DateGeneration::Rule rule,
                  bool endOfMonth,
-                 const Date& firstDate = Date(),
-                 const Date& nextToLastDate = Date());
+                 const ExtDate& firstDate = ExtDate(),
+                 const ExtDate& nextToLastDate = ExtDate());
         Schedule() {}
-        //! \name Date access
+        //! \name ExtDate access
         //@{
         Size size() const { return dates_.size(); }
-        const Date& operator[](Size i) const;
-        const Date& at(Size i) const;
-        const Date& date(Size i) const;
-        Date previousDate(const Date& refDate) const;
-        Date nextDate(const Date& refDate) const;
-        const std::vector<Date>& dates() const { return dates_; }
+        const ExtDate& operator[](Size i) const;
+        const ExtDate& at(Size i) const;
+        const ExtDate& date(Size i) const;
+        ExtDate previousDate(const ExtDate& refDate) const;
+        ExtDate nextDate(const ExtDate& refDate) const;
+        const std::vector<ExtDate>& dates() const { return dates_; }
         bool hasIsRegular() const;
         bool isRegular(Size i) const;
         const std::vector<bool>& isRegular() const;
@@ -80,9 +81,9 @@ namespace QuantLib {
         //! \name Other inspectors
         //@{
         bool empty() const { return dates_.empty(); }
-        const Calendar<Date>& calendar() const;
-        const Date& startDate() const;
-        const Date& endDate() const;
+        const Calendar<ExtDate>& calendar() const;
+        const ExtDate& startDate() const;
+        const ExtDate& endDate() const;
         bool hasTenor() const;
         const Period& tenor() const;
         BusinessDayConvention businessDayConvention() const;
@@ -95,26 +96,26 @@ namespace QuantLib {
         //@}
         //! \name Iterators
         //@{
-        typedef std::vector<Date>::const_iterator const_iterator;
+        typedef typename std::vector<ExtDate>::const_iterator const_iterator;
         const_iterator begin() const { return dates_.begin(); }
         const_iterator end() const { return dates_.end(); }
-        const_iterator lower_bound(const Date& d = Date()) const;
+        const_iterator lower_bound(const ExtDate& d = ExtDate()) const;
         //@}
         //! \name Utilities
         //@{
         //! truncated schedule
-        Schedule after(const Date& truncationDate) const;
-        Schedule until(const Date& truncationDate) const;
+        Schedule after(const ExtDate& truncationDate) const;
+        Schedule until(const ExtDate& truncationDate) const;
         //@}
       private:
         std::optional<Period> tenor_;
-        Calendar<Date> calendar_;
+        Calendar<ExtDate> calendar_;
         BusinessDayConvention convention_;
         std::optional<BusinessDayConvention> terminationDateConvention_;
         std::optional<DateGeneration::Rule> rule_;
         std::optional<bool> endOfMonth_;
-        Date firstDate_, nextToLastDate_;
-        std::vector<Date> dates_;
+        ExtDate firstDate_, nextToLastDate_;
+        std::vector<ExtDate> dates_;
         std::vector<bool> isRegular_;
     };
 
@@ -123,46 +124,48 @@ namespace QuantLib {
     /*! This class provides a more comfortable interface to the
         argument list of Schedule's constructor.
     */
+    template <class ExtDate = Date>
     class MakeSchedule {
       public:
         MakeSchedule();
-        MakeSchedule& from(const Date& effectiveDate);
-        MakeSchedule& to(const Date& terminationDate);
+        MakeSchedule& from(const ExtDate& effectiveDate);
+        MakeSchedule& to(const ExtDate& terminationDate);
         MakeSchedule& withTenor(const Period&);
         MakeSchedule& withFrequency(Frequency);
-        MakeSchedule& withCalendar(const Calendar<Date>&);
+        MakeSchedule& withCalendar(const Calendar<ExtDate>&);
         MakeSchedule& withConvention(BusinessDayConvention);
         MakeSchedule& withTerminationDateConvention(BusinessDayConvention);
         MakeSchedule& withRule(DateGeneration::Rule);
         MakeSchedule& forwards();
         MakeSchedule& backwards();
         MakeSchedule& endOfMonth(bool flag=true);
-        MakeSchedule& withFirstDate(const Date& d);
-        MakeSchedule& withNextToLastDate(const Date& d);
-        operator Schedule() const;
+        MakeSchedule& withFirstDate(const ExtDate& d);
+        MakeSchedule& withNextToLastDate(const ExtDate& d);
+        operator Schedule<ExtDate>() const;
       private:
-        Calendar<Date> calendar_;
-        Date effectiveDate_, terminationDate_;
+        Calendar<ExtDate> calendar_;
+        ExtDate effectiveDate_, terminationDate_;
         std::optional<Period> tenor_;
         std::optional<BusinessDayConvention> convention_;
         std::optional<BusinessDayConvention> terminationDateConvention_;
         DateGeneration::Rule rule_;
         bool endOfMonth_;
-        Date firstDate_, nextToLastDate_;
+        ExtDate firstDate_, nextToLastDate_;
     };
 
     /*! Helper function for returning the date on or before date \p d that is the 20th of the month and obeserves the 
         given date generation \p rule if it is relevant.
     */
-    Date previousTwentieth(const Date& d, DateGeneration::Rule rule);
+    template <class ExtDate = Date>
+    ExtDate previousTwentieth(const ExtDate& d, DateGeneration::Rule rule);
 
     // inline definitions
 
-    inline const Date& Schedule::date(Size i) const {
+    template <class ExtDate> inline const ExtDate& Schedule<ExtDate>::date(Size i) const {
         return dates_.at(i);
     }
 
-    inline const Date& Schedule::operator[](Size i) const {
+    template <class ExtDate> inline const ExtDate& Schedule<ExtDate>::operator[](Size i) const {
         #if defined(QL_EXTRA_SAFETY_CHECKS)
         return dates_.at(i);
         #else
@@ -170,60 +173,60 @@ namespace QuantLib {
         #endif
     }
 
-    inline const Date& Schedule::at(Size i) const {
+    template <class ExtDate> inline const ExtDate& Schedule<ExtDate>::at(Size i) const {
         return dates_.at(i);
     }
 
-    inline const Calendar<Date>& Schedule::calendar() const {
+    template <class ExtDate> inline const Calendar<ExtDate>& Schedule<ExtDate>::calendar() const {
         return calendar_;
     }
 
-    inline const Date& Schedule::startDate() const {
+    template <class ExtDate> inline const ExtDate& Schedule<ExtDate>::startDate() const {
         return dates_.front();
     }
 
-    inline const Date &Schedule::endDate() const { return dates_.back(); }
+    template <class ExtDate> inline const ExtDate &Schedule<ExtDate>::endDate() const { return dates_.back(); }
 
-    inline bool Schedule::hasTenor() const {
+    template <class ExtDate> inline bool Schedule<ExtDate>::hasTenor() const {
         return tenor_ != std::nullopt;
     }
 
-    inline const Period& Schedule::tenor() const {
+    template <class ExtDate> inline const Period& Schedule<ExtDate>::tenor() const {
         QL_REQUIRE(hasTenor(),
                    "full interface (tenor) not available");
         return *tenor_;
     }
 
-    inline BusinessDayConvention Schedule::businessDayConvention() const {
+    template <class ExtDate> inline BusinessDayConvention Schedule<ExtDate>::businessDayConvention() const {
         return convention_;
     }
 
-    inline bool
-    Schedule::hasTerminationDateBusinessDayConvention() const {
+    template <class ExtDate> inline bool
+    Schedule<ExtDate>::hasTerminationDateBusinessDayConvention() const {
         return terminationDateConvention_ != std::nullopt;
     }
 
-    inline BusinessDayConvention
-    Schedule::terminationDateBusinessDayConvention() const {
+    template <class ExtDate> inline BusinessDayConvention
+    Schedule<ExtDate>::terminationDateBusinessDayConvention() const {
         QL_REQUIRE(hasTerminationDateBusinessDayConvention(),
                    "full interface (termination date bdc) not available");
         return *terminationDateConvention_;
     }
 
-    inline bool Schedule::hasRule() const {
+    template <class ExtDate> inline bool Schedule<ExtDate>::hasRule() const {
         return rule_ != std::nullopt;
     }
 
-    inline DateGeneration::Rule Schedule::rule() const {
+    template <class ExtDate> inline DateGeneration::Rule Schedule<ExtDate>::rule() const {
         QL_REQUIRE(hasRule(), "full interface (rule) not available");
         return *rule_;
     }
 
-    inline bool Schedule::hasEndOfMonth() const {
+    template <class ExtDate> inline bool Schedule<ExtDate>::hasEndOfMonth() const {
         return endOfMonth_ != std::nullopt;
     }
 
-    inline bool Schedule::endOfMonth() const {
+    template <class ExtDate> inline bool Schedule<ExtDate>::endOfMonth() const {
         QL_REQUIRE(hasEndOfMonth(),
                    "full interface (end of month) not available");
         return *endOfMonth_;

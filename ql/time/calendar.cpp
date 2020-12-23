@@ -112,11 +112,11 @@ namespace QuantLib {
                            Integer n, TimeUnit unit,
                            BusinessDayConvention c,
                            bool endOfMonth) const {
-        QL_REQUIRE(d!=ExtDate(), "null date");
+        QL_REQUIRE(to_DateLike(d)!=ExtDate(), "null date");
         if (n == 0) {
             return adjust(d,c);
         } else if (unit == Days) {
-            ExtDate d1 = d;
+            DateLike<ExtDate> d1{d};
             if (n > 0) {
                 while (n > 0) {
                     ++d1;
@@ -134,10 +134,10 @@ namespace QuantLib {
             }
             return d1;
         } else if (unit == Weeks) {
-            ExtDate d1 = d + n*unit;
+            ExtDate d1 = to_DateLike(d) + n*unit;
             return adjust(d1,c);
         } else {
-            ExtDate d1 = d + n*unit;
+            ExtDate d1 = to_DateLike(d) + n*unit;
 
             // we are sure the unit is Months or Years
             if (endOfMonth && isEndOfMonth(d))

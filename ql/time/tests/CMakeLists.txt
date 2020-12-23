@@ -21,7 +21,7 @@ add_executable(qltime_tests ${srcs} ${headers})
 target_link_libraries(qltime_tests Catch2::Catch2 fmt::fmt cpp_rutils::cpp_rutils)
 
 target_precompile_headers(qltime_tests  PUBLIC stdafx.h)
-add_definitions(-DUSING_PCH)
+add_definitions(-DUSING_PCH -D_CRT_SECURE_NO_WARNINGS)
 
 enable_testing()
 add_test(NAME main COMMAND qltime_tests)

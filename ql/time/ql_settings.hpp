@@ -31,6 +31,10 @@
 #include "ql_utilities_observablevalue.hpp"
 #include <optional>
 
+#if __GNUC__
+#pragma GCC diagnostic ignored "-Wnon-template-friend"
+#endif
+
 namespace QuantLib {
 
     //! global repository for run-time library settings

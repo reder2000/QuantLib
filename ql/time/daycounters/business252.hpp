@@ -39,19 +39,19 @@ namespace QuantLib {
       private:
         class Impl : public DayCounter<ExtDate>::Impl {
           private:
-            Calendar<Date> calendar_;
+            Calendar<ExtDate> calendar_;
           public:
             std::string name() const;
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const;
-            explicit Impl(const Calendar<Date>& c) : calendar_(c) {}
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const;
+            explicit Impl(const Calendar<ExtDate>& c) : calendar_(c) {}
         };
       public:
-        Business252(const Calendar<Date>& c = Brazil())
+        Business252(const Calendar<ExtDate>& c = Brazil<ExtDate>())
         : DayCounter<ExtDate>(
               std::shared_ptr<typename DayCounter<ExtDate>::Impl>(new Business252::Impl(c))) {}
     };

@@ -66,45 +66,43 @@ namespace QuantLib {
       private:
         class US_Impl : public DayCounter<ExtDate>::Impl {
           public:
-            std::string name() const { return std::string("30/360 (Bond Basis)");}
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
+            std::string name() const override { return std::string("30/360 (Bond Basis)"); }
+            serial_type dayCount(const ExtDate& d1, const ExtDate& d2) const override;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&, const ExtDate&) const override {
                 return dayCount(d1,d2)/360.0; }
         };
         class EU_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("30E/360 (Eurobond Basis)");}
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const {
                 return dayCount(d1,d2)/360.0; }
         };
         class IT_Impl : public DayCounter<ExtDate>::Impl {
           public:
             std::string name() const { return std::string("30/360 (Italian)");}
-            serial_type dayCount(const Date& d1, const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
+            serial_type dayCount(const ExtDate& d1, const ExtDate& d2) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const {
                 return dayCount(d1,d2)/360.0; }
         };
         class GER_Impl : public DayCounter<ExtDate>::Impl {
           public:
             explicit GER_Impl(bool isLastPeriod) : isLastPeriod_(isLastPeriod) {}
             std::string name() const { return std::string("30/360 (German)");}
-            serial_type dayCount(const Date& d1, const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
+            serial_type dayCount(const ExtDate& d1, const ExtDate& d2) const;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const {
                 return dayCount(d1,d2)/360.0; }
         private:
             bool isLastPeriod_;

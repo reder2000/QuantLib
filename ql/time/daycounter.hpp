@@ -48,14 +48,14 @@ namespace QuantLib {
             virtual ~Impl() {}
             virtual std::string name() const = 0;
             //! to be overloaded by more complex day counters
-            virtual serial_type dayCount(const Date& d1,
-                                               const Date& d2) const {
-                return (d2-d1);
+            virtual serial_type dayCount(const ExtDate& d1,
+                                               const ExtDate& d2) const {
+                return (to_DateLike(d2)-to_DateLike(d1));
             }
-            virtual Time yearFraction(const Date& d1,
-                                      const Date& d2,
-                                      const Date& refPeriodStart,
-                                      const Date& refPeriodEnd) const = 0;
+            virtual Time yearFraction(const ExtDate& d1,
+                                      const ExtDate& d2,
+                                      const ExtDate& refPeriodStart,
+                                      const ExtDate& refPeriodEnd) const = 0;
         };
         std::shared_ptr<Impl> impl_;
         /*! This constructor can be invoked by derived classes which
@@ -80,12 +80,12 @@ namespace QuantLib {
         */
         std::string name() const;
         //! Returns the number of days between two dates.
-        serial_type dayCount(const Date&,
-                                   const Date&) const;
+        serial_type dayCount(const ExtDate&,
+                                   const ExtDate&) const;
         //! Returns the period between two dates as a fraction of year.
-        Time yearFraction(const Date&, const Date&,
-                          const Date& refPeriodStart = Date(),
-                          const Date& refPeriodEnd = Date()) const;
+        Time yearFraction(const ExtDate&, const ExtDate&,
+                          const ExtDate& refPeriodStart = ExtDate(),
+                          const ExtDate& refPeriodEnd = ExtDate()) const;
         //@}
     };
 
@@ -118,14 +118,14 @@ namespace QuantLib {
         return impl_->name();
     }
     template <class ExtDate> 
-    inline serial_type DayCounter<ExtDate>::dayCount(const Date& d1,
-                                                  const Date& d2) const {
+    inline serial_type DayCounter<ExtDate>::dayCount(const ExtDate& d1,
+                                                  const ExtDate& d2) const {
         QL_REQUIRE(impl_, "no day counter implementation provided");
         return impl_->dayCount(d1,d2);
     }
     template <class ExtDate> 
-    inline Time DayCounter<ExtDate>::yearFraction(const Date& d1, const Date& d2,
-        const Date& refPeriodStart, const Date& refPeriodEnd) const {
+    inline Time DayCounter<ExtDate>::yearFraction(const ExtDate& d1, const ExtDate& d2,
+        const ExtDate& refPeriodStart, const ExtDate& refPeriodEnd) const {
             QL_REQUIRE(impl_, "no day counter implementation provided");
             return impl_->yearFraction(d1,d2,refPeriodStart,refPeriodEnd);
     }

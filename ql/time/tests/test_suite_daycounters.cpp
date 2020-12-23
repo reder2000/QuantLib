@@ -36,38 +36,41 @@
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/schedule.hpp>
 #include "boost_to_catch.h"
+#include "pseudo_dates.h"
 #include <iomanip>
 
 using namespace QuantLib;
 //using namespace boost::unit_test_framework;
+using eDate = QuantLibDate;
+using DLe = DateLike<eDate>;
 
 namespace day_counters_test {
 
     struct SingleCase {
-        SingleCase(ActualActual<Date>::Convention convention,
-            const Date& start,
-            const Date& end,
-            const Date& refStart,
-            const Date& refEnd,
+        SingleCase(ActualActual<eDate>::Convention convention,
+            const eDate& start,
+            const eDate& end,
+            const eDate& refStart,
+            const eDate& refEnd,
             Time result)
             : convention(convention), start(start), end(end),
             refStart(refStart), refEnd(refEnd), result(result) {}
-        SingleCase(ActualActual<Date>::Convention convention,
-            const Date& start,
-            const Date& end,
+        SingleCase(ActualActual<eDate>::Convention convention,
+            const eDate& start,
+            const eDate& end,
             Time result)
             : convention(convention), start(start), end(end),
-            refStart(Date()), refEnd(Date()), result(result) {}
-        ActualActual<Date>::Convention convention;
-        Date start;
-        Date end;
-        Date refStart;
-        Date refEnd;
+            refStart(eDate()), refEnd(eDate()), result(result) {}
+        ActualActual<eDate>::Convention convention;
+        eDate start;
+        eDate end;
+        eDate refStart;
+        eDate refEnd;
         Time result;
     };
 
     Time ISMAYearFractionWithReferenceDates(
-        const DayCounter<Date>& dayCounter, Date start, Date end, Date refStart, Date refEnd) {
+        const DayCounter<eDate>& dayCounter, eDate start, eDate end, eDate refStart, eDate refEnd) {
         Real referenceDayCount = Real(dayCounter.dayCount(refStart, refEnd));
         // guess how many coupon periods per year:
         Integer couponsPerYear = (Integer)(0.5 + 365.0 / referenceDayCount);
@@ -76,19 +79,19 @@ namespace day_counters_test {
             / (referenceDayCount*couponsPerYear);
     }
 
-    Time actualActualDaycountComputation(const Schedule& schedule, Date start, Date end) {
+    Time actualActualDaycountComputation(const Schedule<eDate>& schedule, eDate start, eDate end) {
 
-        DayCounter daycounter = ActualActual(ActualActual<Date>::ISMA, schedule);
+        DayCounter daycounter = ActualActual(ActualActual<eDate>::ISMA, schedule);
         Time yearFraction = 0.0;
 
         for (Size i = 1; i < schedule.size() - 1; i++) {
-            Date referenceStart = schedule.date(i);
-            Date referenceEnd = schedule.date(i+1);
-            if (start < referenceEnd && end > referenceStart) {
+            eDate referenceStart = schedule.date(i);
+            eDate referenceEnd = schedule.date(i+1);
+            if (to_DateLike(start) < referenceEnd && to_DateLike(end) > referenceStart) {
                 yearFraction += ISMAYearFractionWithReferenceDates(
                     daycounter,
-                    (start > referenceStart) ? start : referenceStart,
-                    (end < referenceEnd) ? end : referenceEnd,
+                    (to_DateLike(start) > referenceStart) ? start : referenceStart,
+                    (to_DateLike(end) < referenceEnd) ? end : referenceEnd,
                     referenceStart,
                     referenceEnd
                 );
@@ -108,105 +111,106 @@ TEST_CASE("testActualActual", "[DayCounterTest][hide]") {
 
     SingleCase testCases[] = {
         // first example
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(1,November,2003), Date(1,May,2004),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(1,November,2003), eDate(1,May,2004),
                    0.497724380567),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(1,November,2003), Date(1,May,2004),
-                   Date(1,November,2003), Date(1,May,2004),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(1,November,2003), eDate(1,May,2004),
+                   eDate(1,November,2003), eDate(1,May,2004),
                    0.500000000000),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(1,November,2003), Date(1,May,2004),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(1,November,2003), eDate(1,May,2004),
                    0.497267759563),
         // short first calculation period (first period)
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(1,February,1999), Date(1,July,1999),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(1,February,1999), eDate(1,July,1999),
                    0.410958904110),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(1,February,1999), Date(1,July,1999),
-                   Date(1,July,1998), Date(1,July,1999),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(1,February,1999), eDate(1,July,1999),
+                   eDate(1,July,1998), eDate(1,July,1999),
                    0.410958904110),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(1,February,1999), Date(1,July,1999),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(1,February,1999), eDate(1,July,1999),
                    0.410958904110),
         // short first calculation period (second period)
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(1,July,1999), Date(1,July,2000),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(1,July,1999), eDate(1,July,2000),
                    1.001377348600),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(1,July,1999), Date(1,July,2000),
-                   Date(1,July,1999), Date(1,July,2000),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(1,July,1999), eDate(1,July,2000),
+                   eDate(1,July,1999), eDate(1,July,2000),
                    1.000000000000),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(1,July,1999), Date(1,July,2000),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(1,July,1999), eDate(1,July,2000),
                    1.000000000000),
         // long first calculation period (first period)
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(15,August,2002), Date(15,July,2003),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(15,August,2002), eDate(15,July,2003),
                    0.915068493151),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(15,August,2002), Date(15,July,2003),
-                   Date(15,January,2003), Date(15,July,2003),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(15,August,2002), eDate(15,July,2003),
+                   eDate(15,January,2003), eDate(15,July,2003),
                    0.915760869565),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(15,August,2002), Date(15,July,2003),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(15,August,2002), eDate(15,July,2003),
                    0.915068493151),
         // long first calculation period (second period)
         /* Warning: the ISDA case is in disagreement with mktc1198.pdf */
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(15,July,2003), Date(15,January,2004),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(15,July,2003), eDate(15,January,2004),
                    0.504004790778),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(15,July,2003), Date(15,January,2004),
-                   Date(15,July,2003), Date(15,January,2004),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(15,July,2003), eDate(15,January,2004),
+                   eDate(15,July,2003), eDate(15,January,2004),
                    0.500000000000),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(15,July,2003), Date(15,January,2004),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(15,July,2003), eDate(15,January,2004),
                    0.504109589041),
         // short final calculation period (penultimate period)
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(30,July,1999), Date(30,January,2000),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(30,July,1999), eDate(30,January,2000),
                    0.503892506924),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(30,July,1999), Date(30,January,2000),
-                   Date(30,July,1999), Date(30,January,2000),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(30,July,1999), eDate(30,January,2000),
+                   eDate(30,July,1999), eDate(30,January,2000),
                    0.500000000000),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(30,July,1999), Date(30,January,2000),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(30,July,1999), eDate(30,January,2000),
                    0.504109589041),
         // short final calculation period (final period)
-        SingleCase(ActualActual<Date>::ISDA,
-                   Date(30,January,2000), Date(30,June,2000),
+        SingleCase(ActualActual<eDate>::ISDA,
+                   eDate(30,January,2000), eDate(30,June,2000),
                    0.415300546448),
-        SingleCase(ActualActual<Date>::ISMA,
-                   Date(30,January,2000), Date(30,June,2000),
-                   Date(30,January,2000), Date(30,July,2000),
+        SingleCase(ActualActual<eDate>::ISMA,
+                   eDate(30,January,2000), eDate(30,June,2000),
+                   eDate(30,January,2000), eDate(30,July,2000),
                    0.417582417582),
-        SingleCase(ActualActual<Date>::AFB,
-                   Date(30,January,2000), Date(30,June,2000),
+        SingleCase(ActualActual<eDate>::AFB,
+                   eDate(30,January,2000), eDate(30,June,2000),
                    0.41530054644)
     };
 
     Size n = sizeof(testCases)/sizeof(SingleCase);
     for (Size i=0; i<n; i++) {
-        ActualActual dayCounter(testCases[i].convention);
-        Date d1 = testCases[i].start,
+        ActualActual<eDate> dayCounter(testCases[i].convention);
+        eDate d1 = testCases[i].start,
             d2 = testCases[i].end,
             rd1 = testCases[i].refStart,
             rd2 = testCases[i].refEnd;
         Time calculated = dayCounter.yearFraction(d1,d2,rd1,rd2);
 
-        if (std::fabs(calculated-testCases[i].result) > 1.0e-10) {
-            std::ostringstream period, refPeriod;
-            period << "period: " << d1 << " to " << d2;
-            if (testCases[i].convention == ActualActual<Date>::ISMA)
-                refPeriod << "referencePeriod: " << rd1 << " to " << rd2;
-            BOOST_ERROR(dayCounter.name() << ":\n"
-                       << period.str() << "\n" << refPeriod.str() << "\n"
-                       << std::setprecision(10)
-                       << "    calculated: " << calculated << "\n"
-                       << "    expected:   " << testCases[i].result);
-        }
+        IF(std::fabs(calculated - testCases[i].result) > 1.0e-10);
+        //{
+        //    std::ostringstream period, refPeriod;
+        //    period << "period: " << d1 << " to " << d2;
+        //    if (testCases[i].convention == ActualActual<eDate>::ISMA)
+        //        refPeriod << "referencePeriod: " << rd1 << " to " << rd2;
+        //    BOOST_ERROR(dayCounter.name() << ":\n"
+        //               << period.str() << "\n" << refPeriod.str() << "\n"
+        //               << std::setprecision(10)
+        //               << "    calculated: " << calculated << "\n"
+        //               << "    expected:   " << testCases[i].result);
+        //} 
     }
 }
 
@@ -217,27 +221,27 @@ TEST_CASE("testActualActualWithSemiannualSchedule", "[DayCounterTest][hide]") {
 
     using namespace day_counters_test;
 
-    Calendar calendar = UnitedStates<Date>();
-    Date fromDate = Date(10, January, 2017);
-    Date firstCoupon = Date(31, August, 2017);
-    Date quasiCoupon = Date(28, February, 2017);
-    Date quasiCoupon2 = Date(31, August, 2016);
+    Calendar<eDate> calendar = UnitedStates<eDate>();
+    eDate fromDate = DateAdaptor<eDate>::Date(10, January, 2017);
+    eDate firstCoupon = DateAdaptor<eDate>::Date(31, August, 2017);
+    eDate quasiCoupon = DateAdaptor<eDate>::Date(28, February, 2017);
+    eDate quasiCoupon2 = DateAdaptor<eDate>::Date(31, August, 2016);
 
-    Schedule schedule = MakeSchedule()
+    Schedule<eDate> schedule = MakeSchedule<eDate>()
         .from(fromDate)
         .withFirstDate(firstCoupon)
-        .to(Date(28, February, 2026))
+        .to(eDate(28, February, 2026))
         .withFrequency(Semiannual)
         .withCalendar(calendar)
         .withConvention(Unadjusted)
         .backwards().endOfMonth(true);
 
-    Date testDate = schedule.date(1);
-    DayCounter dayCounter = ActualActual(ActualActual<Date>::ISMA, schedule);
-    DayCounter dayCounterNoSchedule = ActualActual(ActualActual<Date>::ISMA);
+    eDate testDate = schedule.date(1);
+    DayCounter<eDate> dayCounter = ActualActual<eDate>(ActualActual<eDate>::ISMA, schedule);
+    DayCounter<eDate> dayCounterNoSchedule = ActualActual<eDate>(ActualActual<eDate>::ISMA);
 
-    Date referencePeriodStart = schedule.date(1);
-    Date referencePeriodEnd = schedule.date(2);
+    eDate referencePeriodStart = schedule.date(1);
+    eDate referencePeriodEnd = schedule.date(2);
 
     //Test
     QL_ASSERT(dayCounter.yearFraction(referencePeriodStart,
@@ -267,12 +271,12 @@ TEST_CASE("testActualActualWithSemiannualSchedule", "[DayCounterTest][hide]") {
               "periods with no schedule");
 
 
-    while (testDate < referencePeriodEnd) {
+    while (to_DateLike(testDate) < referencePeriodEnd) {
         Time difference =
             dayCounter.yearFraction(testDate, referencePeriodEnd,
                                     referencePeriodStart, referencePeriodEnd) -
             dayCounter.yearFraction(testDate, referencePeriodEnd);
-        if (std::fabs(difference) > 1.0e-10) {
+        IFe (std::fabs(difference) > 1.0e-10) {
             BOOST_ERROR("Failed to correctly use the schedule "
                         "to find the reference period for Act/Act");
         };
@@ -293,21 +297,21 @@ TEST_CASE("testActualActualWithSemiannualSchedule", "[DayCounterTest][hide]") {
 
     // test multiple periods
 
-    schedule = MakeSchedule()
-        .from(Date(10, January, 2017))
-        .withFirstDate(Date(31, August, 2017))
-        .to(Date(28, February, 2026))
+    schedule = MakeSchedule<eDate>()
+        .from(eDate(10, January, 2017))
+        .withFirstDate(eDate(31, August, 2017))
+        .to(eDate(28, February, 2026))
         .withFrequency(Semiannual)
         .withCalendar(calendar)
         .withConvention(Unadjusted)
         .backwards().endOfMonth(false);
 
-    Date periodStartDate = schedule.date(1);
-    Date periodEndDate = schedule.date(2);
+    eDate periodStartDate = schedule.date(1);
+    eDate periodEndDate = schedule.date(2);
 
-    dayCounter = ActualActual(ActualActual<Date>::ISMA, schedule);
+    dayCounter = ActualActual<eDate>(ActualActual<eDate>::ISMA, schedule);
 
-    while (periodEndDate < schedule.date(schedule.size()-2)) {
+    while (to_DateLike(periodEndDate) < schedule.date(schedule.size()-2)) {
         Time expected =
             actualActualDaycountComputation(schedule,
                                             periodStartDate,
@@ -315,7 +319,7 @@ TEST_CASE("testActualActualWithSemiannualSchedule", "[DayCounterTest][hide]") {
         Time calculated = dayCounter.yearFraction(periodStartDate,
                                                   periodEndDate);
 
-        if (std::fabs(expected - calculated) > 1e-8) {
+        IFe (std::fabs(expected - calculated) > 1e-8) {
             BOOST_ERROR("Failed to compute the correct year fraction "
                         "given a schedule: " << periodStartDate <<
                         " to " << periodEndDate <<
@@ -334,29 +338,29 @@ TEST_CASE("testActualActualWithAnnualSchedule", "[DayCounterTest][hide]") {
     using namespace day_counters_test;
 
     // Now do an annual schedule
-    Calendar calendar = UnitedStates<Date>();
-    Schedule schedule = MakeSchedule()
-        .from(Date(10, January, 2017))
-        .withFirstDate(Date(31, August, 2017))
-        .to(Date(28, February, 2026))
+    Calendar<eDate> calendar = UnitedStates<eDate>();
+    Schedule<eDate> schedule = MakeSchedule<eDate>()
+        .from(eDate(10, January, 2017))
+        .withFirstDate(eDate(31, August, 2017))
+        .to(eDate(28, February, 2026))
         .withFrequency(Annual)
         .withCalendar(calendar)
         .withConvention(Unadjusted)
         .backwards().endOfMonth(false);
 
-    Date referencePeriodStart = schedule.date(1);
-    Date referencePeriodEnd = schedule.date(2);
+    eDate referencePeriodStart = schedule.date(1);
+    eDate referencePeriodEnd = schedule.date(2);
 
-    Date testDate = schedule.date(1);
-    DayCounter dayCounter = ActualActual(ActualActual<Date>::ISMA, schedule);
+    eDate testDate = schedule.date(1);
+    DayCounter dayCounter = ActualActual(ActualActual<eDate>::ISMA, schedule);
 
-    while (testDate < referencePeriodEnd) {
+    while (to_DateLike(testDate) < referencePeriodEnd) {
         Time difference =
             ISMAYearFractionWithReferenceDates(dayCounter,
                                                testDate, referencePeriodEnd,
                                                referencePeriodStart, referencePeriodEnd) -
             dayCounter.yearFraction(testDate, referencePeriodEnd);
-        if (std::fabs(difference) > 1.0e-10) {
+        IFe (std::fabs(difference) > 1.0e-10) {
             BOOST_ERROR("Failed to correctly use the schedule "
                         "to find the reference period for Act/Act:\n"
                         << testDate << " to " << referencePeriodEnd
@@ -375,49 +379,48 @@ TEST_CASE("testActualActualWithSchedule", "[DayCounterTest][hide]") {
     using namespace day_counters_test;
 
     // long first coupon
-    Date issueDateExpected = Date(17, January, 2017);
-    Date firstCouponDateExpected = Date(31, August, 2017);
+    eDate issueDateExpected = eDate(17, January, 2017);
+    eDate firstCouponDateExpected = eDate(31, August, 2017);
 
-    Schedule schedule =
-        MakeSchedule()
+    Schedule<eDate> schedule = MakeSchedule<eDate>()
         .from(issueDateExpected)
         .withFirstDate(firstCouponDateExpected)
-        .to(Date(28, February, 2026))
+        .to(eDate(28, February, 2026))
         .withFrequency(Semiannual)
-        .withCalendar(Canada())
+        .withCalendar(Canada<eDate>())
         .withConvention(Unadjusted)
         .backwards()
         .endOfMonth();
 
-    Date issueDate = schedule.date(0);
-    QL_REQUIRE(issueDate == issueDateExpected, "This is not the expected issue date {} expected {}",
+    eDate issueDate = schedule.date(0);
+    QL_REQUIRE(to_DateLike(issueDate) == issueDateExpected, "This is not the expected issue date {} expected {}",
                issueDate, issueDateExpected);
-    Date firstCouponDate = schedule.date(1);
-    QL_REQUIRE(firstCouponDate == firstCouponDateExpected,
+    eDate firstCouponDate = schedule.date(1);
+    QL_REQUIRE(to_DateLike(firstCouponDate) == firstCouponDateExpected,
                "This is not the expected first coupon date {} expected: {}",
                firstCouponDate, firstCouponDateExpected);
 
     //Make thw quasi coupon dates:
-    Date quasiCouponDate2 = schedule.calendar().advance(firstCouponDate,
+    eDate quasiCouponDate2 = schedule.calendar().advance(firstCouponDate,
         -schedule.tenor(),
         schedule.businessDayConvention(),
         schedule.endOfMonth());
-    Date quasiCouponDate1 = schedule.calendar().advance(quasiCouponDate2,
+    eDate quasiCouponDate1 = schedule.calendar().advance(quasiCouponDate2,
         -schedule.tenor(),
         schedule.businessDayConvention(),
         schedule.endOfMonth());
 
-    Date quasiCouponDate1Expected = Date(31, August, 2016);
-    Date quasiCouponDate2Expected = Date(28, February, 2017);
+    eDate quasiCouponDate1Expected = eDate(31, August, 2016);
+    eDate quasiCouponDate2Expected = eDate(28, February, 2017);
 
-    QL_REQUIRE(quasiCouponDate2 == quasiCouponDate2Expected,
+    QL_REQUIRE(to_DateLike(quasiCouponDate2) == quasiCouponDate2Expected,
                "Expected {} as the later quasi coupon date but received {}",
                quasiCouponDate2Expected  , quasiCouponDate2);
-    QL_REQUIRE(quasiCouponDate1 == quasiCouponDate1Expected,
+    QL_REQUIRE(to_DateLike(quasiCouponDate1) == quasiCouponDate1Expected,
                "Expected {} as the earlier quasi coupon date but received {}",
                quasiCouponDate1Expected, quasiCouponDate1);
 
-    DayCounter dayCounter = ActualActual(ActualActual<Date>::ISMA, schedule);
+    DayCounter dayCounter = ActualActual<eDate>(ActualActual<eDate>::ISMA, schedule);
 
     // full coupon
     Time t_with_reference = dayCounter.yearFraction(
@@ -436,25 +439,25 @@ TEST_CASE("testActualActualWithSchedule", "[DayCounterTest][hide]") {
     Time expected = 0.6160220994;
 
 
-    if (std::fabs(t_total - expected) > 1.0e-10) {
+    IFe (std::fabs(t_total - expected) > 1.0e-10) {
         BOOST_ERROR("Failed to reproduce expected time:\n"
             << std::setprecision(10)
             << "    calculated: " << t_total << "\n"
             << "    expected:   " << expected);
     }
-    if (std::fabs(t_with_reference -expected) > 1.0e-10) {
+    IFe (std::fabs(t_with_reference -expected) > 1.0e-10) {
         BOOST_ERROR("Failed to reproduce expected time:\n"
                    << std::setprecision(10)
                    << "    calculated: " << t_with_reference << "\n"
                    << "    expected:   " << expected);
     }
-    if (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
+    IFe (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
         BOOST_ERROR("Should produce the same time "
                     "whether or not references are present");
     }
 
     // settlement date in the first quasi-period
-    Date settlementDate = Date(29, January, 2017);
+    eDate settlementDate = eDate(29, January, 2017);
 
     t_with_reference = ISMAYearFractionWithReferenceDates(
         dayCounter,
@@ -463,23 +466,23 @@ TEST_CASE("testActualActualWithSchedule", "[DayCounterTest][hide]") {
     );
     t_no_reference = dayCounter.yearFraction(issueDate, settlementDate);
     Time t_expected_first_qp = 0.03314917127071823; //12.0/362
-    if (std::fabs(t_with_reference - t_expected_first_qp) > 1.0e-10) {
+    IFe (std::fabs(t_with_reference - t_expected_first_qp) > 1.0e-10) {
         BOOST_ERROR("Failed to reproduce expected time:\n"
                    << std::setprecision(10)
                    << "    calculated: " << t_no_reference << "\n"
                    << "    expected:   " << t_expected_first_qp);
     }
-    if (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
+    IFe (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
         BOOST_ERROR("Should produce the same time "
                     "whether or not references are present");
     }
     Time t2 = dayCounter.yearFraction(settlementDate, firstCouponDate);
-    if (std::fabs(t_expected_first_qp + t2 - expected) > 1.0e-10) {
+    IFe (std::fabs(t_expected_first_qp + t2 - expected) > 1.0e-10) {
         BOOST_ERROR("Sum of quasiperiod2 split is not consistent");
     }
 
     // settlement date in the second quasi-period
-    settlementDate = Date(29, July, 2017);
+    settlementDate = eDate(29, July, 2017);
 
     /*T = dayCounter.yearFraction(issueDate,
                                 settlementDate,
@@ -503,13 +506,13 @@ TEST_CASE("testActualActualWithSchedule", "[DayCounterTest][hide]") {
         quasiCouponDate2, settlementDate,
         quasiCouponDate2, firstCouponDate
     );
-    if (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
+    IFe (std::fabs(t_no_reference - t_with_reference) > 1.0e-10) {
         BOOST_ERROR("These two cases should be identical");
     };
     t2 = dayCounter.yearFraction(settlementDate, firstCouponDate);
 
 
-    if (std::fabs(t_total-(t_no_reference+t2)) > 1.0e-10) {
+    IFe (std::fabs(t_total-(t_no_reference+t2)) > 1.0e-10) {
         BOOST_ERROR("Failed to reproduce expected time:\n"
                    << std::setprecision(10)
                    << "    calculated: " << t_total << "\n"
@@ -526,14 +529,14 @@ TEST_CASE("testSimple", "[DayCounterTest][hide]") {
     Size n = sizeof(p)/sizeof(Period);
 
     // 4 years should be enough
-    Date first(1,January,2002), last(31,December,2005);
-    DayCounter dayCounter = SimpleDayCounter();
+    eDate first(1,January,2002), last(31,December,2005);
+    DayCounter<eDate> dayCounter = SimpleDayCounter<eDate>();
 
-    for (Date start = first; start <= last; start++) {
+    for (auto start = to_DateLike(first); start <= last; start++) {
         for (Size i=0; i<n; i++) {
-            Date end = start + p[i];
-            Time calculated = dayCounter.yearFraction(start,end);
-            if (std::fabs(calculated-expected[i]) > 1.0e-12) {
+            eDate end = start + p[i];
+            Time calculated = dayCounter.yearFraction(start.asExtDate(),end);
+            IFe (std::fabs(calculated-expected[i]) > 1.0e-12)  {
                 BOOST_ERROR("from " << start << " to " << end << ":\n"
                            << std::setprecision(12)
                            << "    calculated: " << calculated << "\n"
@@ -552,14 +555,15 @@ TEST_CASE("testOne", "[DayCounterTest][hide]") {
     Size n = sizeof(p)/sizeof(Period);
 
     // 1 years should be enough
-    Date first(1,January,2004), last(31,December,2004);
-    DayCounter dayCounter = OneDayCounter();
+    eDate first(1,January,2004), last(31,December,2004);
+    DayCounter<eDate> dayCounter = OneDayCounter<eDate>();
 
-    for (Date start = first; start <= last; start++) {
+    for (auto start = to_DateLike(first); start <= last; start++) {
         for (Size i=0; i<n; i++) {
-            Date end = start + p[i];
+            eDate end = start + p[i];
             Time calculated = dayCounter.yearFraction(start,end);
-            if (std::fabs(calculated-expected[i]) > 1.0e-12) {
+            IFe(std::fabs(calculated - expected[i]) > 1.0e-12)
+            {
                 BOOST_ERROR("from " << start << " to " << end << ":\n"
                            << std::setprecision(12)
                            << "    calculated: " << calculated << "\n"
@@ -573,22 +577,22 @@ TEST_CASE("testBusiness252", "[DayCounterTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing business/252 day counter...");
 
-    std::vector<Date> testDates;
-    testDates.push_back(Date(1,February,2002));
-    testDates.push_back(Date(4,February,2002));
-    testDates.push_back(Date(16,May,2003));
-    testDates.push_back(Date(17,December,2003));
-    testDates.push_back(Date(17,December,2004));
-    testDates.push_back(Date(19,December,2005));
-    testDates.push_back(Date(2,January,2006));
-    testDates.push_back(Date(13,March,2006));
-    testDates.push_back(Date(15,May,2006));
-    testDates.push_back(Date(17,March,2006));
-    testDates.push_back(Date(15,May,2006));
-    testDates.push_back(Date(26,July,2006));
-    testDates.push_back(Date(28,June,2007));
-    testDates.push_back(Date(16,September,2009));
-    testDates.push_back(Date(26,July,2016));
+    std::vector<eDate> testDates;
+    testDates.push_back(eDate(1,February,2002));
+    testDates.push_back(eDate(4,February,2002));
+    testDates.push_back(eDate(16,May,2003));
+    testDates.push_back(eDate(17,December,2003));
+    testDates.push_back(eDate(17,December,2004));
+    testDates.push_back(eDate(19,December,2005));
+    testDates.push_back(eDate(2,January,2006));
+    testDates.push_back(eDate(13,March,2006));
+    testDates.push_back(eDate(15,May,2006));
+    testDates.push_back(eDate(17,March,2006));
+    testDates.push_back(eDate(15,May,2006));
+    testDates.push_back(eDate(26,July,2006));
+    testDates.push_back(eDate(28,June,2007));
+    testDates.push_back(eDate(16,September,2009));
+    testDates.push_back(eDate(26,July,2016));
 
     Time expected[] = {
         0.0039682539683,
@@ -607,13 +611,13 @@ TEST_CASE("testBusiness252", "[DayCounterTest][hide]") {
         6.84126984127
         };
 
-    DayCounter dayCounter1 = Business252(Brazil());
+    DayCounter<eDate> dayCounter1 = Business252<eDate>(Brazil<eDate>());
 
     Time calculated;
 
     for (Size i=1; i<testDates.size(); i++) {
         calculated = dayCounter1.yearFraction(testDates[i-1],testDates[i]);
-        if (std::fabs(calculated-expected[i-1]) > 1.0e-12) {
+        IFe (std::fabs(calculated-expected[i-1]) > 1.0e-12) {
                 BOOST_ERROR("from " << testDates[i-1]
                             << " to " << testDates[i] << ":\n"
                             << std::setprecision(14)
@@ -622,11 +626,11 @@ TEST_CASE("testBusiness252", "[DayCounterTest][hide]") {
         }
     }
 
-    DayCounter dayCounter2 = Business252();
+    DayCounter<eDate> dayCounter2 = Business252<eDate>();
 
     for (Size i=1; i<testDates.size(); i++) {
         calculated = dayCounter2.yearFraction(testDates[i-1],testDates[i]);
-        if (std::fabs(calculated-expected[i-1]) > 1.0e-12) {
+        IFe (std::fabs(calculated-expected[i-1]) > 1.0e-12) {
                 BOOST_ERROR("from " << testDates[i-1]
                             << " to " << testDates[i] << ":\n"
                             << std::setprecision(14)
@@ -640,11 +644,11 @@ TEST_CASE("testThirty365", "[DayCounterTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing 30/365 day counter...");
 
-    Date d1(17,June,2011), d2(30,December,2012);
-    DayCounter dayCounter = Thirty365();
+    eDate d1(17,June,2011), d2(30,December,2012);
+    DayCounter<eDate> dayCounter = Thirty365<eDate>();
 
     BigInteger days = dayCounter.dayCount(d1,d2);
-    if (days != 553) {
+    IFe (days != 553) {
         BOOST_FAIL("from " << d1 << " to " << d2 << ":\n"
                    << "    calculated: " << days << "\n"
                    << "    expected:   " << 553);
@@ -652,7 +656,7 @@ TEST_CASE("testThirty365", "[DayCounterTest][hide]") {
 
     Time t = dayCounter.yearFraction(d1,d2);
     Time expected = 553/365.0;
-    if (std::fabs(t-expected) > 1.0e-12) {
+    IFe (std::fabs(t-expected) > 1.0e-12) {
         BOOST_FAIL("from " << d1 << " to " << d2 << ":\n"
                    << std::setprecision(12)
                    << "    calculated: " << t << "\n"
@@ -668,43 +672,43 @@ TEST_CASE("testThirty360_BondBasis", "[DayCounterTest][hide]") {
     // Source: 2006 ISDA Definitions, Sec. 4.16 (f)
     // 30/360 (or Bond Basis)
 
-    DayCounter dayCounter = Thirty360(Thirty360<Date>::BondBasis);
-    std::vector<Date> testStartDates;
-    std::vector<Date> testEndDates;
+    DayCounter<eDate> dayCounter = Thirty360<eDate>(Thirty360<eDate>::BondBasis);
+    std::vector<eDate> testStartDates;
+    std::vector<eDate> testEndDates;
     serial_type calculated;
 
     // ISDA - Example 1: End dates do not involve the last day of February
-    testStartDates.push_back(Date(20, August, 2006)); testEndDates.push_back(Date(20, February, 2007));
-    testStartDates.push_back(Date(20, February, 2007)); testEndDates.push_back(Date(20, August, 2007));
-    testStartDates.push_back(Date(20, August, 2007)); testEndDates.push_back(Date(20, February, 2008));
-    testStartDates.push_back(Date(20, February, 2008)); testEndDates.push_back(Date(20, August, 2008));
-    testStartDates.push_back(Date(20, August, 2008)); testEndDates.push_back(Date(20, February, 2009));
-    testStartDates.push_back(Date(20, February, 2009)); testEndDates.push_back(Date(20, August, 2009));
+    testStartDates.push_back(eDate(20, August, 2006)); testEndDates.push_back(eDate(20, February, 2007));
+    testStartDates.push_back(eDate(20, February, 2007)); testEndDates.push_back(eDate(20, August, 2007));
+    testStartDates.push_back(eDate(20, August, 2007)); testEndDates.push_back(eDate(20, February, 2008));
+    testStartDates.push_back(eDate(20, February, 2008)); testEndDates.push_back(eDate(20, August, 2008));
+    testStartDates.push_back(eDate(20, August, 2008)); testEndDates.push_back(eDate(20, February, 2009));
+    testStartDates.push_back(eDate(20, February, 2009)); testEndDates.push_back(eDate(20, August, 2009));
 
     // ISDA - Example 2: End dates include some end-February dates
-    testStartDates.push_back(Date(31, August, 2006)); testEndDates.push_back(Date(28, February, 2007));
-    testStartDates.push_back(Date(28, February, 2007)); testEndDates.push_back(Date(31, August, 2007));
-    testStartDates.push_back(Date(31, August, 2007)); testEndDates.push_back(Date(29, February, 2008));
-    testStartDates.push_back(Date(29, February, 2008)); testEndDates.push_back(Date(31, August, 2008));
-    testStartDates.push_back(Date(31, August, 2008)); testEndDates.push_back(Date(28, February, 2009));
-    testStartDates.push_back(Date(28, February, 2009)); testEndDates.push_back(Date(31, August, 2009));
+    testStartDates.push_back(eDate(31, August, 2006)); testEndDates.push_back(eDate(28, February, 2007));
+    testStartDates.push_back(eDate(28, February, 2007)); testEndDates.push_back(eDate(31, August, 2007));
+    testStartDates.push_back(eDate(31, August, 2007)); testEndDates.push_back(eDate(29, February, 2008));
+    testStartDates.push_back(eDate(29, February, 2008)); testEndDates.push_back(eDate(31, August, 2008));
+    testStartDates.push_back(eDate(31, August, 2008)); testEndDates.push_back(eDate(28, February, 2009));
+    testStartDates.push_back(eDate(28, February, 2009)); testEndDates.push_back(eDate(31, August, 2009));
 
     //// ISDA - Example 3: Miscellaneous calculations
-    testStartDates.push_back(Date(31, January, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(30, January, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(28, February, 2006)); testEndDates.push_back(Date(3, March, 2006));
-    testStartDates.push_back(Date(14, February, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(30, September, 2006)); testEndDates.push_back(Date(31, October, 2006));
-    testStartDates.push_back(Date(31, October, 2006)); testEndDates.push_back(Date(28, November, 2006));
-    testStartDates.push_back(Date(31, August, 2007)); testEndDates.push_back(Date(28, February, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(28, August, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(30, August, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(31, August, 2008));
-    testStartDates.push_back(Date(26, February, 2007)); testEndDates.push_back(Date(28, February, 2008));
-    testStartDates.push_back(Date(26, February, 2007)); testEndDates.push_back(Date(29, February, 2008));
-    testStartDates.push_back(Date(29, February, 2008)); testEndDates.push_back(Date(28, February, 2009));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(30, March, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(31, March, 2008));
+    testStartDates.push_back(eDate(31, January, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(30, January, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(28, February, 2006)); testEndDates.push_back(eDate(3, March, 2006));
+    testStartDates.push_back(eDate(14, February, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(30, September, 2006)); testEndDates.push_back(eDate(31, October, 2006));
+    testStartDates.push_back(eDate(31, October, 2006)); testEndDates.push_back(eDate(28, November, 2006));
+    testStartDates.push_back(eDate(31, August, 2007)); testEndDates.push_back(eDate(28, February, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(28, August, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(30, August, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(31, August, 2008));
+    testStartDates.push_back(eDate(26, February, 2007)); testEndDates.push_back(eDate(28, February, 2008));
+    testStartDates.push_back(eDate(26, February, 2007)); testEndDates.push_back(eDate(29, February, 2008));
+    testStartDates.push_back(eDate(29, February, 2008)); testEndDates.push_back(eDate(28, February, 2009));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(30, March, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(31, March, 2008));
 
     serial_type expected[] = { 180, 180, 180, 180, 180, 180,
                                      178, 183, 179, 182, 178, 183,
@@ -714,7 +718,7 @@ TEST_CASE("testThirty360_BondBasis", "[DayCounterTest][hide]") {
 
     for (Size i = 0; i < testStartDates.size(); i++) {
         calculated = dayCounter.dayCount(testStartDates[i], testEndDates[i]);
-        if (calculated != expected[i]) {
+        IFe (calculated != expected[i]) {
                 BOOST_ERROR("from " << testStartDates[i]
                             << " to " << testEndDates[i] << ":\n"
                             << "    calculated: " << calculated << "\n"
@@ -731,49 +735,49 @@ TEST_CASE("testThirty360_EurobondBasis", "[DayCounterTest][hide]") {
     // 30E/360 (or Eurobond Basis)
     // Based on ICMA (Rule 251) and FBF; this is the version of 30E/360 used by Excel
 
-    DayCounter dayCounter = Thirty360(Thirty360<Date>::EurobondBasis);
-    std::vector<Date> testStartDates;
-    std::vector<Date> testEndDates;
+    DayCounter<eDate> dayCounter = Thirty360<eDate>(Thirty360<eDate>::EurobondBasis);
+    std::vector<eDate> testStartDates;
+    std::vector<eDate> testEndDates;
     serial_type calculated;
 
     // ISDA - Example 1: End dates do not involve the last day of February
-    testStartDates.push_back(Date(20, August, 2006)); testEndDates.push_back(Date(20, February, 2007));
-    testStartDates.push_back(Date(20, February, 2007)); testEndDates.push_back(Date(20, August, 2007));
-    testStartDates.push_back(Date(20, August, 2007)); testEndDates.push_back(Date(20, February, 2008));
-    testStartDates.push_back(Date(20, February, 2008)); testEndDates.push_back(Date(20, August, 2008));
-    testStartDates.push_back(Date(20, August, 2008)); testEndDates.push_back(Date(20, February, 2009));
-    testStartDates.push_back(Date(20, February, 2009)); testEndDates.push_back(Date(20, August, 2009));
+    testStartDates.push_back(eDate(20, August, 2006)); testEndDates.push_back(eDate(20, February, 2007));
+    testStartDates.push_back(eDate(20, February, 2007)); testEndDates.push_back(eDate(20, August, 2007));
+    testStartDates.push_back(eDate(20, August, 2007)); testEndDates.push_back(eDate(20, February, 2008));
+    testStartDates.push_back(eDate(20, February, 2008)); testEndDates.push_back(eDate(20, August, 2008));
+    testStartDates.push_back(eDate(20, August, 2008)); testEndDates.push_back(eDate(20, February, 2009));
+    testStartDates.push_back(eDate(20, February, 2009)); testEndDates.push_back(eDate(20, August, 2009));
 
     //// ISDA - Example 2: End dates include some end-February dates
-    testStartDates.push_back(Date(28, February, 2006)); testEndDates.push_back(Date(31, August, 2006));
-    testStartDates.push_back(Date(31, August, 2006)); testEndDates.push_back(Date(28, February, 2007));
-    testStartDates.push_back(Date(28, February, 2007)); testEndDates.push_back(Date(31, August, 2007));
-    testStartDates.push_back(Date(31, August, 2007)); testEndDates.push_back(Date(29, February, 2008));
-    testStartDates.push_back(Date(29, February, 2008)); testEndDates.push_back(Date(31, August, 2008));
-    testStartDates.push_back(Date(31, August, 2008)); testEndDates.push_back(Date(28, Feb, 2009));
-    testStartDates.push_back(Date(28, February, 2009)); testEndDates.push_back(Date(31, August, 2009));
-    testStartDates.push_back(Date(31, August, 2009)); testEndDates.push_back(Date(28, Feb, 2010));
-    testStartDates.push_back(Date(28, February, 2010)); testEndDates.push_back(Date(31, August, 2010));
-    testStartDates.push_back(Date(31, August, 2010)); testEndDates.push_back(Date(28, Feb, 2011));
-    testStartDates.push_back(Date(28, February, 2011)); testEndDates.push_back(Date(31, August, 2011));
-    testStartDates.push_back(Date(31, August, 2011)); testEndDates.push_back(Date(29, Feb, 2012));
+    testStartDates.push_back(eDate(28, February, 2006)); testEndDates.push_back(eDate(31, August, 2006));
+    testStartDates.push_back(eDate(31, August, 2006)); testEndDates.push_back(eDate(28, February, 2007));
+    testStartDates.push_back(eDate(28, February, 2007)); testEndDates.push_back(eDate(31, August, 2007));
+    testStartDates.push_back(eDate(31, August, 2007)); testEndDates.push_back(eDate(29, February, 2008));
+    testStartDates.push_back(eDate(29, February, 2008)); testEndDates.push_back(eDate(31, August, 2008));
+    testStartDates.push_back(eDate(31, August, 2008)); testEndDates.push_back(eDate(28, Feb, 2009));
+    testStartDates.push_back(eDate(28, February, 2009)); testEndDates.push_back(eDate(31, August, 2009));
+    testStartDates.push_back(eDate(31, August, 2009)); testEndDates.push_back(eDate(28, Feb, 2010));
+    testStartDates.push_back(eDate(28, February, 2010)); testEndDates.push_back(eDate(31, August, 2010));
+    testStartDates.push_back(eDate(31, August, 2010)); testEndDates.push_back(eDate(28, Feb, 2011));
+    testStartDates.push_back(eDate(28, February, 2011)); testEndDates.push_back(eDate(31, August, 2011));
+    testStartDates.push_back(eDate(31, August, 2011)); testEndDates.push_back(eDate(29, Feb, 2012));
 
     //// ISDA - Example 3: Miscellaneous calculations
-    testStartDates.push_back(Date(31, January, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(30, January, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(28, February, 2006)); testEndDates.push_back(Date(3, March, 2006));
-    testStartDates.push_back(Date(14, February, 2006)); testEndDates.push_back(Date(28, February, 2006));
-    testStartDates.push_back(Date(30, September, 2006)); testEndDates.push_back(Date(31, October, 2006));
-    testStartDates.push_back(Date(31, October, 2006)); testEndDates.push_back(Date(28, November, 2006));
-    testStartDates.push_back(Date(31, August, 2007)); testEndDates.push_back(Date(28, February, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(28, August, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(30, August, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(31, August, 2008));
-    testStartDates.push_back(Date(26, February, 2007)); testEndDates.push_back(Date(28, February, 2008));
-    testStartDates.push_back(Date(26, February, 2007)); testEndDates.push_back(Date(29, February, 2008));
-    testStartDates.push_back(Date(29, February, 2008)); testEndDates.push_back(Date(28, February, 2009));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(30, March, 2008));
-    testStartDates.push_back(Date(28, February, 2008)); testEndDates.push_back(Date(31, March, 2008));
+    testStartDates.push_back(eDate(31, January, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(30, January, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(28, February, 2006)); testEndDates.push_back(eDate(3, March, 2006));
+    testStartDates.push_back(eDate(14, February, 2006)); testEndDates.push_back(eDate(28, February, 2006));
+    testStartDates.push_back(eDate(30, September, 2006)); testEndDates.push_back(eDate(31, October, 2006));
+    testStartDates.push_back(eDate(31, October, 2006)); testEndDates.push_back(eDate(28, November, 2006));
+    testStartDates.push_back(eDate(31, August, 2007)); testEndDates.push_back(eDate(28, February, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(28, August, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(30, August, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(31, August, 2008));
+    testStartDates.push_back(eDate(26, February, 2007)); testEndDates.push_back(eDate(28, February, 2008));
+    testStartDates.push_back(eDate(26, February, 2007)); testEndDates.push_back(eDate(29, February, 2008));
+    testStartDates.push_back(eDate(29, February, 2008)); testEndDates.push_back(eDate(28, February, 2009));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(30, March, 2008));
+    testStartDates.push_back(eDate(28, February, 2008)); testEndDates.push_back(eDate(31, March, 2008));
 
     serial_type expected[] = { 180, 180, 180, 180, 180, 180,
                                      182, 178, 182, 179, 181, 178,
@@ -784,7 +788,7 @@ TEST_CASE("testThirty360_EurobondBasis", "[DayCounterTest][hide]") {
 
     for (Size i = 0; i < testStartDates.size(); i++) {
         calculated = dayCounter.dayCount(testStartDates[i], testEndDates[i]);
-        if (calculated != expected[i]) {
+        IFe (calculated != expected[i]) {
                 BOOST_ERROR("from " << testStartDates[i]
                             << " to " << testEndDates[i] << ":\n"
                             << "    calculated: " << calculated << "\n"
@@ -797,15 +801,15 @@ TEST_CASE("testThirty360_EurobondBasis", "[DayCounterTest][hide]") {
 TEST_CASE("testThirty360_German", "[DayCounterTest][hide]") {
     BOOST_TEST_MESSAGE("Testing 30/360 (German) day counter...");
 
-    Thirty360 dayCounter(Thirty360<Date>::German);
+    Thirty360<eDate> dayCounter(Thirty360<eDate>::German);
 
-    Date start(5, February, 2020);
-    Date end(29, February, 2020);
+    eDate start(5, February, 2020);
+    eDate end(29, February, 2020);
 
     serial_type calculated = dayCounter.dayCount(start, end);
     serial_type expected = 25;  // 30 - 5, as 29 is adjusted
 
-    if (calculated != expected) {
+    IFe (calculated != expected) {
         BOOST_ERROR("Day count from " << start
                     << " to " << end << ":\n"
                     << "    calculated: " << calculated << "\n"
@@ -818,18 +822,18 @@ TEST_CASE("testActual365_Canadian", "[DayCounterTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing that Actual 365 (Canadian) throws when needed...");
 
-    Actual365Fixed dayCounter(Actual365Fixed<Date>::Canadian);
+    Actual365Fixed<eDate> dayCounter(Actual365Fixed<eDate>::Canadian);
 
 CHECK_THROWS(
 
-        dayCounter.yearFraction(Date(10, September, 2018), Date(10, September, 2019))
+        dayCounter.yearFraction(eDate(10, September, 2018), eDate(10, September, 2019))
 );
 
 // reference period shorter than a month
-CHECK_THROWS( dayCounter.yearFraction(Date(10, September, 2018),
-                                Date(12, September, 2018),
-                                Date(10, September, 2018),
-                                Date(15, September, 2018)) 
+CHECK_THROWS( dayCounter.yearFraction(eDate(10, September, 2018),
+                                eDate(12, September, 2018),
+                                eDate(10, September, 2018),
+                                eDate(15, September, 2018)) 
 );
 }
 
@@ -839,8 +843,8 @@ TEST_CASE("testIntraday", "[DayCounterTest][hide]") {
 
     BOOST_TEST_MESSAGE("Testing intraday behavior of day counter ...");
 
-    const Date d1(12, February, 2015);
-    const Date d2(14, February, 2015, 12, 34, 17, 1, 230298);
+    const eDate d1(12, February, 2015);
+    const eDate d2(14, February, 2015, 12, 34, 17, 1, 230298);
 
     const Time tol = 100*QL_EPSILON;
 

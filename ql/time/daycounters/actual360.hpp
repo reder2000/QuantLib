@@ -47,15 +47,15 @@ namespace QuantLib {
                     std::string("Actual/360 (inc)")
                     : std::string("Actual/360");
             }
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const {
-                return (d2-d1) + (includeLastDay_ ? 1 : 0);
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const {
+                return (to_DateLike(d2)-to_DateLike(d1)) + (includeLastDay_ ? 1 : 0);
             }
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const {
-                return (daysBetween(d1,d2)
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const {
+                return (daysBetween<ExtDate>(to_DateLike(d1),to_DateLike(d2))
                         + (includeLastDay_ ? 1.0 : 0.0))/360.0;
             }
         };

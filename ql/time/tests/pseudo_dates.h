@@ -15,6 +15,14 @@ struct DateAdaptor<pseudoDate> {
     static std::int_fast32_t serialNumber(const pseudoDate& d) { return 0; }
 };
 
+template <>
+struct fmt::formatter<pseudoDate> : formatter<std::string> {
+    // parse is inherited from formatter<string_view>.
+    template <typename FormatContext>
+    auto format(pseudoDate c, FormatContext& ctx) {
+        return formatter<std::string>::format("pseudoDate", ctx);
+    }
+};
 
 struct QuantLibDate {
     QuantLibDate() = default;

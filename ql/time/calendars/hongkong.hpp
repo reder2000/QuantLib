@@ -25,7 +25,7 @@
 #ifndef quantlib_hongkong_Calendar_hpp
 #define quantlib_hongkong_Calendar_hpp
 
-#include <ql/time/Calendar.hpp>
+#include <ql/time/calendar.hpp>
 
 namespace QuantLib {
 

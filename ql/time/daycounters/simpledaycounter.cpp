@@ -22,31 +22,41 @@
 
 namespace QuantLib {
 
-    namespace { DayCounter fallback = Thirty360(); }
-    template <class ExtDate> inline
-    serial_type SimpleDayCounter<ExtDate>::Impl::dayCount(const Date& d1,
-                                                       const Date& d2) const {
-        return fallback.dayCount(d1,d2);
+    namespace {
+        template <class ExtDate>
+        struct fallback {
+            static DayCounter<ExtDate>& get() {
+                static DayCounter<ExtDate> res = Thirty360<ExtDate>();
+                return res;
+            }
+        };
     }
     template <class ExtDate> inline
-    Time SimpleDayCounter<ExtDate>::Impl::yearFraction(const Date& d1,
-                                              const Date& d2,
-                                              const Date&,
-                                              const Date&) const {
+    serial_type SimpleDayCounter<ExtDate>::Impl::dayCount(const ExtDate& d1,
+                                                       const ExtDate& d2) const {
+        return fallback<ExtDate>::get().dayCount(d1,d2);
+    }
+    template <class ExtDate> inline
+    Time SimpleDayCounter<ExtDate>::Impl::yearFraction(const ExtDate& dd1,
+                                              const ExtDate& dd2,
+                                              const ExtDate&,
+                                              const ExtDate&) const {
+        auto d1 = to_DateLike(dd1);
+        auto d2 = to_DateLike(dd2);
         Day dm1 = d1.dayOfMonth(),
             dm2 = d2.dayOfMonth();
 
         if (dm1 == dm2 ||
             // e.g., Aug 30 -> Feb 28 ?
-            (dm1 > dm2 && Date::isEndOfMonth(d2)) ||
+            (dm1 > dm2 && DateLike<ExtDate>::isEndOfMonth(d2)) ||
             // e.g., Feb 28 -> Aug 30 ?
-            (dm1 < dm2 && Date::isEndOfMonth(d1))) {
+            (dm1 < dm2 && DateLike<ExtDate>::isEndOfMonth(d1))) {
 
             return (d2.year()-d1.year()) +
                 (Integer(d2.month())-Integer(d1.month()))/12.0;
 
         } else {
-            return fallback.yearFraction(d1,d2);
+            return fallback<ExtDate>::get().yearFraction(d1,d2);
         }
     }
 

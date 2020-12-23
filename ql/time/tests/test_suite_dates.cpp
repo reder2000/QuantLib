@@ -33,6 +33,7 @@
 #include <ql/time/ql_utilities_dataparsers.hpp>
 
 #include <unordered_set>
+#include "boost_to_catch.h"
 //#include <boost/functional/hash.hpp>
 #include <sstream>
 #include "pseudo_dates.h"
@@ -41,10 +42,6 @@ using namespace QuantLib;
 //using namespace boost::unit_test_framework;
 
 using eDate = QuantLibDate;
-
-#define BOOST_TEST_MESSAGE INFO
-#define BOOST_FAIL(...) 
-#define IF(a) CHECK_FALSE(a)
 
 TEST_CASE("ecbDates", "[DateTest][hide]") {
 //void DateTest::ecbDates() {

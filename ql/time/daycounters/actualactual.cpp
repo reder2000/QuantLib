@@ -27,9 +27,9 @@ namespace QuantLib {
 
         // the template argument works around passing a protected type
 
-        template <class T>
+        template <class T,class ExtDate> inline
         Integer findCouponsPerYear(const T& impl,
-                                   Date refStart, Date refEnd) {
+                                   ExtDate refStart, ExtDate refEnd) {
             // This will only work for day counts longer than 15 days.
             Integer months = (Integer)std::lround(12 * Real(impl.dayCount(refStart, refEnd))/365.0);
             return (Integer)std::lround(12.0 / Real(months));
@@ -39,30 +39,30 @@ namespace QuantLib {
            been explicitly passed a reference period. This usage
            leads to inaccurate year fractions.
         */
-        template <class T>
+        template <class T,class ExtDate> inline
         Time yearFractionGuess(const T& impl,
-                               const Date& start, const Date& end) {
+                               const ExtDate& start, const ExtDate& end) {
             // asymptotically correct.
             return Real(impl.dayCount(start, end)) / 365.0;
         }
-
-        std::vector<Date> getListOfPeriodDatesIncludingQuasiPayments(
-                                                   const Schedule& schedule) {
+        template <class ExtDate> inline
+        std::vector<ExtDate> getListOfPeriodDatesIncludingQuasiPayments(
+                                                   const Schedule<ExtDate>& schedule) {
             // Process the schedule into an array of dates.
-            Date issueDate = schedule.date(0);
-            Date firstCoupon = schedule.date(1);
-            Date notionalCoupon =
+            ExtDate issueDate = schedule.date(0);
+            ExtDate firstCoupon = schedule.date(1);
+            ExtDate notionalCoupon =
                 schedule.calendar().advance(firstCoupon,
                                             -schedule.tenor(),
                                             schedule.businessDayConvention(),
                                             schedule.endOfMonth());
 
-            std::vector<Date> newDates = schedule.dates();
+            std::vector<ExtDate> newDates = schedule.dates();
             newDates[0] = notionalCoupon;
 
             //long first coupon
-            if (notionalCoupon > issueDate) {
-                Date priorNotionalCoupon =
+            if (to_DateLike(notionalCoupon) > issueDate) {
+                ExtDate priorNotionalCoupon =
                     schedule.calendar().advance(notionalCoupon,
                                                 -schedule.tenor(),
                                                 schedule.businessDayConvention(),
@@ -73,11 +73,11 @@ namespace QuantLib {
             return newDates;
         }
 
-        template <class T>
+        template <class T,class ExtDate> inline
         Time yearFractionWithReferenceDates(const T& impl,
-                                            const Date& d1, const Date& d2,
-                                            const Date& d3, const Date& d4) {
-            QL_REQUIRE(d1 <= d2,
+                                            const ExtDate& d1, const ExtDate& d2,
+                                            const ExtDate& d3, const ExtDate& d4) {
+            QL_REQUIRE(to_DateLike(d1) <= d2,
                        "This function is only correct if d1 <= d2\n"
                        "d1: {} d2: {}"  , d1, d2);
 
@@ -86,7 +86,7 @@ namespace QuantLib {
             Integer couponsPerYear;
             if (referenceDayCount < 16) {
                 couponsPerYear = 1;
-                referenceDayCount = impl.dayCount(d1, d1 + 1 * Years);
+                referenceDayCount = impl.dayCount(d1, to_DateLike(d1) + 1 * Years);
             }
             else {
                 couponsPerYear = findCouponsPerYear(impl, d3, d4);
@@ -98,7 +98,7 @@ namespace QuantLib {
     template <class ExtDate> inline
     std::shared_ptr<typename DayCounter<ExtDate>::Impl>
     ActualActual<ExtDate>::implementation(ActualActual<ExtDate>::Convention c,
-                                 const Schedule& schedule) {
+                                 const Schedule<ExtDate>& schedule) {
         switch (c) {
           case ISMA:
           case Bond:
@@ -119,28 +119,28 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    Time ActualActual<ExtDate>::ISMA_Impl::yearFraction(const Date& d1,
-                                               const Date& d2,
-                                               const Date& d3,
-                                               const Date& d4) const {
-        if (d1 == d2) {
+    Time ActualActual<ExtDate>::ISMA_Impl::yearFraction(const ExtDate& d1,
+                                               const ExtDate& d2,
+                                               const ExtDate& d3,
+                                               const ExtDate& d4) const {
+        if (to_DateLike(d1) == d2) {
             return 0.0;
-        } else if (d2 < d1) {
+        } else if (to_DateLike(d2) < d1) {
             return -yearFraction(d2, d1, d3, d4);
         }
 
-        std::vector<Date> couponDates =
-            getListOfPeriodDatesIncludingQuasiPayments(schedule_);
+        std::vector<ExtDate> couponDates =
+            getListOfPeriodDatesIncludingQuasiPayments<ExtDate>(schedule_);
 
         Real yearFractionSum = 0.0;
         for (Size i = 0; i < couponDates.size() - 1; i++) {
-            Date startReferencePeriod = couponDates[i];
-            Date endReferencePeriod = couponDates[i + 1];
-            if (d1 < endReferencePeriod && d2 > startReferencePeriod) {
+            ExtDate startReferencePeriod = couponDates[i];
+            ExtDate endReferencePeriod = couponDates[i + 1];
+            if (to_DateLike(d1) < endReferencePeriod && to_DateLike(d2) > startReferencePeriod) {
                 yearFractionSum +=
-                    yearFractionWithReferenceDates(*this,
-                                                   std::max(d1, startReferencePeriod),
-                                                   std::min(d2, endReferencePeriod),
+                    yearFractionWithReferenceDates<ActualActual<ExtDate>::ISMA_Impl,ExtDate>(*this,
+                                                   std::max(to_DateLike(d1), to_DateLike(startReferencePeriod)).asExtDate(),
+                                                   std::min(to_DateLike(d2), to_DateLike(endReferencePeriod)).asExtDate(),
                                                    startReferencePeriod,
                                                    endReferencePeriod);
             }
@@ -149,22 +149,22 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    Time ActualActual<ExtDate>::Old_ISMA_Impl::yearFraction(const Date& d1,
-                                                   const Date& d2,
-                                                   const Date& d3,
-                                                   const Date& d4) const {
-        if (d1 == d2)
+    Time ActualActual<ExtDate>::Old_ISMA_Impl::yearFraction(const ExtDate& d1,
+                                                   const ExtDate& d2,
+                                                   const ExtDate& d3,
+                                                   const ExtDate& d4) const {
+        if (to_DateLike(d1) == d2)
             return 0.0;
 
-        if (d1 > d2)
+        if (to_DateLike(d1) > d2)
             return -yearFraction(d2,d1,d3,d4);
 
         // when the reference period is not specified, try taking
         // it equal to (d1,d2)
-        Date refPeriodStart = (d3 != Date() ? d3 : d1);
-        Date refPeriodEnd = (d4 != Date() ? d4 : d2);
+        ExtDate refPeriodStart = (to_DateLike(d3) != ExtDate() ? d3 : d1);
+        ExtDate refPeriodEnd = (to_DateLike(d4) != ExtDate() ? d4 : d2);
 
-        QL_REQUIRE(refPeriodEnd > refPeriodStart && refPeriodEnd > d1,
+        QL_REQUIRE(to_DateLike(refPeriodEnd) > to_DateLike(refPeriodStart) && to_DateLike(refPeriodEnd) > d1,
                    "invalid reference period: date 1: {}, date 2: {}"
                    ", reference period start: {}" 
                    ", reference period end: {}",
@@ -172,29 +172,29 @@ namespace QuantLib {
 
         // estimate roughly the length in months of a period
         Integer months =
-            (Integer)std::lround(12*Real(refPeriodEnd-refPeriodStart)/365);
+            (Integer)std::lround(12*Real(to_DateLike(refPeriodEnd)-to_DateLike(refPeriodStart))/365);
 
         // for short periods...
         if (months == 0) {
             // ...take the reference period as 1 year from d1
             refPeriodStart = d1;
-            refPeriodEnd = d1 + 1*Years;
+            refPeriodEnd = to_DateLike(d1) + 1*Years;
             months = 12;
         }
 
         Time period = Real(months)/12.0;
 
-        if (d2 <= refPeriodEnd) {
+        if (to_DateLike(d2) <= refPeriodEnd) {
             // here refPeriodEnd is a future (notional?) payment date
-            if (d1 >= refPeriodStart) {
+            if (to_DateLike(d1) >= refPeriodStart) {
                 // here refPeriodStart is the last (maybe notional)
                 // payment date.
                 // refPeriodStart <= d1 <= d2 <= refPeriodEnd
                 // [maybe the equality should be enforced, since
                 // refPeriodStart < d1 <= d2 < refPeriodEnd
                 // could give wrong results] ???
-                return period*Real(daysBetween(d1,d2)) /
-                    daysBetween(refPeriodStart,refPeriodEnd);
+                return period*Real(daysBetween(to_DateLike(d1),to_DateLike(d2))) /
+                    daysBetween(to_DateLike(refPeriodStart),to_DateLike(refPeriodEnd));
             } else {
                 // here refPeriodStart is the next (maybe notional)
                 // payment date and refPeriodEnd is the second next
@@ -204,9 +204,9 @@ namespace QuantLib {
                 // this case is long first coupon
 
                 // the last notional payment date
-                Date previousRef = refPeriodStart - months*Months;
+                ExtDate previousRef = to_DateLike(refPeriodStart) - months*Months;
 
-                if (d2 > refPeriodStart)
+                if (to_DateLike(d2) > refPeriodStart)
                     return yearFraction(d1, refPeriodStart, previousRef,
                                         refPeriodStart) +
                         yearFraction(refPeriodStart, d2, refPeriodStart,
@@ -217,7 +217,7 @@ namespace QuantLib {
         } else {
             // here refPeriodEnd is the last (notional?) payment date
             // d1 < refPeriodEnd < d2 AND refPeriodStart < refPeriodEnd
-            QL_REQUIRE(refPeriodStart<=d1,
+            QL_REQUIRE(to_DateLike(refPeriodStart)<=d1,
                        "invalid dates: "
                        "d1 < refPeriodStart < refPeriodEnd < d2");
             // now it is: refPeriodStart <= d1 < refPeriodEnd < d2
@@ -230,11 +230,11 @@ namespace QuantLib {
             // count how many regular periods are in [refPeriodEnd, d2],
             // then add the remaining time
             Integer i=0;
-            Date newRefStart, newRefEnd;
+            ExtDate newRefStart, newRefEnd;
             for (;;) {
-                newRefStart = refPeriodEnd + (months*i)*Months;
-                newRefEnd = refPeriodEnd + (months*(i+1))*Months;
-                if (d2 < newRefEnd) {
+                newRefStart = to_DateLike(refPeriodEnd) + (months*i)*Months;
+                newRefEnd = to_DateLike(refPeriodEnd) + (months*(i+1))*Months;
+                if (to_DateLike(d2) < newRefEnd) {
                     break;
                 } else {
                     sum += period;
@@ -247,44 +247,48 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    Time ActualActual<ExtDate>::ISDA_Impl::yearFraction(const Date& d1,
-                                               const Date& d2,
-                                               const Date&,
-                                               const Date&) const {
+    Time ActualActual<ExtDate>::ISDA_Impl::yearFraction(const ExtDate& dd1,
+                                               const ExtDate& dd2,
+                                               const ExtDate&,
+                                               const ExtDate&) const {
+        auto d1 = to_DateLike(dd1);
+        auto d2 = to_DateLike(dd2);
         if (d1 == d2)
             return 0.0;
 
         if (d1 > d2)
-            return -yearFraction(d2,d1,Date(),Date());
+            return -yearFraction(d2,d1,ExtDate(),ExtDate());
 
         Integer y1 = d1.year(), y2 = d2.year();
-        Real dib1 = (Date::isLeap(y1) ? 366.0 : 365.0),
-             dib2 = (Date::isLeap(y2) ? 366.0 : 365.0);
+        Real dib1 = (DateLike<ExtDate>::isLeap(y1) ? 366.0 : 365.0),
+             dib2 = (DateLike<ExtDate>::isLeap(y2) ? 366.0 : 365.0);
 
         Time sum = y2 - y1 - 1;
         // FLOATING_POINT_EXCEPTION
-        sum += daysBetween(d1, Date(1,January,y1+1))/dib1;
-        sum += daysBetween(Date(1,January,y2),d2)/dib2;
+        sum += daysBetween(d1, to_DateLike(DateAdaptor<ExtDate>::Date(1,January,y1+1)))/dib1;
+        sum += daysBetween(to_DateLike(DateAdaptor<ExtDate>::Date(1,January,y2)),d2)/dib2;
         return sum;
     }
 
     template <class ExtDate> inline
-    Time ActualActual<ExtDate>::AFB_Impl::yearFraction(const Date& d1,
-                                              const Date& d2,
-                                              const Date&,
-                                              const Date&) const {
+    Time ActualActual<ExtDate>::AFB_Impl::yearFraction(const ExtDate& dd1,
+                                              const ExtDate& dd2,
+                                              const ExtDate&,
+                                              const ExtDate&) const {
+        auto d1 = to_DateLike(dd1);
+        auto d2 = to_DateLike(dd2);
         if (d1 == d2)
             return 0.0;
 
         if (d1 > d2)
-            return -yearFraction(d2,d1,Date(),Date());
+            return -yearFraction(d2,d1,ExtDate(),ExtDate());
 
-        Date newD2=d2, temp=d2;
+        auto newD2=d2, temp=d2;
         Time sum = 0.0;
         while (temp > d1) {
             temp = newD2 - 1*Years;
-            if (temp.dayOfMonth()==28 && temp.month()==2
-                && Date::isLeap(temp.year())) {
+            if (temp.dayOfMonth()==28 && temp.month()==2 &&
+                DateLike<ExtDate>::isLeap(temp.year())) {
                 temp += 1;
             }
             if (temp>=d1) {
@@ -295,12 +299,12 @@ namespace QuantLib {
 
         Real den = 365.0;
 
-        if (Date::isLeap(newD2.year())) {
-            temp = Date(29, February, newD2.year());
+        if (DateLike<ExtDate>::isLeap(newD2.year())) {
+            temp = to_DateLike(DateAdaptor<ExtDate>::Date(29, February, newD2.year()));
             if (newD2>temp && d1<=temp)
                 den += 1.0;
-        } else if (Date::isLeap(d1.year())) {
-            temp = Date(29, February, d1.year());
+        } else if (DateLike<ExtDate>::isLeap(d1.year())) {
+            temp = to_DateLike(DateAdaptor<ExtDate>::Date(29, February, d1.year()));
             if (newD2>temp && d1<=temp)
                 den += 1.0;
         }

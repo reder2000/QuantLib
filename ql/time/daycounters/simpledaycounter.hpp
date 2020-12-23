@@ -48,19 +48,19 @@ namespace QuantLib {
       private:
         class Impl : public DayCounter<ExtDate>::Impl {
           public:
-            std::string name() const { return "Simple"; }
-            serial_type dayCount(const Date& d1,
-                                       const Date& d2) const;
-            Time yearFraction(const Date& d1,
-                              const Date& d2,
-                              const Date&,
-                              const Date&) const;
+            std::string name() const override { return "Simple"; }
+            serial_type dayCount(const ExtDate& d1,
+                                       const ExtDate& d2) const override;
+            Time yearFraction(const ExtDate& d1,
+                              const ExtDate& d2,
+                              const ExtDate&,
+                              const ExtDate&) const override;
         };
       public:
         SimpleDayCounter()
         : DayCounter<ExtDate>(
               std::shared_ptr<typename DayCounter<ExtDate>::Impl>(
-                                             new SimpleDayCounter::Impl())) {}
+                                             new SimpleDayCounter<ExtDate>::Impl())) {}
     };
 
 }

@@ -99,14 +99,15 @@ namespace QuantLib {
     }
     template <class ExtDate>    inline
     DateLike<ExtDate>& DateLike<ExtDate>::operator+=(typename DateLike<ExtDate>::serial_type days) {
-        typename DateLike<ExtDate>::serial_type serial = serialNumber() + days;
+        serial_type serial = serialNumber() + days;
         checkSerialNumber(serial);
-        serialNumber() = serial;
+        *static_cast<ExtDate*>(this) = DateAdaptor<ExtDate>::Date(serial);
         return *this;
     }
     template <class ExtDate>    inline
     DateLike<ExtDate>& DateLike<ExtDate>::operator+=(const Period& p) {
-        serialNumber() = advance(*this,p.length(),p.units()).serialNumber();
+        auto serial = advance(*this,p.length(),p.units()).serialNumber();
+        *static_cast<ExtDate*>(this) = DateAdaptor<ExtDate>::Date(serial);
         return *this;
     }
     template <class ExtDate>    inline
@@ -118,7 +119,8 @@ namespace QuantLib {
     }
     template <class ExtDate>    inline
     DateLike<ExtDate>& DateLike<ExtDate>::operator-=(const Period& p) {
-        serialNumber() = advance(*this,-p.length(),p.units()).serialNumber();
+        auto serial = advance(*this,-p.length(),p.units()).serialNumber();
+        *static_cast<ExtDate*>(this) = DateAdaptor<ExtDate>::Date(serial);
         return *this;
     }
     template <class ExtDate>    inline

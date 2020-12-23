@@ -8,7 +8,7 @@ struct DateAdaptor {
     static ExtDate Date(QuantLib::Day d, QuantLib::Month m, QuantLib::Year y) {
         static_assert(sizeof(ExtDate) == 0, "must be defined");
     }
-    static std::int_fast32_t serialNumber(const ExtDate&) {
+    static std::int_fast32_t serialNumber [[noreturn]] (const ExtDate&)  {
         static_assert(sizeof(ExtDate) == 0, "must be defined");
     }
 

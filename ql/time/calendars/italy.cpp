@@ -42,7 +42,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool Italy<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    bool Italy<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -78,7 +79,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool Italy<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& date) const {
+    bool Italy<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();

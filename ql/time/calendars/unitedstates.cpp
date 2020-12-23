@@ -125,7 +125,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -160,9 +161,10 @@ namespace QuantLib {
         return true;
     }
     template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::LiborImpactImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::LiborImpactImpl::isBusinessDay(const ExtDate& dat) const {
         // Since 2015 Independence Day only impacts Libor if it falls
         // on a weekday
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -173,7 +175,8 @@ namespace QuantLib {
         return SettlementImpl::isBusinessDay(date);
     }
     template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::NyseImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::NyseImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -258,7 +261,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::GovernmentBondImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::GovernmentBondImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -305,7 +309,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::NercImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::NercImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -328,7 +333,8 @@ namespace QuantLib {
     }
  
  template <class ExtDate> inline
-    bool UnitedStates<ExtDate>::FederalReserveImpl::isBusinessDay(const ExtDate& date) const {
+    bool UnitedStates<ExtDate>::FederalReserveImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         // see https://www.frbservices.org/holidayschedules/ for details
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();

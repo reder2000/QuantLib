@@ -171,6 +171,7 @@ template <class ExtDate>
         //    return this->serialNumber() <=>
         //           static_cast<const DateLike<ExtDate>&>(d).serialNumber();
         //}
+        const ExtDate & asExtDate() const { return *this; }
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         Hour hours() const;
@@ -444,7 +445,8 @@ template <class ExtDate>
 
     template <class ExtDate>
     inline DateLike<ExtDate> DateLike<ExtDate>::operator+(serial_type days) const {
-        return to_DateLike(DateAdaptor<ExtDate>::Date(serialNumber()+days));
+        auto res = DateAdaptor<ExtDate>::Date(serialNumber() + days);
+        return *static_cast<T*>(&res);
     }
 
     template <class ExtDate>
@@ -466,7 +468,8 @@ template <class ExtDate>
     inline DateLike<ExtDate> DateLike<ExtDate>::endOfMonth(const DateLike<ExtDate>& d) {
         Month m = d.month();
         Year y = d.year();
-        return Date(monthLength(m, isLeap(y)), m, y);
+        auto res = DateAdaptor<ExtDate>::Date(monthLength(m, isLeap(y)), m, y);
+        return *static_cast<T*>(&res);
     }
 
     template <class ExtDate>
@@ -516,6 +519,10 @@ template <class ExtDate>
         return (d1.serialNumber() <= static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
     }
     template <class ExtDate>
+    inline bool operator<=(const DateLike<ExtDate>& d1, const DateLike<ExtDate>& d2) {
+        return (d1.serialNumber() <= d2.serialNumber());
+    }
+    template <class ExtDate>
     inline bool operator<(const DateLike<ExtDate>& d1, const ExtDate& d2) {
         return (d1.serialNumber() < static_cast<const DateLike<ExtDate>&>(d2).serialNumber());
     }
@@ -540,7 +547,7 @@ template <class ExtDate>
     template <class ExtDate>
     struct Less {
         bool operator()(const ExtDate& d1, const ExtDate& d2) const {
-            return to_DateLike(d1) < to_DateLike(d2);
+            return to_DateLike<ExtDate>(d1) < to_DateLike<ExtDate>(d2);
         }
     };
 }

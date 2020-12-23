@@ -29,7 +29,7 @@
 #define quantlib_calendar_hpp
 
 #include "ql_errors.hpp"
-#include <ql/time/date.hpp>
+#include <ql/time/date_like.hpp>
 #include <ql/time/businessdayconvention.hpp>
 //#include <ql/shared_ptr.hpp>
 #include <set>
@@ -60,6 +60,9 @@ namespace QuantLib {
     */
     template <class ExtDate=Date>
     class Calendar {
+      public:
+        using setExtDate = std::set<ExtDate, Less<ExtDate> >;
+
       protected:
         //! abstract base class for calendar implementations
         class Impl {
@@ -68,7 +71,7 @@ namespace QuantLib {
             virtual std::string name() const = 0;
             virtual bool isBusinessDay(const ExtDate&) const = 0;
             virtual bool isWeekend(Weekday) const = 0;
-            std::set<ExtDate> addedHolidays, removedHolidays;
+            setExtDate addedHolidays, removedHolidays;
         };
         std::shared_ptr<Impl> impl_;
       public:
@@ -92,10 +95,10 @@ namespace QuantLib {
         */
 
         /*! Returns the set of added holidays for the given calendar */
-        const std::set<ExtDate>& addedHolidays() const;
+        const setExtDate& addedHolidays() const;
         
         /*! Returns the set of removed holidays for the given calendar */
-        const std::set<ExtDate>& removedHolidays() const;
+        const setExtDate& removedHolidays() const;
 
         bool isBusinessDay(const ExtDate& d) const;
         /*! Returns <tt>true</tt> iff the date is a holiday for the given
@@ -219,13 +222,16 @@ namespace QuantLib {
         return impl_->name();
     }
 
-    template <class ExtDate> inline  const std::set<ExtDate>& Calendar<ExtDate>::addedHolidays() const {
+    template <class ExtDate>
+    inline const typename Calendar<ExtDate>::setExtDate& Calendar<ExtDate>::addedHolidays() const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
         return impl_->addedHolidays;
     }
 
-    template <class ExtDate> inline  const std::set<ExtDate>& Calendar<ExtDate>::removedHolidays() const {
+    template <class ExtDate>
+    inline const typename Calendar<ExtDate>::setExtDate &
+    Calendar<ExtDate>::removedHolidays() const {
         QL_REQUIRE(impl_, "no calendar implementation provided");
 
         return impl_->removedHolidays;
@@ -252,11 +258,12 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline  bool Calendar<ExtDate>::isEndOfMonth(const ExtDate& d) const {
-        return (d.month() != adjust(d+1).month());
+        auto dd = to_DateLike(d);
+        return (dd.month() != to_DateLike(adjust(dd+1)).month());
     }
 
     template <class ExtDate> inline  ExtDate Calendar<ExtDate>::endOfMonth(const ExtDate& d) const {
-        return adjust(ExtDate::endOfMonth(d), Preceding);
+        return adjust(DateLike<ExtDate>::endOfMonth(to_DateLike(d)), Preceding);
     }
 
     template <class ExtDate> inline  bool Calendar<ExtDate>::isHoliday(const ExtDate& d) const {

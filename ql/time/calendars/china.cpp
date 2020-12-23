@@ -45,7 +45,8 @@ namespace QuantLib {
         return w == Saturday || w == Sunday;
     }
     template <class ExtDate> inline
-    bool China<ExtDate>::SseImpl::isBusinessDay(const ExtDate& date) const {
+    bool China<ExtDate>::SseImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -313,7 +314,7 @@ namespace QuantLib {
         };
         static const Size n =
             sizeof(working_weekends)/sizeof(working_weekends[0]);
-        static const std::set<ExtDate> workingWeekends(working_weekends+0,
+        static const std::set<ExtDate,QuantLib::Less<ExtDate>> workingWeekends(working_weekends+0,
                                                     working_weekends+n);
 
         // If it is already a SSE business day, it must be a IB business day

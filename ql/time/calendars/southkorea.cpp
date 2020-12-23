@@ -49,7 +49,8 @@ namespace QuantLib {
         return w == Saturday || w == Sunday;
     }
     template <class ExtDate> inline
-    bool SouthKorea<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    bool SouthKorea<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();
@@ -200,7 +201,8 @@ namespace QuantLib {
         return true;
     }
     template <class ExtDate> inline
-    bool SouthKorea<ExtDate>::KrxImpl::isBusinessDay(const ExtDate& date) const {
+    bool SouthKorea<ExtDate>::KrxImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         // public holidays
         if ( !SettlementImpl::isBusinessDay(date) )
             return false;

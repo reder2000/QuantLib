@@ -125,14 +125,14 @@ namespace QuantLib {
     DateLike<ExtDate>& DateLike<ExtDate>::operator++() {
         typename DateLike<ExtDate>::serial_type serial = serialNumber() + 1;
         checkSerialNumber(serial);
-        serialNumber() = serial;
+        *static_cast<ExtDate*>(this) = DateAdaptor<ExtDate>::Date(serial);
         return *this;
     }
     template <class ExtDate>    inline
     DateLike<ExtDate>& DateLike<ExtDate>::operator--() {
         typename DateLike<ExtDate>::serial_type serial = serialNumber() - 1;
         checkSerialNumber(serial);
-        serialNumber() = serial;
+        *static_cast<ExtDate*>(this) = DateAdaptor<ExtDate>::Date(serial);
         return *this;
     }
     template <class ExtDate>    inline
@@ -741,18 +741,17 @@ namespace QuantLib {
         QL_REQUIRE(serialNumber >= minimumSerialNumber() && serialNumber <= maximumSerialNumber(),
                    "Date's serial number ( {} ) outside "
                    "allowed range [{}-{}], i.e. [{}{}-{}]",
-                   serialNumber, minimumSerialNumber(), maximumSerialNumber(), minDate(),
-                   maxDate());
+                   serialNumber, minimumSerialNumber(), maximumSerialNumber(), minDate().asExtDate(), maxDate().asExtDate());
                               
     }
     template <class ExtDate>    inline
     DateLike<ExtDate> DateLike<ExtDate>::minDate() {
-        static const DateLike<ExtDate> minimumDate(to_DateLike(DateAdaptor<ExtDate>::Date(minimumSerialNumber())));
+        static const DateLike<ExtDate> minimumDate{ DateAdaptor<ExtDate>::Date(minimumSerialNumber()) };
         return minimumDate;
     }
     template <class ExtDate>    inline
     DateLike<ExtDate> DateLike<ExtDate>::maxDate() {
-        static const DateLike<ExtDate> maximumDate( to_DateLike(DateAdaptor<ExtDate>::Date(maximumSerialNumber())));
+        static const DateLike<ExtDate> maximumDate{ DateAdaptor<ExtDate>::Date(maximumSerialNumber()) };
         return maximumDate;
     }
     template <class ExtDate>    inline

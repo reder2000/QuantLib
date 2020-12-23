@@ -33,7 +33,8 @@ namespace QuantLib {
         return w == Saturday || w == Sunday;
     }
     template <class ExtDate> inline
-    bool Japan<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
+    bool Japan<ExtDate>::Impl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth();
         Month m = date.month();

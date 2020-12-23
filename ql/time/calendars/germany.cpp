@@ -58,7 +58,8 @@ namespace QuantLib {
     }
 
     template <class ExtDate> inline
-    bool Germany<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& date) const {
+    bool Germany<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -92,7 +93,8 @@ namespace QuantLib {
     }
     template <class ExtDate> inline
     bool Germany<ExtDate>::FrankfurtStockExchangeImpl::isBusinessDay(
-      const ExtDate& date) const {
+      const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -117,7 +119,8 @@ namespace QuantLib {
         return true;
     }
     template <class ExtDate> inline
-    bool Germany<ExtDate>::XetraImpl::isBusinessDay(const ExtDate& date) const {
+    bool Germany<ExtDate>::XetraImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -142,7 +145,8 @@ namespace QuantLib {
         return true;
     }
     template <class ExtDate> inline
-    bool Germany<ExtDate>::EurexImpl::isBusinessDay(const ExtDate& date) const {
+    bool Germany<ExtDate>::EurexImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();
@@ -169,7 +173,8 @@ namespace QuantLib {
         return true;
     }
     template <class ExtDate> inline
-    bool Germany<ExtDate>::EuwaxImpl::isBusinessDay(const ExtDate& date) const {
+    bool Germany<ExtDate>::EuwaxImpl::isBusinessDay(const ExtDate& dat) const {
+        auto date = to_DateLike(dat);
         Weekday w = date.weekday();
         Day d = date.dayOfMonth(), dd = date.dayOfYear();
         Month m = date.month();

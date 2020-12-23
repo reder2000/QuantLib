@@ -61,14 +61,15 @@ namespace QuantLib {
             impl_->removedHolidays.insert(_d);
     }
     template <class ExtDate> inline 
-    ExtDate Calendar<ExtDate>::adjust(const ExtDate& d,
+    ExtDate Calendar<ExtDate>::adjust(const ExtDate& dd,
                           BusinessDayConvention c) const {
+        auto d = to_DateLike(dd);
         QL_REQUIRE(d != ExtDate(), "null date");
 
         if (c == Unadjusted)
             return d;
 
-        ExtDate d1 = d;
+        DateLike<ExtDate> d1 = d;
         if (c == Following || c == ModifiedFollowing 
             || c == HalfMonthModifiedFollowing) {
             while (isHoliday(d1))
@@ -91,7 +92,7 @@ namespace QuantLib {
                 return adjust(d,Following);
             }
         } else if (c == Nearest) {
-            ExtDate d2 = d;
+            DateLike<ExtDate> d2 = d;
             while (isHoliday(d1) && isHoliday(d2))
             {
                 ++d1;
@@ -154,23 +155,24 @@ namespace QuantLib {
     }
     template <class ExtDate>
     inline 
-    serial_type Calendar<ExtDate>::businessDaysBetween(const ExtDate& from,
+    serial_type Calendar<ExtDate>::businessDaysBetween(const ExtDate& fro,
                                                     const ExtDate& to,
                                                     bool includeFirst,
                                                     bool includeLast) const {
         serial_type wd = 0;
+        auto from = to_DateLike(fro);
         if (from != to) {
             if (from < to) {
                 // the last one is treated separately to avoid
                 // incrementing ExtDate::maxDate()
-                for (ExtDate d = from; d < to; ++d) {
+                for (auto d = from; d < to; ++d) {
                     if (isBusinessDay(d))
                         ++wd;
                 }
                 if (isBusinessDay(to))
                     ++wd;
             } else if (from > to) {
-                for (ExtDate d = to; d < from; ++d) {
+                for (auto d = to_DateLike(to); d < from; ++d) {
                     if (isBusinessDay(d))
                         ++wd;
                 }
@@ -294,9 +296,9 @@ namespace QuantLib {
     std::vector<ExtDate> Calendar<ExtDate>::holidayList(
         const ExtDate& from, const ExtDate& to, bool includeWeekEnds) const {
     
-    QL_REQUIRE(to > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);    
+    QL_REQUIRE(to_DateLike(to) > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);    
         std::vector<ExtDate> result;
-        for (ExtDate d = from; d <= to; ++d) {
+        for (auto d = to_DateLike(from); d <= to_DateLike(to); ++d) {
             if (isHoliday(d) && (includeWeekEnds || !isWeekend(d.weekday())))
                 result.push_back(d);
        }
@@ -306,9 +308,9 @@ namespace QuantLib {
     std::vector<ExtDate> Calendar<ExtDate>::businessDayList(
         const ExtDate& from, const ExtDate& to) const {
 
-        QL_REQUIRE(to > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);
+        QL_REQUIRE(to_DateLike(to) > from, "'from' date ({}) must be earlier than 'to' date ({})", from, to);
         std::vector<ExtDate> result;
-        for (ExtDate d = from; d <= to; ++d) {
+        for (auto d = to_DateLike(from); d <= to_DateLike(to); ++d) {
             if (isBusinessDay(d))
                 result.push_back(d);
        }

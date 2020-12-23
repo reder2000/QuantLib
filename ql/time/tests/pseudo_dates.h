@@ -19,6 +19,7 @@ struct DateAdaptor<pseudoDate> {
 struct QuantLibDate {
     QuantLibDate() = default;
     QuantLibDate(const QuantLib::Date& d) : _d(d) {}
+    QuantLibDate(QuantLib::Day d, QuantLib::Month m, QuantLib::Year y) : _d(d, m, y) {}
     QuantLib::Date _d;
 };
 

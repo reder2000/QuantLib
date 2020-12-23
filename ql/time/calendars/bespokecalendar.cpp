@@ -34,7 +34,7 @@ namespace QuantLib {
     }
     template <class ExtDate> inline
     bool BespokeCalendar<ExtDate>::Impl::isBusinessDay(const ExtDate& date) const {
-        return !isWeekend(date.weekday());
+        return !isWeekend(to_DateLike(date).weekday());
     }
     template <class ExtDate> inline
     void BespokeCalendar<ExtDate>::Impl::addWeekend(Weekday w) {

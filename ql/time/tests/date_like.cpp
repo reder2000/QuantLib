@@ -9,12 +9,13 @@
 
 #include "pseudo_dates.h"
 
+using eDate = QuantLibDate;
 
 void f() {
-    { QuantLib::TARGET<pseudoDate> c; }
-    { QuantLib::UnitedKingdom<pseudoDate> c; }
-    { QuantLib::Actual360<pseudoDate> c; }
-    { QuantLib::Actual365Fixed<pseudoDate> c; }
-    { QuantLib::ActualActual<pseudoDate> c; }
-    { QuantLib::Business252<pseudoDate> c; }
+    { QuantLib::TARGET<eDate> c; }
+    { QuantLib::UnitedKingdom<eDate> c; }
+    { QuantLib::Actual360<eDate> c; }
+    { QuantLib::Actual365Fixed<eDate> c; }
+    { QuantLib::ActualActual<eDate> c; }
+    { QuantLib::Business252<eDate> c; }
 }

@@ -531,7 +531,11 @@ template <class ExtDate>
         return (static_cast<const DateLike<ExtDate>&>(d1).serialNumber() < d2.serialNumber());
     }
     template <class ExtDate>
-    inline bool operator<=(const ExtDate& d1 , const DateLike<ExtDate>& d2 ) {
+    inline bool operator>(const ExtDate& d1 , const DateLike<ExtDate>& d2 ) {
+        return (static_cast<const DateLike<ExtDate>&>(d1).serialNumber() > d2.serialNumber());
+    }
+    template <class ExtDate>
+    inline bool operator<=(const ExtDate& d1, const DateLike<ExtDate>& d2) {
         return (static_cast<const DateLike<ExtDate>&>(d1).serialNumber() <= d2.serialNumber());
     }
     template <class ExtDate>

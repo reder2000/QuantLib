@@ -200,18 +200,19 @@ TEST_CASE("testActualActual", "[DayCounterTest][hide]") {
             rd2 = testCases[i].refEnd;
         Time calculated = dayCounter.yearFraction(d1,d2,rd1,rd2);
 
-        IF(std::fabs(calculated - testCases[i].result) > 1.0e-10);
-        //{
-        //    std::ostringstream period, refPeriod;
-        //    period << "period: " << d1 << " to " << d2;
-        //    if (testCases[i].convention == ActualActual<eDate>::ISMA)
-        //        refPeriod << "referencePeriod: " << rd1 << " to " << rd2;
-        //    BOOST_ERROR(dayCounter.name() << ":\n"
-        //               << period.str() << "\n" << refPeriod.str() << "\n"
-        //               << std::setprecision(10)
-        //               << "    calculated: " << calculated << "\n"
-        //               << "    expected:   " << testCases[i].result);
-        //} 
+        IF(std::fabs(calculated - testCases[i].result) > 1.0e-10)
+        BOOST_FAIL({
+            std::ostringstream period, refPeriod;
+            period << "period: " << d1 << " to " << d2;
+            if (testCases[i].convention == ActualActual<eDate>::ISMA)
+                refPeriod << "referencePeriod: " << rd1 << " to " << rd2;
+            BOOST_ERROR(dayCounter.name()
+                        << ":\n"
+                        << period.str() << "\n"
+                        << refPeriod.str() << "\n"
+                        << std::setprecision(10) << "    calculated: " << calculated << "\n"
+                        << "    expected:   " << testCases[i].result);
+        });
     }
 }
 

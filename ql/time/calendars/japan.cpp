@@ -35,10 +35,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Japan<ExtDate>::Impl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         // equinox calculation
         const Time exact_vernal_equinox_time = 20.69115;
         const Time exact_autumnal_equinox_time = 23.09;

@@ -29,10 +29,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool TARGET<ExtDate>::Impl::isBusinessDay(const ExtDate& edate) const {
         auto& date = to_DateLike(edate);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = Calendar<ExtDate>::WesternImpl::easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day

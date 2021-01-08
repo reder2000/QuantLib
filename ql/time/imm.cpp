@@ -39,16 +39,17 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool IMM<ExtDate>::isIMMdate(const ExtDate& dat, bool mainCycle) {
         auto date = to_DateLike(dat);
-        if (date.weekday()!=Wednesday)
+        auto s = date.serialNumber();
+        if (date.weekday(s)!=Wednesday)
             return false;
 
-        Day d = date.dayOfMonth();
+        Day d = date.dayOfMonth(s);
         if (d<15 || d>21)
             return false;
 
         if (!mainCycle) return true;
 
-        switch (date.month()) {
+        switch (date.month(s)) {
           case March:
           case June:
           case September:
@@ -79,8 +80,10 @@ namespace QuantLib {
                    "{} is not an IMM date",date);
 
         std::ostringstream IMMcode;
-        unsigned int y = to_DateLike(date).year() % 10;
-        switch(to_DateLike(date).month()) {
+        auto d = to_DateLike(date);
+        auto s = d.serialNumber();
+        unsigned int y = d.year(s) % 10;
+        switch(d.month(s)) {
           case January:
             IMMcode << 'F' << y;
             break;
@@ -159,9 +162,10 @@ namespace QuantLib {
         Year y= io::to_integer(code.substr(1,1));
         /* year<1900 are not valid QuantLib years: to avoid a run-time
            exception few lines below we need to add 10 years right away */
-        if (y==0 && referenceDate.year()<=1909) y+=10;
-        Year referenceYear = (referenceDate.year() % 10);
-        y += referenceDate.year() - referenceYear;
+        auto s = referenceDate.serialNumber();
+        if (y==0 && referenceDate.year(s)<=1909) y+=10;
+        Year referenceYear = (referenceDate.year(s) % 10);
+        y += referenceDate.year(s) - referenceYear;
         ExtDate result = IMM<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y), false);
         if (result<referenceDate)
             return IMM<ExtDate>::nextDate(DateAdaptor<ExtDate>::Date(1, m, y + 10), false);
@@ -173,12 +177,13 @@ namespace QuantLib {
         DateLike<ExtDate> refDate{(to_DateLike(date) == ExtDate() ?
                                        ExtDate(Settings<ExtDate>::instance().evaluationDate()) :
                                        date)};
-        Year y = refDate.year();
-        QuantLib::Month m = refDate.month();
+        auto s = refDate.serialNumber();
+        Year y = refDate.year(s);
+        QuantLib::Month m = refDate.month(s);
 
         Size offset = mainCycle ? 3 : 1;
         Size skipMonths = offset-(m%offset);
-        if (skipMonths != offset || refDate.dayOfMonth() > 21) {
+        if (skipMonths != offset || refDate.dayOfMonth(s) > 21) {
             skipMonths += Size(m);
             if (skipMonths<=12) {
                 m = QuantLib::Month(skipMonths);

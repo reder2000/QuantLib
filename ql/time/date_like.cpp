@@ -78,26 +78,44 @@ namespace QuantLib {
 
     //    serialNumber_ = d + offset + yearOffset(y);
     //}
-    template <class ExtDate> inline
-    Month DateLike<ExtDate>::month() const {
-        Day d = dayOfYear(); // dayOfYear is 1 based
-        Integer m = d/30 + 1;
-        bool leap = isLeap(year());
-        while (d <= monthOffset(Month(m),leap))
+    template <class ExtDate>
+    inline Month DateLike<ExtDate>::month(serial_type s) const {
+        Day d = dayOfYear(s); // dayOfYear is 1 based
+        Integer m = d / 30 + 1;
+        bool leap = isLeap(year(s));
+        while (d <= monthOffset(Month(m), leap))
             --m;
-        while (d > monthOffset(Month(m+1),leap)) // NOLINT(misc-misplaced-widening-cast)
+        while (d > monthOffset(Month(m + 1), leap)) // NOLINT(misc-misplaced-widening-cast)
             ++m;
         return Month(m);
     }
-    template <class ExtDate>    inline
-    Year DateLike<ExtDate>::year() const {
-        Year y = (serialNumber() / 365)+1900;
+    template <class ExtDate>
+    inline
+    Month DateLike<ExtDate>::month() const {
+        auto s = serialNumber();
+        return month(s);
+    }
+    template <class ExtDate>
+    inline Year DateLike<ExtDate>::year(std::int_fast32_t serialNumber_) const {
+        Year y = (serialNumber_ / 365) + 1900;
         // yearOffset(y) is December 31st of the preceding year
-        if (serialNumber() <= yearOffset(y))
+        if (serialNumber_ <= yearOffset(y))
             --y;
         return y;
     }
-    template <class ExtDate>    inline
+    template <class ExtDate>
+    inline
+    Year DateLike<ExtDate>::year() const {
+        auto s = serialNumber();
+        return year(s);
+    }
+    template <class ExtDate>
+    inline YearMonth DateLike<ExtDate> :: year_month() const {
+        auto s = serialNumber();
+        return {year(s), month(s)};
+    }
+    template <class ExtDate>
+    inline
     DateLike<ExtDate>& DateLike<ExtDate>::operator+=(typename DateLike<ExtDate>::serial_type days) {
         serial_type serial = serialNumber() + days;
         checkSerialNumber(serial);
@@ -145,9 +163,10 @@ namespace QuantLib {
           case Weeks:
             return date + 7*n;
           case Months: {
-            Day d = date.dayOfMonth();
-            Integer m = Integer(date.month())+n;
-            Year y = date.year();
+            auto s = date.serialNumber();
+            Day d = date.dayOfMonth(s);
+            Integer m = Integer(date.month(s))+n;
+            Year y = date.year(s);
             while (m > 12) {
                 m -= 12;
                 y += 1;
@@ -168,9 +187,10 @@ namespace QuantLib {
             return static_cast<DateLike<ExtDate> >(res);
           }
           case Years: {
-              Day d = date.dayOfMonth();
-              Month m = date.month();
-              Year y = date.year()+n;
+              auto s = date.serialNumber();
+              Day d = date.dayOfMonth(s);
+              Month m = date.month(s);
+              Year y = date.year(s)+n;
 
             QL_ENSURE(y >= 1900 && y <= 2199,
                       "year {} out of bounds. It must be in [1901,2199]",y);
@@ -793,7 +813,9 @@ namespace QuantLib {
                    "zeroth day of week in a given (month, year) is undefined");
         QL_REQUIRE(nth<6,
                    "no more than 5 weekday in a given (month, year)");
-        Weekday first = static_cast<DateLike<ExtDate>>(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
+        //Weekday first = static_cast<DateLike<ExtDate>>(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
+        Weekday first =
+            QuantLib::Date(1, m, y).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
         auto res = DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip*7) - first, m, y);
         return static_cast<DateLike<ExtDate> >(res);

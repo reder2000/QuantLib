@@ -89,7 +89,8 @@ namespace QuantLib {
             Cache& cache = monthlyFigures_[calendar_.name()];
             serial_type total = 0;
             // first, we get to the beginning of next month.
-            auto d = to_DateLike(DateAdaptor<ExtDate>::Date(1,d1.month(),d1.year())) + 1*Months;
+            auto dd1 = d1.year_month();
+            auto d = to_DateLike(DateAdaptor<ExtDate>::Date(1,dd1.month,dd1.year)) + 1*Months;
             total += calendar_.businessDaysBetween(d1, d);
             // then, we add any whole months (whose figures might be
             // cached already) in the middle of our period.

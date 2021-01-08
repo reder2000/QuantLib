@@ -18,20 +18,22 @@
 */
 
 #include <ql/time/calendars/thailand.hpp>
-
+#include "../ql_errors.hpp"
 namespace QuantLib {
-
-    Thailand::Thailand() {
+    template <class ExtDate> inline
+    Thailand<ExtDate>::Thailand() {
         // all calendar instances share the same implementation instance
-        static ext::shared_ptr<Calendar<ExtDate>::Impl> impl(new Thailand::SetImpl);
-        impl_ = impl;
+        static std::shared_ptr<Calendar<ExtDate>::Impl> impl(new Thailand<ExtDate>::SetImpl);
+        this->impl_ = impl;
     }
-
-    bool Thailand::SetImpl::isBusinessDay(const ExtDate& date) const {
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+    template <class ExtDate> inline
+    bool Thailand<ExtDate>::SetImpl::isBusinessDay(const ExtDate& edate) const {
+        auto& date = to_DateLike(edate);
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
 
         if (this->isWeekend(w)
             // New Year's Day

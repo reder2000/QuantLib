@@ -20,7 +20,7 @@
 /*! \file thailand.hpp
     \brief Thailand calendars
 */
-
+#pragma once
 #ifndef quantlib_thailand_calendar_hpp
 #define quantlib_thailand_calendar_hpp
 
@@ -64,10 +64,10 @@ namespace QuantLib {
         </ul>
 
         \ingroup calendars
-    */
-    class Thailand : public Calendar {
+    */    template <class ExtDate=Date>
+    class Thailand : public Calendar<ExtDate> {
       private:
-        class SetImpl : public Calendar::WesternImpl {
+        class SetImpl : public Calendar<ExtDate>::WesternImpl {
           public:
             std::string name() const { return "Thailand stock exchange"; }
             bool isBusinessDay(const ExtDate&) const;
@@ -78,5 +78,5 @@ namespace QuantLib {
 
 }
 
-
+#include "thailand.cpp"
 #endif

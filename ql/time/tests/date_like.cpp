@@ -2,10 +2,12 @@
 #include "../date_like.hpp"
 #include <ql/time/calendars/target.hpp>
 #include <ql/time/calendars/unitedkingdom.hpp>
+#include <ql/time/calendars/thailand.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
 #include <ql/time/daycounters/actualactual.hpp>
 #include <ql/time/daycounters/business252.hpp>
+
 
 #include "pseudo_dates.h"
 

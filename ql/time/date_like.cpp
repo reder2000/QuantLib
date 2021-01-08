@@ -164,7 +164,8 @@ namespace QuantLib {
             if (d > length)
                 d = length;
 
-            return to_DateLike(DateAdaptor<ExtDate>::Date(d, Month(m), y));
+            auto res = DateAdaptor<ExtDate>::Date(d, Month(m), y);
+            return static_cast<DateLike<ExtDate> >(res);
           }
           case Years: {
               Day d = date.dayOfMonth();
@@ -177,7 +178,7 @@ namespace QuantLib {
               if (d == 29 && m == February && !isLeap(y))
                   d = 28;
 
-              return to_DateLike(DateAdaptor<ExtDate>::Date(d,m,y));
+              return static_cast<DateLike<ExtDate> >(DateAdaptor<ExtDate>::Date(d, m, y));
           }
           default:
             QL_FAIL("undefined time units");
@@ -792,9 +793,10 @@ namespace QuantLib {
                    "zeroth day of week in a given (month, year) is undefined");
         QL_REQUIRE(nth<6,
                    "no more than 5 weekday in a given (month, year)");
-        Weekday first = to_DateLike(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
+        Weekday first = static_cast<DateLike<ExtDate>>(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
-        return to_DateLike(DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip*7) - first, m, y));
+        auto res = DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip*7) - first, m, y);
+        return static_cast<DateLike<ExtDate> >(res);
     }
 #if defined(QL_SETTINGS_ARE_REMOVED)
     // month formatting

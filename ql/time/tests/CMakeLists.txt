@@ -7,18 +7,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Catch2 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(cpp_rutils CONFIG REQUIRED)
+find_package(blpapi REQUIRED)
 
-file(GLOB headers ../date_like.hpp )
-file (GLOB srcs CONFIGURE_DEPENDS *.cpp)
+if (${blpapi_FOUND})
+message ("using blpapi")
+add_definitions(-DUSING_BLPAPI)
+endif()
+
+file(GLOB headers CONFIGURE_DEPENDS ../date_like.hpp *.h)
+file (GLOB srcs CONFIGURE_DEPENDS  
+date_like.cpp
+main.cpp
+test_suite_calendars.cpp
+test_suite_dates.cpp
+test_suite_daycounters.cpp
+test_suite_schedule.cpp
+)
 
 include_directories(../../..)
+
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
 
 #include(CTest)
 #enable_testing()
 
 add_executable(qltime_tests ${srcs} ${headers})
 
-target_link_libraries(qltime_tests Catch2::Catch2 fmt::fmt cpp_rutils::cpp_rutils)
+target_link_libraries(qltime_tests Catch2::Catch2 fmt::fmt cpp_rutils::cpp_rutils blpapi)
+set_property(TARGET qltime_tests APPEND PROPERTY LINK_FLAGS /DEBUG)
+
+
 
 target_precompile_headers(qltime_tests  PUBLIC stdafx.h)
 add_definitions(-DUSING_PCH -D_CRT_SECURE_NO_WARNINGS)

@@ -41,7 +41,11 @@
 using namespace QuantLib;
 //using namespace boost::unit_test_framework;
 
+#ifdef USING_BLPAPI
+using eDate = blpapi_datetime;
+#else
 using eDate = QuantLibDate;
+#endif
 
 TEST_CASE("ecbDates", "[DateTest][hide]") {
 //void DateTest::ecbDates() {
@@ -352,6 +356,7 @@ TEST_CASE("isoDates", "[DateTest][hide]") {
                    << " year:          " << d.year()) ; 
     
 }
+#ifdef PARSE_FORMATTED_DATES // TODO
 TEST_CASE("parseDates", "[DateTest][hide]") {
 //    void DateTest::parseDates() {
     BOOST_TEST_MESSAGE("Testing parsing of dates...");
@@ -386,6 +391,7 @@ TEST_CASE("parseDates", "[DateTest][hide]") {
                    << " parsed date: " << d);
     
 }
+#endif // PARSE_FORMATTED_DATES // TODO
 TEST_CASE("intraday", "[DateTest][hide]") {
 //    void DateTest::intraday() {
 #ifdef QL_HIGH_RESOLUTION_DATE

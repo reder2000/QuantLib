@@ -41,7 +41,12 @@
 
 using namespace QuantLib;
 //using namespace boost::unit_test_framework;
+#ifdef USING_BLPAPI
+using eDate = blpapi_datetime;
+#else
 using eDate = QuantLibDate;
+#endif
+
 using DLe = DateLike<eDate>;
 using DAe = DateAdaptor<eDate>;
 

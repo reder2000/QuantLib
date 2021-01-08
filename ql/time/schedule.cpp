@@ -429,13 +429,14 @@ namespace QuantLib {
 
     }
     template <class ExtDate> inline
-    Schedule<ExtDate> Schedule<ExtDate>::after(const ExtDate& truncationDate) const {
+    Schedule<ExtDate> Schedule<ExtDate>::after(const ExtDate& _truncationDate) const {
+        auto truncationDate = to_DateLike(_truncationDate);
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate < result.dates_.back(),
                    "truncation date {} "
                    " must be before the last schedule date {}",
-                   truncationDate
+                   truncationDate.asExtDate()
              ,
             result.dates_.back());
         if (truncationDate > result.dates_[0]) {
@@ -465,12 +466,13 @@ namespace QuantLib {
         return result;
     }
     template <class ExtDate> inline
-    Schedule<ExtDate> Schedule<ExtDate>::until(const ExtDate& truncationDate) const {
+    Schedule<ExtDate> Schedule<ExtDate>::until(const ExtDate& _truncationDate) const {
+        auto truncationDate = to_DateLike(_truncationDate);
         Schedule result = *this;
 
         QL_REQUIRE(truncationDate>result.dates_[0],
                    "truncation date {} must be later than schedule first date {}",
-                   truncationDate ,
+                   truncationDate.asExtDate(),
                    result.dates_[0]);
         if (truncationDate<result.dates_.back()) {
             // remove later dates

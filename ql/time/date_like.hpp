@@ -157,11 +157,18 @@ template <class ExtDate>
         //! \name inspectors
         //@{
         Weekday weekday() const;
+        Weekday weekday(serial_type _serialNumber) const;
         Day dayOfMonth() const;
+        Day dayOfMonth(serial_type _serialNumber) const;
         //! One-based (Jan 1st = 1)
         Day dayOfYear() const;
+        Day dayOfYear(serial_type _serialNumber) const;
         Month month() const;
+        Month month(serial_type serialNumber_) const;
         Year year() const;
+        Year year(serial_type serialNumber_) const;
+        YearMonth year_month() const;
+
         serial_type serialNumber() const;
 
         auto operator<=>(const DateLike<ExtDate>& d) const {
@@ -427,15 +434,30 @@ template <class ExtDate>
         Integer w = serialNumber() % 7;
         return Weekday(w == 0 ? 7 : w);
     }
-
     template <class ExtDate>
-    inline Day DateLike<ExtDate>::dayOfMonth() const {
-        return dayOfYear() - monthOffset(month(),isLeap(year()));
+    inline Weekday DateLike<ExtDate>::weekday(serial_type _serialNumber) const {
+        Integer w = _serialNumber % 7;
+        return Weekday(w == 0 ? 7 : w);
     }
 
     template <class ExtDate>
+    inline Day DateLike<ExtDate>::dayOfMonth(serial_type _serialNumber) const {
+        return dayOfYear(_serialNumber) - monthOffset(this->month(_serialNumber), isLeap(year(_serialNumber)));
+    }
+    template <class ExtDate>
+    inline Day DateLike<ExtDate>::dayOfMonth() const {
+        auto s = serialNumber();
+        return dayOfMonth(s);
+    }
+
+    template <class ExtDate>
+    inline Day DateLike<ExtDate>::dayOfYear(serial_type _serialNumber) const {
+        return _serialNumber - yearOffset(year(_serialNumber));
+    }
+    template <class ExtDate>
     inline Day DateLike<ExtDate>::dayOfYear() const {
-        return serialNumber() - yearOffset(year());
+        auto s = serialNumber();
+        return dayOfYear(s);
     }
 
     template <class ExtDate>

@@ -60,10 +60,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Germany<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day
@@ -95,10 +96,11 @@ namespace QuantLib {
     bool Germany<ExtDate>::FrankfurtStockExchangeImpl::isBusinessDay(
       const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day
@@ -121,10 +123,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Germany<ExtDate>::XetraImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day
@@ -147,10 +150,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Germany<ExtDate>::EurexImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day
@@ -175,10 +179,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Germany<ExtDate>::EuwaxImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if ((w == Saturday || w == Sunday)
             // New Year's Day

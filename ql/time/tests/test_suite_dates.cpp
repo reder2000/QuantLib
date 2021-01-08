@@ -247,11 +247,12 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
     serial_type minDate = DateLike<eDate>::minDate().serialNumber()+1,
                       maxDate = DateLike<eDate>::maxDate().serialNumber();
     DateLike<eDate> minDate_minus_1{DateAdaptor<eDate>::Date(minDate - 1)};
-    serial_type dyold = minDate_minus_1.dayOfYear(),
-                      dold  = minDate_minus_1.dayOfMonth(),
-                      mold  = minDate_minus_1.month(),
-                      yold  = minDate_minus_1.year(),
-                      wdold = minDate_minus_1.weekday();
+    auto sn = minDate_minus_1.serialNumber();
+    serial_type dyold = minDate_minus_1.dayOfYear(sn),
+                      dold  = minDate_minus_1.dayOfMonth(sn),
+                      mold  = minDate_minus_1.month(sn),
+                      yold  = minDate_minus_1.year(sn),
+                      wdold = minDate_minus_1.weekday(sn);
 
     for (serial_type i=minDate; i<=maxDate; i++) {
         DateLike<eDate> t {DateAdaptor<eDate>::Date(i)};
@@ -264,11 +265,11 @@ TEST_CASE("testConsistency", "[DateTest][hide]") {
                        << "    date:          " << t << "\n"
                        << "    serial number: " << serial);
 
-        Integer dy = t.dayOfYear(),
-                d  = t.dayOfMonth(),
-                m  = t.month(),
-                y  = t.year(),
-                wd = t.weekday();
+        Integer dy = t.dayOfYear(serial),
+                d  = t.dayOfMonth(serial),
+                m  = t.month(serial),
+                y  = t.year(serial),
+                wd = t.weekday(serial);
 
         // check IF skipping any date
         IF (!((dy == dyold+1) ||

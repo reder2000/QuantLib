@@ -44,11 +44,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Brazil<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
-        Day dd = date.dayOfYear();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
 
         if (this->isWeekend(w)
@@ -81,11 +81,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Brazil<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
-        Day dd = date.dayOfYear();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
 
         if (this->isWeekend(w)

@@ -127,10 +127,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedStates<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
@@ -165,10 +166,11 @@ namespace QuantLib {
         // Since 2015 Independence Day only impacts Libor if it falls
         // on a weekday
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         if (((d == 5 && w == Monday) ||
             (d == 3 && w == Friday)) && m == July && y >= 2015)
             return true;
@@ -177,10 +179,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedStates<ExtDate>::NyseImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -263,10 +266,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedStates<ExtDate>::GovernmentBondImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
@@ -311,10 +315,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedStates<ExtDate>::NercImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)
@@ -336,10 +341,11 @@ namespace QuantLib {
     bool UnitedStates<ExtDate>::FederalReserveImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
         // see https://www.frbservices.org/holidayschedules/ for details
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday if on Sunday)
             || ((d == 1 || (d == 2 && w == Monday)) && m == January)

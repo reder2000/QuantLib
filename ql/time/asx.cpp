@@ -40,16 +40,17 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool ASX<ExtDate>::isASXdate(const ExtDate& dat, bool mainCycle) {
         auto date = to_DateLike(dat);
-        if (date.weekday()!=Friday)
+        auto s = date.serialNumber();
+        if (date.weekday(s)!=Friday)
             return false;
 
-        Day d = date.dayOfMonth();
+        Day d = date.dayOfMonth(s);
         if (d<8 || d>14)
             return false;
 
         if (!mainCycle) return true;
 
-        switch (date.month()) {
+        switch (date.month(s)) {
           case March:
           case June:
           case September:

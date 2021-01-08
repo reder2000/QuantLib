@@ -107,7 +107,9 @@ inline blpapi_datetime DateAdaptor<blpapi_datetime>::Date(QuantLib::Day d, Quant
 inline blpapi_datetime DateAdaptor<blpapi_datetime>::Date(std::int_fast32_t i) {
     QuantLib::Date d(i);
 //    std::cout << fmt::format("Date {},{},{}\n", d.year(), d.month(), d.dayOfMonth());
-    blpapi_datetime res(d.year(), d.month(), d.dayOfMonth());
+    //blpapi_datetime res(d.year(), d.month(), d.dayOfMonth());
+    auto t = d.year_month_day();
+    blpapi_datetime res(t.year, t.month, t.day);
     return res;
 }
 

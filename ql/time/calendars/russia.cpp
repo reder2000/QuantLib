@@ -83,10 +83,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Russia<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         if (this->isWeekend(w)
             // New Year's holidays
             || (y <= 2005 && d <= 2 && m == January)
@@ -222,10 +223,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool Russia<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
 
         // the exchange was formally established in 2011, so data are only
         // available from 2012 to present

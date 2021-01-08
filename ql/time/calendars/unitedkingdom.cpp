@@ -49,10 +49,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedKingdom<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& edate) const {
         auto& date = to_DateLike(edate);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
@@ -93,10 +94,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedKingdom<ExtDate>::ExchangeImpl::isBusinessDay(const ExtDate& edate) const {
         auto& date = to_DateLike(edate);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)
@@ -137,10 +139,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool UnitedKingdom<ExtDate>::MetalsImpl::isBusinessDay(const ExtDate& edate) const {
         auto& date = to_DateLike(edate);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth(), dd = date.dayOfYear();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
         Day em = this->easterMonday(y);
         if (this->isWeekend(w)
             // New Year's Day (possibly moved to Monday)

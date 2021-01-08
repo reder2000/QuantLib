@@ -87,6 +87,16 @@ namespace QuantLib {
     /*! \ingroup datetime */
     typedef Integer Year;
 
+    struct YearMonth {
+        Year year;
+        Month month;
+    };
+    struct YearMonthDay {
+        Year year;
+        Month month;
+        Day day;
+    };
+
 #ifdef QL_HIGH_RESOLUTION_DATE
     //! Hour number
     /*! \ingroup datetime */
@@ -154,6 +164,8 @@ namespace QuantLib {
         Month month() const;
         Year year() const;
         serial_type serialNumber() const;
+
+        YearMonthDay year_month_day() const;
 
 #ifdef QL_HIGH_RESOLUTION_DATE
         Hour hours() const;
@@ -395,9 +407,29 @@ namespace QuantLib {
     inline Day Date::dayOfYear() const {
         return serialNumber_ - yearOffset(year());
     }
+    inline
+    YearMonthDay Date::year_month_day() const    
+    { 
+        // year
+        auto y = year();
+        auto yo = yearOffset(y);
+        auto doy = serialNumber_ - yo;
+        // month
+        Integer mo = doy / 30 + 1;
+        bool leap = isLeap(y);
+        while (doy <= monthOffset(Month(mo), leap))
+            --mo;
+        while (doy > monthOffset(Month(mo + 1), leap)) // NOLINT(misc-misplaced-widening-cast)
+            ++mo;
+        auto m = Month(mo);
+        // day
+        auto d = doy - monthOffset(m, isLeap(y));
+
+        return {y, m, d};
+    }
 
     inline serial_type Date::serialNumber() const {
-        return serialNumber_;
+    return serialNumber_;
     }
 
     inline Date Date::operator+(serial_type days) const {

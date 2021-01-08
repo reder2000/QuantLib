@@ -51,10 +51,11 @@ namespace QuantLib {
     template <class ExtDate> inline
     bool SouthKorea<ExtDate>::SettlementImpl::isBusinessDay(const ExtDate& dat) const {
         auto date = to_DateLike(dat);
-        Weekday w = date.weekday();
-        Day d = date.dayOfMonth();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
 
         if (this->isWeekend(w)
             // New Year's Day
@@ -207,10 +208,11 @@ namespace QuantLib {
         if ( !SettlementImpl::isBusinessDay(date) )
             return false;
 
-        Day d = date.dayOfMonth();
-        Weekday w = date.weekday();
-        Month m = date.month();
-        Year y = date.year();
+        auto sn = date.serialNumber();
+        Weekday w = date.weekday(sn);
+        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Month m = date.month(sn);
+        Year y = date.year(sn);
 
         if (// Year-end closing
             ((((d == 29 || d == 30) && w == Friday) || d == 31) 

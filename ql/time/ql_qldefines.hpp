@@ -99,7 +99,7 @@
 #elif defined(__SUNPRO_CC)      // Sun Studio
    #include <ql/config.sun.hpp>
 #else                           // We hope that the compiler follows ANSI
-   #include <ql/config.ansi.hpp>
+   #include "ql_config.ansi.hpp"
 #endif
 
 
@@ -123,7 +123,7 @@
 #endif
 
 // ensure that needed math constants are defined
-#include <ql/mathconstants.hpp>
+#include "ql_mathconstants.hpp"
 
 
 // import global functions into std namespace

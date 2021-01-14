@@ -3,41 +3,23 @@ project("ql_time" VERSION 1.0.1
              DESCRIPTION "A header only c++ library that interface to QuantLib  "
              HOMEPAGE_URL "https://github.com/reder2000/QuantLib")
 
-include(GNUInstallDirs)
 
-#set(CMAKE_CXX_STANDARD 20)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_subdirectory(tests)
+enable_testing()
+
+include(GNUInstallDirs)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include_directories(c:/dev/src/blpapi_cpp_3.15.0.1/include)
-
-#find_package(boost REQUIRED preprocessor)
-#include_directories(${Boost_INCLUDE_DIRS})
-#find_package(fmt CONFIG REQUIRED)
-#find_package(blpapi REQUIRED)
-#include_directories(${BLPAPI_CPP_INCLUDE_DIR})
 find_package(cpp_rutils REQUIRED)
 
-#add_definitions(-DQL_USE_STD_SHARED_PTR)
-
-#FILE(GLOB sources CONFIGURE_DEPENDS *.cpp *.hpp *.h calendars/*.cpp calendars/*.hpp daycounters/*.cpp daycounters/*.hpp)
-#FILE(GLOB sources CONFIGURE_DEPENDS *.hpp *.h calendars/*.hpp daycounters/*.hpp daycounters/actualactual.cpp  calendars/argentina.cpp)
-FILE(GLOB ql_time_sources CONFIGURE_DEPENDS *.hpp *.h)
-FILE(GLOB ql_time_calendars_sources CONFIGURE_DEPENDS calendars/*.hpp calendars/*.h)
-FILE(GLOB ql_time_daycounters_sources CONFIGURE_DEPENDS daycounters/*.hpp daycounters/*.h)
+FILE(GLOB ql_time_sources CONFIGURE_DEPENDS *.hpp *.h *.cpp)
+FILE(GLOB ql_time_calendars_sources CONFIGURE_DEPENDS calendars/*.hpp calendars/*.h calendars/*.cpp)
+FILE(GLOB ql_time_daycounters_sources CONFIGURE_DEPENDS daycounters/*.hpp daycounters/*.h daycounters/*.cpp)
 
 
 add_library(ql_time INTERFACE ${ql_time_sources} ${ql_time_calendars_sources} ${ql_time_daycounters_sources})
 add_library(ql_time::ql_time ALIAS ql_time)
-
-#add_library(ql_time SHARED ${sources})
-#target_link_libraries(ql_time PRIVATE fmt::fmt-header-only blpapi)
-
-
-#target_precompile_headers(ql_time PUBLIC    stdafx.h)
-#target_precompile_headers(ql_time INTERFACE    stdafx.h)
-
 
 target_link_libraries(ql_time INTERFACE cpp_rutils::cpp_rutils)
 
@@ -75,8 +57,7 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
-install(FILES ${ql_time_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql_time)
-install(FILES ${ql_time_calendars_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql_time/calendars)
-install(FILES ${ql_time_daycounters_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql_time/daycounters)
+install(FILES ${ql_time_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql/time)
+install(FILES ${ql_time_calendars_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql/time/calendars)
+install(FILES ${ql_time_daycounters_sources} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ql/time/daycounters)
 
-#install(FILES ${sources} DESTINATION include)

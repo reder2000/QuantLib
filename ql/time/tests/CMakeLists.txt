@@ -7,10 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Catch2 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(cpp_rutils CONFIG REQUIRED)
-find_package(blpapi REQUIRED)
+find_package(blpapi)
 
 if (${blpapi_FOUND})
-message ("using blpapi")
+set(blpapi blpapi)
+message ("using blpapi  ${blpapi}")
 add_definitions(-DUSING_BLPAPI)
 endif()
 
@@ -33,7 +34,7 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
 
 add_executable(qltime_tests ${srcs} ${headers})
 
-target_link_libraries(qltime_tests Catch2::Catch2 fmt::fmt cpp_rutils::cpp_rutils blpapi)
+target_link_libraries(qltime_tests Catch2::Catch2 fmt::fmt cpp_rutils::cpp_rutils ${blpapi})
 set_property(TARGET qltime_tests APPEND PROPERTY LINK_FLAGS /DEBUG)
 
 

@@ -187,7 +187,7 @@ namespace QuantLib {
                   date);
 
         typename setExtDate<ExtDate>::const_iterator i =
-            std::upper_bound(knownDates().begin(), knownDates().end(), d, QuantLib::Less<ExtDate>());
+            std::upper_bound(knownDates().begin(), knownDates().end(), d, Less<ExtDate>());
 
         QL_REQUIRE(i!=knownDates().end(), "ECB dates after {} are unknown",
                    *(--knownDates().end()) ) ;
@@ -200,7 +200,7 @@ namespace QuantLib {
                   date);
 
         typename setExtDate<ExtDate>::const_iterator i = std::upper_bound(
-            knownDates().begin(), knownDates().end(), d, QuantLib::Less<ExtDate>());
+            knownDates().begin(), knownDates().end(), d, Less<ExtDate>());
 
         QL_REQUIRE(i!=knownDates().end(), "ECB dates after {} are unknown",
                     *knownDates().end());

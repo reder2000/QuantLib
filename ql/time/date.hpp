@@ -36,6 +36,7 @@
 #include <ql/time/weekday.hpp>
 #include "ql_utilities_null.hpp"
 //#include <boost/cstdint.hpp>
+#include "timeunit.hpp"
 
 #ifdef QL_HIGH_RESOLUTION_DATE
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -48,44 +49,6 @@
 
 
 namespace QuantLib {
-
-    //! Day number
-    /*! \ingroup datetime */
-    typedef Integer Day;
-
-    //! Month names
-    /*! \ingroup datetime */
-    enum Month { January   = 1,
-                 February  = 2,
-                 March     = 3,
-                 April     = 4,
-                 May       = 5,
-                 June      = 6,
-                 July      = 7,
-                 August    = 8,
-                 September = 9,
-                 October   = 10,
-                 November  = 11,
-                 December  = 12,
-                 Jan = 1,
-                 Feb = 2,
-                 Mar = 3,
-                 Apr = 4,
-                 Jun = 6,
-                 Jul = 7,
-                 Aug = 8,
-                 Sep = 9,
-                 Oct = 10,
-                 Nov = 11,
-                 Dec = 12
-    };
-
-    /*! \relates Month */
-    std::ostream& operator<<(std::ostream&, Month);
-
-    //! Year number
-    /*! \ingroup datetime */
-    typedef Integer Year;
 
     struct YearMonth {
         Year year;

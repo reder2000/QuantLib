@@ -818,7 +818,7 @@ namespace QuantLib {
                    "no more than 5 weekday in a given (month, year)");
         //Weekday first = static_cast<DateLike<ExtDate>>(DateAdaptor<ExtDate>::Date(1, m, y)).weekday();
         Weekday first =
-            QuantLib::Date(1, m, y).weekday();
+            Date(1, m, y).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
         auto tmp = DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip * 7) - first, m, y);
         DateLike<ExtDate> res{tmp};

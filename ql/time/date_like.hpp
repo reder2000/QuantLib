@@ -28,8 +28,6 @@
     \brief date- and time-related classes, typedefs and enumerations
 */
 #pragma once
-#ifndef quantlib_date_like_hpp
-#define quantlib_date_like_hpp
 #include <ql/time/date.hpp> // we hate to, but we somehow still need it until we throw away ql_setting
 #include <ql/time/period.hpp>
 #include <ql/time/weekday.hpp>
@@ -44,50 +42,6 @@
 #include <utility>
 #include <functional>
 #include <string>
-
-
-namespace QuantLib {
-
-    //! Day number
-    /*! \ingroup datetime */
-    typedef Integer Day;
-#if defined(QL_SETTINGS_ARE_REMOVED)
-    //! Month names
-    /*! \ingroup datetime */
-    enum Month {
-        January = 1,
-        February = 2,
-        March = 3,
-        April = 4,
-        May = 5,
-        June = 6,
-        July = 7,
-        August = 8,
-        September = 9,
-        October = 10,
-        November = 11,
-        December = 12,
-        Jan = 1,
-        Feb = 2,
-        Mar = 3,
-        Apr = 4,
-        Jun = 6,
-        Jul = 7,
-        Aug = 8,
-        Sep = 9,
-        Oct = 10,
-        Nov = 11,
-        Dec = 12
-    };
-#endif //defined(QL_SETTINGS_ARE_REMOVED)
-    /*! \relates Month */
-    std::ostream& operator<<(std::ostream&, Month);
-
-    //! Year number
-    /*! \ingroup datetime */
-    typedef Integer Year;
-
-}
 
 #include "date_adaptor.h"
 
@@ -594,7 +548,6 @@ template <class ExtDate>
 }
 
 #include "date_like.cpp"
-#endif
 
 template <class ExtDate>
 QuantLib::DateLike<ExtDate>& to_DateLike(ExtDate&e) {

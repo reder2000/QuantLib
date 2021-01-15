@@ -316,7 +316,7 @@ namespace QuantLib {
         };
         static const Size n =
             sizeof(working_weekends)/sizeof(working_weekends[0]);
-        static const std::set<ExtDate,QuantLib::Less<ExtDate>> workingWeekends(working_weekends+0,
+        static const std::set<ExtDate,Less<ExtDate>> workingWeekends(working_weekends+0,
                                                     working_weekends+n);
 
         // If it is already a SSE business day, it must be a IB business day

@@ -85,7 +85,7 @@ namespace QuantLib {
         auto date = to_DateLike(dat);
         auto sn = date.serialNumber();
         Weekday w = date.weekday(sn);
-        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Day d = date.dayOfMonth(sn);
         Month m = date.month(sn);
         Year y = date.year(sn);
         if (this->isWeekend(w)
@@ -225,7 +225,7 @@ namespace QuantLib {
         auto date = to_DateLike(dat);
         auto sn = date.serialNumber();
         Weekday w = date.weekday(sn);
-        Day d = date.dayOfMonth(sn), dd = date.dayOfYear(sn);
+        Day d = date.dayOfMonth(sn);
         Month m = date.month(sn);
         Year y = date.year(sn);
 

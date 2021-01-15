@@ -183,8 +183,9 @@ namespace QuantLib {
             if (d > length)
                 d = length;
 
-            auto res = DateAdaptor<ExtDate>::Date(d, Month(m), y);
-            return static_cast<DateLike<ExtDate> >(res);
+            auto tmp = DateAdaptor<ExtDate>::Date(d, Month(m), y);
+            DateLike<ExtDate> res{tmp};
+            return res;
           }
           case Years: {
               auto s = date.serialNumber();
@@ -198,7 +199,9 @@ namespace QuantLib {
               if (d == 29 && m == February && !isLeap(y))
                   d = 28;
 
-              return static_cast<DateLike<ExtDate> >(DateAdaptor<ExtDate>::Date(d, m, y));
+            auto tmp = DateAdaptor<ExtDate>::Date(d, m, y);
+            DateLike<ExtDate> res{tmp};
+            return res;
           }
           default:
             QL_FAIL("undefined time units");
@@ -817,8 +820,9 @@ namespace QuantLib {
         Weekday first =
             QuantLib::Date(1, m, y).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
-        auto res = DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip*7) - first, m, y);
-        return static_cast<DateLike<ExtDate> >(res);
+        auto tmp = DateAdaptor<ExtDate>::Date((1 + dayOfWeek + skip * 7) - first, m, y);
+        DateLike<ExtDate> res{tmp};
+        return res;
     }
 #if defined(QL_SETTINGS_ARE_REMOVED)
     // month formatting

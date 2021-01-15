@@ -473,8 +473,9 @@ template <class ExtDate>
 
     template <class ExtDate>
     inline DateLike<ExtDate> DateLike<ExtDate>::operator-(serial_type days) const {
-        auto res = DateAdaptor<ExtDate>::Date(serialNumber()-days);
-        return static_cast<DateLike<ExtDate> >(res);
+        auto tmp = DateAdaptor<ExtDate>::Date(serialNumber()-days);
+        DateLike<ExtDate> res{tmp};
+        return (res);
     }
 
     template <class ExtDate>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "timeunit.hpp"
+
 template <class ExtDate>
 struct DateAdaptor {
     static ExtDate Date(std::int_fast32_t) {

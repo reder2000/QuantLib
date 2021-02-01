@@ -21,6 +21,8 @@ FILE(GLOB ql_time_daycounters_sources CONFIGURE_DEPENDS daycounters/*.hpp daycou
 add_library(ql_time INTERFACE ${ql_time_sources} ${ql_time_calendars_sources} ${ql_time_daycounters_sources})
 add_library(ql_time::ql_time ALIAS ql_time)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 target_link_libraries(ql_time INTERFACE cpp_rutils::cpp_rutils)
 
 target_include_directories(

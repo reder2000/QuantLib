@@ -388,7 +388,7 @@ namespace QuantLib {
         // day
         auto d = doy - monthOffset(m, isLeap(y));
 
-        return {y, m, d};
+        return {y, m, static_cast<QuantLib::Day>(d)};
     }
 
     inline serial_type Date::serialNumber() const {

@@ -798,10 +798,11 @@ namespace QuantLib {
 
         if (std::time(&t) == std::time_t(-1)) // -1 means time() didn't work
             return DateLike<ExtDate>();
-        std::tm *lt = std::localtime(&t);
-        ExtDate res(DateAdaptor<ExtDate>::Date(Day(lt->tm_mday),
-                        Month(lt->tm_mon+1),
-                        Year(lt->tm_year+1900)));
+        std::tm lt;
+        localtime_s(&lt,&t);
+        ExtDate res(DateAdaptor<ExtDate>::Date(Day(lt.tm_mday),
+                        Month(lt.tm_mon+1),
+                        Year(lt.tm_year+1900)));
         return *static_cast<T*>(&res);
     }
     template <class ExtDate>    inline

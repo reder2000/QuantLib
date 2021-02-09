@@ -770,10 +770,11 @@ inline    Date::Date()
 
         if (std::time(&t) == std::time_t(-1)) // -1 means time() didn't work
             return Date();
-        std::tm *lt = std::localtime(&t);
-        return Date(Day(lt->tm_mday),
-                        Month(lt->tm_mon+1),
-                        Year(lt->tm_year+1900));
+        std::tm lt;
+        localtime_s(&lt,&t);
+        return Date(Day(lt.tm_mday),
+                        Month(lt.tm_mon+1),
+                        Year(lt.tm_year+1900));
     }
     inline
     Date Date::nextWeekday(const Date& d, Weekday dayOfWeek) {

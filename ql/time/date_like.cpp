@@ -36,11 +36,12 @@
 //#include <boost/functional/hash.hpp>
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
+#define localtime_s(a,b) localtime_r(b,a)
 #endif
 #include <iomanip>
 #include <ctime>
 #include <compare>
-
+#include <time.h>
 #if defined(BOOST_NO_STDC_NAMESPACE)
     namespace std { using ::time; using ::time_t; using ::tm;
                     using ::gmtime; using ::localtime; }

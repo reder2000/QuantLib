@@ -28,6 +28,7 @@
 #include "ql_utilities_dataformatters.hpp"
 #include "ql_errors.hpp"
 #if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
+#define localtime_s(a,b) localtime_r(b,a)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif

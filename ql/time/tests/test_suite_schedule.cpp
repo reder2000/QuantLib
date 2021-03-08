@@ -23,8 +23,6 @@
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/calendars/weekendsonly.hpp>
 //#include <ql/instruments/creditdefaultswap.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/foreach.hpp>
 #include <map>
 #include <vector>
 #include "boost_to_catch.h"

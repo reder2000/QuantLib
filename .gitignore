@@ -119,3 +119,4 @@ nbproject
 Build.props
 Directory.Build.props
 mybuild/
+CMakeSettings.json

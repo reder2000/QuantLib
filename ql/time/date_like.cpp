@@ -27,15 +27,7 @@
 #include <ql/time/date.hpp>
 #include "ql_utilities_dataformatters.hpp"
 #include "ql_errors.hpp"
-#if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-//#include <boost/date_time/gregorian/gregorian.hpp>
-//#include <boost/date_time/posix_time/posix_time_types.hpp>
-//#include <boost/functional/hash.hpp>
-#if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
-#pragma GCC diagnostic pop
+#if defined(__GNUC__) || defined(__linux__)
 #define localtime_s(a,b) localtime_r(b,a)
 #endif
 #include <iomanip>

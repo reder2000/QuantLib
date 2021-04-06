@@ -12,7 +12,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 FetchContent_Declare(
   cpp_rutils
   GIT_REPOSITORY https://github.com/reder2000/cpp_rutils.git
-  GIT_TAG "ea8f66a5c9105f2d7d3bf283eed412b6f5051710"
+  GIT_TAG "f7d244b325a6f72554425b44b90b1d31bb86732c"
+  GIT_REMOTE_UPDATE_STRATEGY REBASE_CHECKOUT
+  GIT_PROGRESS TRUE
 )
 set(cpp_rutils_BUILD_TESTS OFF)
 FetchContent_MakeAvailable(cpp_rutils)

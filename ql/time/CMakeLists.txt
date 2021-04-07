@@ -12,9 +12,11 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 FetchContent_Declare(
   cpp_rutils
   GIT_REPOSITORY https://github.com/reder2000/cpp_rutils.git
-  GIT_TAG "f7d244b325a6f72554425b44b90b1d31bb86732c"
+  GIT_TAG origin/master
   GIT_REMOTE_UPDATE_STRATEGY REBASE_CHECKOUT
   GIT_PROGRESS TRUE
+  GIT_SHALLOW TRUE
+  LOG_UPDATE TRUE
 )
 set(cpp_rutils_BUILD_TESTS OFF)
 FetchContent_MakeAvailable(cpp_rutils)
@@ -24,7 +26,7 @@ FILE(GLOB ql_time_calendars_sources CONFIGURE_DEPENDS calendars/*.hpp calendars/
 FILE(GLOB ql_time_daycounters_sources CONFIGURE_DEPENDS daycounters/*.hpp daycounters/*.h daycounters/*.cpp)
 
 
-add_library(ql_time INTERFACE ${ql_time_sources} ${ql_time_calendars_sources} ${ql_time_daycounters_sources})
+add_library(ql_time INTERFACE ${ql_time_sources} ${ql_time_calendars_sources} ${ql_time_daycounters_sources} ../../README.md)
 add_library(ql_time::ql_time ALIAS ql_time)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

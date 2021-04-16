@@ -3,12 +3,9 @@ project("ql_time" VERSION 1.0.1
              DESCRIPTION "A header only c++ library that interface to QuantLib  "
              HOMEPAGE_URL "https://github.com/reder2000/QuantLib")
 
+message("Configuring ql_time ...")
+
 include(FetchContent)
-include(GNUInstallDirs)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-#find_package(cpp_rutils REQUIRED)
 FetchContent_Declare(
   cpp_rutils
   GIT_REPOSITORY https://github.com/reder2000/cpp_rutils.git
@@ -21,6 +18,7 @@ FetchContent_Declare(
 set(cpp_rutils_BUILD_TESTS OFF)
 FetchContent_MakeAvailable(cpp_rutils)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 FILE(GLOB ql_time_sources CONFIGURE_DEPENDS *.hpp *.h *.cpp)
 FILE(GLOB ql_time_calendars_sources CONFIGURE_DEPENDS calendars/*.hpp calendars/*.h calendars/*.cpp)
 FILE(GLOB ql_time_daycounters_sources CONFIGURE_DEPENDS daycounters/*.hpp daycounters/*.h daycounters/*.cpp)
@@ -40,6 +38,7 @@ target_include_directories(
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
+include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}_Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -74,5 +73,6 @@ install(FILES ${ql_time_daycounters_sources} DESTINATION ${CMAKE_INSTALL_INCLUDE
 
 if (NOT "${ql_time_BUILD_TESTS}" STREQUAL "OFF")
     add_subdirectory(tests)
-    enable_testing()
 endif()
+
+message("... done ql_time Configuring")

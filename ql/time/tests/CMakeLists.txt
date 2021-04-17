@@ -11,16 +11,8 @@ include(rr_cmake/cxx20)
 find_vcpkg_install_missing(Catch2)
 find_vcpkg_install_missing(fmt)
 
-include(rr_cmake/fetch_cache_archive)
-if (WIN32)
-    set(blpapi_archive "blpapi_cpp_3.16.1.1-windows.zip")
-else ()
-    set(blpapi_archive "blpapi_cpp_3.16.1.1-linux.tar.gz")
-endif()
-fetch_cache_archive(blpapi ${blpapi_archive} "https://bcms.bloomberg.com/BLPAPI-Generic/" blpapi_srcdir)
-
-message("find_package(blpapi PATHS ${blpapi_srcdir}/cmake REQUIRED")
-find_package(blpapi PATHS "${blpapi_srcdir}/cmake" REQUIRED)
+include(rr_cmake/blpapi)
+find_blpapi()
 add_definitions(-DUSING_BLPAPI)
 
 file(GLOB headers CONFIGURE_DEPENDS ../date_like.hpp *.h)

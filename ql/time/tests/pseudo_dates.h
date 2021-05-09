@@ -116,6 +116,8 @@ inline blpapi_datetime DateAdaptor<blpapi_datetime>::Date(std::int_fast32_t i) {
 inline std::int_fast32_t DateAdaptor<blpapi_datetime>::serialNumber(const blpapi_datetime& d) {
     //std::cout << fmt::format("serialNumber {},{},{}\n", d.day(),
     //                         static_cast<QuantLib::Month>(d.month()), d.year());
+    if (d == blpapi_datetime())
+        return QuantLib::Date().serialNumber();
     QuantLib::Date qd(d.day(), static_cast<QuantLib::Month>(d.month()), d.year());
     return qd.serialNumber();
 }
